@@ -36,6 +36,10 @@ jobs:
         run: node build.js --hosted
 
       - uses: actions/configure-pages@v5
+        # Turns Pages on for the repo the first time, so there's no manual
+        # trip through Settings -> Pages.
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
