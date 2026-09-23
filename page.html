@@ -417,8 +417,17 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     // On a phone the rails sit below the feed, so don't bury them under 34 stories.
     var narrow = window.matchMedia('(max-width:860px)').matches;
     var cap = narrow && !state.expanded ? 12 : list.length;
-    var lead = list[0], rest = list.slice(1, cap);
-    var hidden = list.length - 1 - rest.length;
+
+    // The lead carries a full-width picture, so never lead with a story that
+    // has none - promote the best-ranked one in the top few that does.
+    var leadIdx = 0;
+    for (var i = 0; i < Math.min(6, list.length); i++) {
+      if (picture(list[i])) { leadIdx = i; break; }
+    }
+    var lead = list[leadIdx];
+    var others = list.filter(function (_, i) { return i !== leadIdx; });
+    var rest = others.slice(0, cap - 1);
+    var hidden = others.length - rest.length;
     var html = '<a class="lead" href="' + esc(lead.url) + '" target="_blank" rel="noopener">' +
       (picture(lead)
         ? '<figure><img src="' + esc(picture(lead)) + '" alt="" decoding="async" ' +
