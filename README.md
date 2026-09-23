@@ -20,6 +20,50 @@ node refresh.js --no-img                      # skip thumbnail resolution (fast)
 node check-links.js                           # verify every hand-curated link still resolves
 ```
 
+## Running it online (no Mac needed)
+
+The site is really just static output: `refresh.js` writes `data/live.json`, `page.html` reads
+it. So it can be built and published by CI with no machine of yours involved.
+
+`.github/workflows/refresh.yml` pulls the feeds and republishes every ~15 minutes
+(GitHub queues scheduled jobs, so treat that as *about* 15-20 minutes). To set it up:
+
+1. Create an empty repo on github.com.
+2. `git remote add origin <your repo url>` then `git push -u origin main`.
+3. In the repo: **Settings → Pages → Source → GitHub Actions**.
+4. **Actions → Refresh and publish → Run workflow** to publish immediately rather than
+   waiting for the next scheduled run.
+
+The site then lives at `https://<you>.github.io/<repo>/`.
+
+**Hosted mode ships no images.** `node refresh.js --hosted` keeps the publishers' own image
+URLs instead of caching copies, so nothing of theirs is re-hosted on your domain and the
+deploy is ~100KB rather than 7.5MB. Where a publisher blocks hotlinking, the page falls back
+to its generated tile. Locally the cached copies are still used, so the site works offline.
+
+The page knows which mode it is in — it reads `mode` from `live.json` and says "Wire updated"
+for a CI-refreshed site versus "Snapshot taken" for a frozen copy, rather than implying the
+feeds are live when they aren't.
+
+A GitHub Pages site is public. Nothing personal is in the published files (no name, email,
+paths or credentials), and the headlines and summaries come from publishers' own RSS. If you
+want it restricted to you, host the same `dist/` on Cloudflare Pages and put Cloudflare Access
+in front of it.
+
+### Starting automatically on your Mac
+
+`~/Library/LaunchAgents/com.abovetheline.server.plist` starts the local server at login and
+restarts it if it exits. Logs go to `~/Library/Logs/abovetheline/server.log`.
+
+```bash
+launchctl bootout  gui/$(id -u)/com.abovetheline.server   # stop and disable
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.abovetheline.server.plist
+launchctl kickstart -k gui/$(id -u)/com.abovetheline.server   # restart after a code change
+```
+
+This only helps on the Mac itself. It sleeps when the Mac sleeps — which is the reason to host
+it if you want it from work.
+
 ## If it stops working
 
 **`ERR_CONNECTION_REFUSED` / "localhost refused to connect"** means nothing is serving the
@@ -91,6 +135,7 @@ means the publisher is blocking scripted clients, not that the page is gone.
 
 ```
 page.html          the whole front end — markup, styles, behaviour
+build.js           wraps page.html into dist/ for deployment
 server.js          static server, /api/refresh, timed re-pull
 refresh.js         fetch → normalise → rank → cache images → data/live.json
 check-links.js     link verifier for data/curated.json
