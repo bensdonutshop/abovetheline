@@ -16,6 +16,7 @@ const P = require('./lib/parse');
 const { relevance, isOffTopic, isSponsored, isNonArticleUrl } = require('./lib/relevance');
 const { detectAccess, sourceAccess } = require('./lib/paywall');
 const { cluster } = require('./lib/cluster');
+const { kindOf, sectorOf, channelOf, SECTORS, CHANNELS } = require('./lib/classify');
 
 const ROOT = __dirname;
 const IMG_DIR = path.join(ROOT, 'public', 'img');
@@ -185,10 +186,19 @@ async function inspect(items) {
         .match(/<p[^>]*>[\s\S]*?<\/p>/g) || [])
         .join(' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       a.prose = prose.length;
+      // Classify on the article's own text - a headline alone cannot tell
+      // "Nike launches a film" from "Nike reviews its media account".
+      const body = prose.slice(0, 6000);
+      a.kind = kindOf(a.title, body);
+      a.sector = sectorOf(a.title, body);
+      a.channel = channelOf(a.title, body);
     } else {
       // The publisher refused us, so fall back to what we know about them.
       blocked++;
       a.access = sourceAccess(a.source);
+      a.kind = kindOf(a.title, a.summary);
+      a.sector = sectorOf(a.title, a.summary);
+      a.channel = channelOf(a.title, a.summary);
     }
   });
   log('  read', fetched, 'articles;', blocked, 'refused our fetcher (used source policy)');
@@ -304,6 +314,7 @@ function pruneImages(keep) {
     src: a.image || '',
     access: a.access || 'open',
     alsoIn: (a.alsoIn || []).slice(0, 3),
+    kind: a.kind || '', sector: a.sector || '', channel: a.channel || '',
     market: a.market || '', lang: a.lang
   });
 
@@ -312,6 +323,7 @@ function pruneImages(keep) {
     mode: HOSTED ? 'hosted' : 'local',
     counts: { global: buckets.global.length, europe: buckets.europe.length, nordic: buckets.nordic.length },
     policy: { paywalled: 'dropped', metered: KEEP_METERED ? 'kept and labelled' : 'dropped' },
+    facets: { sectors: SECTORS, channels: CHANNELS },
     sources: Array.from(new Set([].concat(buckets.global, buckets.europe, buckets.nordic)
               .map(a => a.source))).sort(),
     global: buckets.global.map(shape),

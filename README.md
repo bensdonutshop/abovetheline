@@ -103,6 +103,36 @@ Finnish trade press is the one genuine gap: *Markkinointi & Mainonta*, *Markkino
 and *Kauppalehti* publish no reachable feed, so Finland arrives through Finnish-language news
 searches plus the hand-checked list under **Landmark work**.
 
+## Filters
+
+Above the feed: **Everything / Campaign work / Industry / Media**, and when you pick Campaign
+work, **Industry** (the advertiser's sector) and **Media** (the channel) appear beneath it —
+the Ads of the World model, applied to a news feed. Every chip carries its own count, so you
+can see what a filter is worth before clicking it.
+
+`lib/classify.js` reads the article's own text, not just the headline. That matters: a
+headline cannot distinguish "Nike launches a film" from "Nike reviews its media account".
+The refresher already downloads each page to check its paywall, so the body text is free.
+
+**Coverage, measured on a real pull — not estimated:**
+
+| | |
+|---|---|
+| Kind (work / industry / media) | ~66% of stories |
+| Industry sector | ~54% of campaign work |
+| Media channel | ~33% of campaign work |
+
+Channel is the weak one, and honestly so: trade reporting frequently never says whether the
+work ran as film, print or out-of-home.
+
+Because of that, **nothing is ever hidden.** A story the classifier could not place is never
+silently dropped from a filtered view — it is offered at the foot of the list as *"+ N more we
+could not classify"*. A wrong guess costs you a click, not a story.
+
+Classification is lexicon-based and deliberately abstains when two categories score close
+together, which is why a third of stories stay unclassified rather than being confidently
+mislabelled.
+
 ## Paywalls
 
 Articles the publisher marks as subscriber-only never reach the page. The check is
@@ -183,6 +213,7 @@ lib/parse.js       RSS/Atom, article-card scrape, entity decoding, Bing unwrappi
 lib/relevance.js   campaign-relevance, off-topic, sponsored and non-article detection
 lib/paywall.js     per-article paywall detection, with per-source fallback
 lib/cluster.js     groups the same story across outlets, prefers the readable one
+lib/classify.js    kind / sector / channel classification from article text
 data/sources.json  feed roster and filter vocabulary
 data/curated.json  the hand-researched rails
 data/live.json     generated — the current wire
