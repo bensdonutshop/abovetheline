@@ -103,6 +103,45 @@ Finnish trade press is the one genuine gap: *Markkinointi & Mainonta*, *Markkino
 and *Kauppalehti* publish no reachable feed, so Finland arrives through Finnish-language news
 searches plus the hand-checked list under **Landmark work**.
 
+## Paywalls
+
+Articles the publisher marks as subscriber-only never reach the page. The check is
+**per article, not per masthead** — Ad Age, Adweek, Resumé and Dagens Media all publish a
+mix, so banning the title outright would throw away their open journalism along with the
+locked pieces.
+
+`lib/paywall.js` reads schema.org `isAccessibleForFree`, which publishers set for Google and
+is the most trustworthy signal available; it falls back to paywall markup, subscriber copy
+(English, Swedish, Finnish), and only then to a per-source policy, used for the handful of
+publishers that refuse our fetcher outright.
+
+Three outcomes:
+
+| | |
+|---|---|
+| `locked` | dropped before it reaches the page |
+| `metered` | kept, and labelled **Metered** in the byline so you know before clicking |
+| `open` | normal |
+
+Set `KEEP_METERED=false` to drop metered titles too.
+
+Also filtered out: sponsored and partner content — caught by URL path (`/sponsored/`,
+`/brandvoice/`, `/advertorial/`) as well as by copy, because publishers file commercial
+content under a giveaway path far more reliably than they label it — and pages with no
+article text at all, which is how section fronts and video stubs (`thedrum.com/tv`) get in.
+
+## The same story, from somewhere you can read it
+
+The trade press covers the same news repeatedly: an account win runs in Ad Age, Campaign and
+Marketing Dive the same morning under three different headlines. Exact-title de-duplication
+misses that completely.
+
+`lib/cluster.js` groups them by word overlap plus shared *named* parties — brands and
+agencies, ignoring the generic vocabulary ("campaign", "brand", "global") that every trade
+headline contains, which is what stops two unrelated stories merging just because both say
+"campaign". Within a group the version you can open wins; ties break on masthead, then on
+having a picture. The byline then reads "also in Ad Age".
+
 ## How stories are chosen
 
 `refresh.js` runs each item through:
@@ -141,7 +180,9 @@ refresh.js         fetch → normalise → rank → cache images → data/live.j
 check-links.js     link verifier for data/curated.json
 lib/fetch.js       HTTP with redirects, gzip, byte caps and hard deadlines
 lib/parse.js       RSS/Atom, article-card scrape, entity decoding, Bing unwrapping
-lib/relevance.js   campaign-relevance, off-topic and sponsored-post detection
+lib/relevance.js   campaign-relevance, off-topic, sponsored and non-article detection
+lib/paywall.js     per-article paywall detection, with per-source fallback
+lib/cluster.js     groups the same story across outlets, prefers the readable one
 data/sources.json  feed roster and filter vocabulary
 data/curated.json  the hand-researched rails
 data/live.json     generated — the current wire

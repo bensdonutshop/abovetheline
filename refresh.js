@@ -13,7 +13,9 @@ const path = require('path');
 const crypto = require('crypto');
 const { get, pool } = require('./lib/fetch');
 const P = require('./lib/parse');
-const { relevance, isOffTopic, isSponsored } = require('./lib/relevance');
+const { relevance, isOffTopic, isSponsored, isNonArticleUrl } = require('./lib/relevance');
+const { detectAccess, sourceAccess } = require('./lib/paywall');
+const { cluster } = require('./lib/cluster');
 
 const ROOT = __dirname;
 const IMG_DIR = path.join(ROOT, 'public', 'img');
@@ -24,7 +26,10 @@ const HOSTED = process.argv.indexOf('--hosted') >= 0;
 
 const MAX_AGE_DAYS = 21;
 const PER_COLUMN = { global: 34, europe: 34, nordic: 14 };
-const IMAGE_BUDGET = 64;       // articles we'll open just to find an og:image
+const INSPECT_BUDGET = 150;    // articles we open to read their picture and paywall state
+// 'locked' is always dropped. Set KEEP_METERED=false to drop metered titles
+// (Digiday, Marketing Week, Campaign UK) as well.
+const KEEP_METERED = process.env.KEEP_METERED !== 'false';
 const MAX_IMG_BYTES = 600 * 1024;
 
 const log = (...a) => console.log('[refresh]', ...a);
@@ -83,6 +88,8 @@ function normalise(it, f) {
 
   const title = cleanTitle(it.title, f.name);
   if (title.length < 12) return null;
+
+  if (isNonArticleUrl(url)) return null;
 
   const low = title.toLowerCase();
   if ((SRC.dropTitle || []).some(w => low.indexOf(w) >= 0)) return null;
@@ -159,16 +166,32 @@ function classify(a) {
 
 /* ------------------------------------------------------------------ images */
 
-async function resolveImages(items) {
-  const needs = items.filter(a => !a.image).slice(0, IMAGE_BUDGET);
-  log('resolving og:image for', needs.length, 'articles');
-  await pool(needs, 6, async a => {
-    const r = await get(a.url, { accept: 'text/html,application/xhtml+xml', timeout: 15000, maxBytes: 600 * 1024 });
+/*
+ * Open each candidate article once and take two things from it: the picture,
+ * and whether a reader can actually read it. One fetch, both answers.
+ */
+async function inspect(items) {
+  log('inspecting', items.length, 'articles for pictures and paywalls');
+  let fetched = 0, blocked = 0;
+  await pool(items, 8, async a => {
+    const r = await get(a.url, { accept: 'text/html,application/xhtml+xml', timeout: 15000, maxBytes: 700 * 1024 });
     if (r.ok && r.body) {
-      const img = P.ogImage(r.body);
-      if (img) a.image = img;
+      fetched++;
+      if (!a.image) { const img = P.ogImage(r.body); if (img) a.image = img; }
+      a.access = detectAccess(r.body) || sourceAccess(a.source);
+      // A real story has prose. Section fronts and video stubs do not, and no
+      // URL pattern catches all of them.
+      const prose = (r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, '')
+        .match(/<p[^>]*>[\s\S]*?<\/p>/g) || [])
+        .join(' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      a.prose = prose.length;
+    } else {
+      // The publisher refused us, so fall back to what we know about them.
+      blocked++;
+      a.access = sourceAccess(a.source);
     }
   });
+  log('  read', fetched, 'articles;', blocked, 'refused our fetcher (used source policy)');
 }
 
 function extOf(url, ctype) {
@@ -232,8 +255,28 @@ function pruneImages(keep) {
   all = all.filter(a => (a.region === 'nordic' ? a.rel >= 2 : a.rel > -1));
   log('after dedupe + relevance', all.length);
 
+  // Rank first, then look closely at only the plausible front-page candidates -
+  // opening every one of 500 articles would be slow and rude.
+  all.sort((x, y) => score(y, now) - score(x, now));
+  const candidates = all.slice(0, INSPECT_BUDGET);
+  await inspect(candidates);
+
+  const thin = candidates.filter(a => a.prose !== undefined && a.prose < 600);
+  if (thin.length) log('dropped', thin.length, 'pages with no article text (section fronts, video stubs)');
+
+  const before = candidates.length;
+  let pool2 = candidates.filter(a => !(a.prose !== undefined && a.prose < 600));
+  pool2 = pool2.filter(a => a.access !== 'locked');
+  const lockedOut = before - thin.length - pool2.length;
+  if (!KEEP_METERED) pool2 = pool2.filter(a => a.access !== 'metered');
+  log('dropped', lockedOut, 'paywalled articles' + (KEEP_METERED ? '' : ' (+ metered)'));
+
+  const preCluster = pool2.length;
+  pool2 = cluster(pool2);
+  log('clustered', preCluster, '->', pool2.length, 'distinct stories');
+
   const buckets = { global: [], europe: [], nordic: [] };
-  for (const a of all) {
+  for (const a of pool2) {
     const c = classify(a);
     if (c === 'nordic') buckets.nordic.push(a);
     else if (c === 'europe+nordic') { buckets.europe.push(a); buckets.nordic.push(a); }
@@ -250,10 +293,7 @@ function pruneImages(keep) {
   const picked = [].concat(buckets.global, buckets.europe, buckets.nordic);
   const unique = Array.from(new Set(picked));
 
-  if (!NO_IMG) {
-    await resolveImages(unique);
-    if (!HOSTED) await cacheImages(unique);
-  }
+  if (!NO_IMG && !HOSTED) await cacheImages(unique);
 
   // `thumb` is our local copy (used offline and in the sandboxed artifact);
   // `src` is the publisher's own URL, used when hosting, so we re-host nothing.
@@ -262,6 +302,8 @@ function pruneImages(keep) {
     summary: a.summary, ts: a.ts || null,
     thumb: HOSTED ? '' : (a.thumb || ''),
     src: a.image || '',
+    access: a.access || 'open',
+    alsoIn: (a.alsoIn || []).slice(0, 3),
     market: a.market || '', lang: a.lang
   });
 
@@ -269,7 +311,9 @@ function pruneImages(keep) {
     generatedAt: new Date().toISOString(),
     mode: HOSTED ? 'hosted' : 'local',
     counts: { global: buckets.global.length, europe: buckets.europe.length, nordic: buckets.nordic.length },
-    sources: Array.from(new Set(all.map(a => a.source))).sort(),
+    policy: { paywalled: 'dropped', metered: KEEP_METERED ? 'kept and labelled' : 'dropped' },
+    sources: Array.from(new Set([].concat(buckets.global, buckets.europe, buckets.nordic)
+              .map(a => a.source))).sort(),
     global: buckets.global.map(shape),
     europe: buckets.europe.map(shape),
     nordic: buckets.nordic.map(shape)

@@ -215,6 +215,11 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .tile b{font-family:var(--display); font-weight:800; font-stretch:72%; font-size:clamp(15px,26%,40px);
   letter-spacing:.02em; color:rgba(255,255,255,.94); text-transform:uppercase; z-index:1; text-align:center; padding:0 6px; line-height:1}
 
+.meter{display:inline-flex; align-items:center; gap:4px; font-family:var(--mono); font-size:9px;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3);
+  border:1px solid var(--rule); border-radius:2px; padding:1px 5px}
+.meter b{font-weight:400; color:var(--ink-3)}
+
 /* ============================================================ rail modules */
 .mod{margin-bottom:34px}
 .rank{display:grid; grid-template-columns:26px minmax(0,1fr); gap:11px; padding:11px 0;
@@ -401,8 +406,15 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
   function byline(item) {
     var t = ago(item.ts);
+    // Paywalled stories never reach the page; metered ones do, so say so
+    // rather than letting the reader find out by clicking.
+    var chip = item.access === 'metered'
+      ? '<span class="sep"></span><span class="meter">Metered</span>' : '';
+    var also = (item.alsoIn && item.alsoIn.length)
+      ? '<span class="sep"></span><span>also in ' + esc(item.alsoIn.join(', ')) + '</span>' : '';
     return '<div class="byline"><b>' + esc(item.source) + '</b>' +
-           (t ? '<span class="sep"></span><span>' + esc(t) + '</span>' : '') + '</div>';
+           (t ? '<span class="sep"></span><span>' + esc(t) + '</span>' : '') +
+           chip + also + '</div>';
   }
 
   /* -------------------------------------------------------------- feed */
@@ -604,8 +616,10 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       ((state.liveHost || (d && d.mode === 'hosted'))
         ? 'pulls the advertising trade press every few minutes and ranks it by '
         : 'is showing a saved pull of the advertising trade press, ranked by ') +
-      'recency, masthead and how squarely the story is about the work. Every headline links straight to the publisher — nothing is rewritten here, ' +
-      'and paywalled titles are left out of the rotation where an open alternative exists.</p>' +
+      'recency, masthead and how squarely the story is about the work. Every headline links straight to the publisher — nothing is rewritten here.</p>' +
+      '<p style="max-width:76ch;margin:0 0 10px">Articles the publisher marks as subscriber-only are dropped before they reach this page, ' +
+      'checked per article rather than per masthead — so a paywalled title\'s open journalism still gets through. Where the same story ran in ' +
+      'several outlets, the version you can actually read wins. Titles marked <span class="meter">Metered</span> allow a few free reads a month.</p>' +
       '<p style="max-width:76ch;margin:0 0 10px">On the wire right now: ' + srcs.map(esc).join(' · ') + '.</p>' +
       '<p style="margin:0">Cannes Lions case films are indexed by <a href="https://www.lovetheworkmore.com" target="_blank" rel="noopener">lovetheworkmore.com</a>. ' +
       'Rankings in the right-hand rails were compiled ' + esc(c ? c.generated : '') + ' and are reviewed by hand.</p>';
