@@ -1,0 +1,358 @@
+{
+  "generated": "2026-09-23",
+  "topics": [
+    {
+      "rank": 1,
+      "kicker": "Holding companies",
+      "headline": "The Omnicom–IPG integration bill lands",
+      "ingress": "Nine months after the deal closed, the restructuring is no longer theoretical. Roughly 4,000 roles have gone, DDB and MullenLowe have been rolled into TBWA and FCB folded into BBDO, leaving the world's largest group running on three creative networks where there were six. Rivals are still picking over the talent.",
+      "url": "https://www.storyboard18.com/brand-makers/layoffs-rival-narratives-and-culture-questions-inside-omnicoms-integration-of-ipg-ws-l-92465.htm",
+      "source": "Storyboard18"
+    },
+    {
+      "rank": 2,
+      "kicker": "Platforms",
+      "headline": "ChatGPT becomes an ad platform in earnest",
+      "ingress": "OpenAI shipped eight changes to ChatGPT Ads over the summer — conversion-optimised campaigns, rolling seven-day budgets, geographic exclusions and automatic advanced matching. The question media agencies are now asked in every pitch is what a media plan looks like when the answer engine is also the inventory.",
+      "url": "https://www.jumpfly.com/blog/ai-in-online-advertising-5-key-trends-from-july-2026/",
+      "source": "JumpFly"
+    },
+    {
+      "rank": 3,
+      "kicker": "Agency economics",
+      "headline": "The bypass problem nobody wants to say out loud",
+      "ingress": "Amazon, Google and Meta have now automated targeting, creative optimisation and performance reporting far enough that a straightforward direct-response advertiser can skip the agency entirely. The live debate inside networks is not whether that is true, but where agency value sits in three to five years.",
+      "url": "https://www.jpmorgan.com/insights/banking/commercial-banking/how-advertising-agencies-compete-in-2026-ai-and-platforms",
+      "source": "J.P. Morgan"
+    },
+    {
+      "rank": 4,
+      "kicker": "Creative strategy",
+      "headline": "Honesty became the default brand position",
+      "ingress": "The strongest brand work of the first half of 2026 shared a posture rather than a category: Dove publishing unedited Reddit reviews, Aerie refusing AI imagery outright, Burger King retiring its own mascot. The open question for the second half is whether audiences read it as candour or as a new kind of polish.",
+      "url": "https://www.marketingdive.com/news/best-brand-campaigns-h1-2026-sold-honesty-consumers-buying/819960/",
+      "source": "Marketing Dive"
+    },
+    {
+      "rank": 5,
+      "kicker": "Search & performance",
+      "headline": "Google's AI Max migration stops being optional",
+      "ingress": "From 1 September Google began automatically moving campaign-level Broad Match and legacy Automatically Created Assets campaigns onto AI Max, rolling out through the month. Performance teams spent the summer rebuilding account structures around a system they cannot opt out of.",
+      "url": "https://twooctobers.com/blog/digital-marketing-updates-july-2026/",
+      "source": "Two Octobers"
+    },
+    {
+      "rank": 6,
+      "kicker": "Retail media",
+      "headline": "Retail media starts selling creative, not just inventory",
+      "ingress": "Albertsons and Walmart have rewritten the pitch. Instead of audiences and impressions, they are selling branded content and creative services built on first-party data — Albertsons aired a 22-episode series with Procter & Gamble in June. It puts grocers into direct competition with the agencies on their own roster.",
+      "url": "https://www.adweek.com/commerce/retail-medias-next-evolution-getting-into-content/",
+      "source": "Adweek"
+    },
+    {
+      "rank": 7,
+      "kicker": "Marketing leadership",
+      "headline": "Ritson: the CMO job shrank, so the title grew",
+      "ingress": "Mark Ritson's argument that the proliferating C-suite acronyms — CGO, CCO, CXO — are compensation for a role that has lost scope became the summer's most-forwarded column. It landed in a year when marketing budgets moved toward platforms that require no marketer to operate them.",
+      "url": "https://www.thedrum.com/opinion/mark-ritson-cmo-titles-are-getting-longer-as-marketing-gets-smaller",
+      "source": "The Drum"
+    },
+    {
+      "rank": 8,
+      "kicker": "Awards",
+      "headline": "Cannes 2026 and the jury room's AI reckoning",
+      "ingress": "Thirty-four Grand Prix across 32 categories, and a festival where the Film Grand Prix went to an AI company advertising that it would not put ads in its own product. Juries spent as much time on provenance and disclosure as on craft, and the debate has followed the industry home.",
+      "url": "https://www.creativereview.co.uk/cannes-lions-2026-all-the-grand-prix-winners/",
+      "source": "Creative Review"
+    },
+    {
+      "rank": 9,
+      "kicker": "Production",
+      "headline": "Generative tools move from the pitch to the deliverable",
+      "ingress": "Meta's Muse Image, launched in July, parses a creative brief and produces on-brand variations inside Advantage+. Production shops that spent 2025 arguing about whether to use generative imagery spent this summer arguing about how to price it.",
+      "url": "https://www.forbes.com/sites/gabrielalinzainescu/2026/07/08/metas-new-image-model-is-competing-for-ad-budgets/",
+      "source": "Forbes"
+    },
+    {
+      "rank": 10,
+      "kicker": "Brand safety",
+      "headline": "Converse pulls an ad the brief never saw coming",
+      "ingress": "A Chuck 70 X image with Karina of aespa was read online as KKK and lynching imagery within hours. Converse pulled it and apologised on 19 September. It is the recurring shape of 2026 brand-safety incidents: not media adjacency, but interpretation at speed, in public, long before any agency has cleared a statement.",
+      "url": "https://www.cnn.com/2026/09/20/us/converse-ad-controversy-hnk",
+      "source": "CNN"
+    }
+  ],
+  "campaigns12m": [
+    {
+      "rank": 1,
+      "campaign": "Can I Get a Six Pack Quickly?",
+      "brand": "Claude / Anthropic",
+      "agency": "Mother London",
+      "note": "Super Bowl LX debut that ribbed rivals for putting ads in chatbots. Took the Film Grand Prix at Cannes four months later.",
+      "url": "https://techcrunch.com/2026/02/08/super-bowl-60-ai-ads-svedka-anthropic-brands-commercials/",
+      "source": "TechCrunch"
+    },
+    {
+      "rank": 2,
+      "campaign": "Haven",
+      "brand": "Suncorp Insurance",
+      "agency": "Leo Australia",
+      "note": "Natural-disaster risk data turned into a homeowner tool. Dan Wieden Titanium Grand Prix.",
+      "url": "https://lbbonline.com/news/Cannes-Lions-2026-Grand-Prix-Winners-in-Glass-The-Lion-for-Change-Sustainable-Development-Goals-Film-Dan-Wieden-Titanium-Lions-and-Grand-Prix-for-Good",
+      "source": "LBBOnline"
+    },
+    {
+      "rank": 3,
+      "campaign": "Expedition Impossible",
+      "brand": "Columbia Sportswear",
+      "agency": "adam&eveDDB",
+      "note": "A flat-earther sent to the edge of the world in Columbia kit. Brand Experience & Activation Grand Prix.",
+      "url": "https://www.creativereview.co.uk/cannes-lions-2026-all-the-grand-prix-winners/",
+      "source": "Creative Review"
+    },
+    {
+      "rank": 4,
+      "campaign": "New Home",
+      "brand": "Google",
+      "agency": "Google",
+      "note": "Gemini image generation shown through a mother and son. Ranked the most effective ad of Super Bowl LX by Kellogg.",
+      "url": "https://www.cbsnews.com/news/best-worst-super-bowl-commercials-2026/",
+      "source": "CBS News"
+    },
+    {
+      "rank": 5,
+      "campaign": "Dove r/eal reviews",
+      "brand": "Dove",
+      "agency": "David London",
+      "note": "The first fifty unfiltered Reddit reviews of Dove products, run as the advertising.",
+      "url": "https://www.marketingdive.com/news/why-dove-turned-reddit-product-feedback-into-a-real-world-campaign/814523/",
+      "source": "Marketing Dive"
+    },
+    {
+      "rank": 6,
+      "campaign": "The Pub That Refused to Die",
+      "brand": "Heineken",
+      "agency": "LePub Milan",
+      "note": "Creative Strategy Grand Prix, and the case study most quoted in strategy departments this year.",
+      "url": "https://www.creativereview.co.uk/cannes-lions-2026-all-the-grand-prix-winners/",
+      "source": "Creative Review"
+    },
+    {
+      "rank": 7,
+      "campaign": "America250",
+      "brand": "Coca-Cola",
+      "agency": "Coca-Cola",
+      "note": "The 1971 Hilltop song rebuilt for the US semiquincentennial — and argued about for weeks.",
+      "url": "https://www.marketingdive.com/news/coca-cola-says-id-like-to-buy-america-a-coke-in-america250-campaign/816694/",
+      "source": "Marketing Dive"
+    },
+    {
+      "rank": 8,
+      "campaign": "Bad Bunny Halftime Show — Shot on iPhone",
+      "brand": "Apple",
+      "agency": "Apple",
+      "note": "The halftime show filmed entirely on the product, then cut as the campaign.",
+      "url": "https://lbbonline.com/news/Apple-Bad-Bunny-Super-Bowl-Halftime-Show-Shot-on-iPhone",
+      "source": "LBBOnline"
+    },
+    {
+      "rank": 9,
+      "campaign": "There's A New King And It's You",
+      "brand": "Burger King",
+      "agency": "OKRP",
+      "note": "Burger King retired its own mascot on Oscars night and handed the crown to the customer.",
+      "url": "https://www.marketingdive.com/news/best-brand-campaigns-h1-2026-sold-honesty-consumers-buying/819960/",
+      "source": "Marketing Dive"
+    },
+    {
+      "rank": 10,
+      "campaign": "IShowSpeed × Expedia",
+      "brand": "Expedia",
+      "agency": "In-house",
+      "note": "A 150-million-follower creator livestreaming five countries, with every moment instantly bookable.",
+      "url": "https://www.expedia.com/newsroom/expedia-and-ishowspeed-launch-shoppable-travel-experience-where-every-moment-is-instantly-bookable/",
+      "source": "Expedia"
+    }
+  ],
+  "cannes2026": [
+    {
+      "rank": 1,
+      "award": "Titanium Grand Prix",
+      "campaign": "Haven",
+      "brand": "Suncorp Insurance",
+      "agency": "Leo Sydney",
+      "url": "https://www.youtube.com/watch?v=Pwf50R9flkU"
+    },
+    {
+      "rank": 2,
+      "award": "Brand Experience & Activation",
+      "campaign": "Expedition Impossible",
+      "brand": "Columbia Sportswear",
+      "agency": "adam&eveDDB",
+      "url": "https://www.youtube.com/watch?v=N0WxAUkBuQA"
+    },
+    {
+      "rank": 3,
+      "award": "Film Grand Prix",
+      "campaign": "Can I Get a Six Pack Quickly?",
+      "brand": "Claude",
+      "agency": "Mother London",
+      "url": "https://www.youtube.com/watch?v=NuEXYfbV_PA"
+    },
+    {
+      "rank": 4,
+      "award": "Grand Prix for Good",
+      "campaign": "600K Network",
+      "brand": "Comando Con Venezuela",
+      "agency": "Rainbow Lobster Mexico",
+      "url": "https://www.youtube.com/watch?v=k2U1G8xCYus"
+    },
+    {
+      "rank": 5,
+      "award": "Creative Strategy Grand Prix",
+      "campaign": "The Pub That Refused to Die",
+      "brand": "Heineken",
+      "agency": "LePub Milan",
+      "url": "https://vimeo.com/1190924385"
+    },
+    {
+      "rank": 6,
+      "award": "Creative B2B Grand Prix",
+      "campaign": "The Faroe Islands Space Program",
+      "brand": "SKF",
+      "agency": "Nord DDB Stockholm",
+      "url": "https://youtu.be/I182TbpuV0U"
+    },
+    {
+      "rank": 7,
+      "award": "Glass: The Lion for Change",
+      "campaign": "Nigrum Corpus",
+      "brand": "IDOMED",
+      "agency": "Artplan São Paulo",
+      "url": "https://vimeo.com/1089083708"
+    },
+    {
+      "rank": 8,
+      "award": "Innovation Grand Prix",
+      "campaign": "Supernova Adaptive",
+      "brand": "adidas",
+      "agency": "TBWA\\Toronto",
+      "url": "https://vimeo.com/1203657943"
+    },
+    {
+      "rank": 9,
+      "award": "Design Grand Prix",
+      "campaign": "Apple TV Rebrand",
+      "brand": "Apple TV",
+      "agency": "TBWA\\Media Arts Lab",
+      "url": "https://www.youtube.com/watch?v=MWfJcl8deLE"
+    },
+    {
+      "rank": 10,
+      "award": "Media Grand Prix",
+      "campaign": "Build Your Own Super Bowl Commercial",
+      "brand": "Uber Eats",
+      "agency": "Special Los Angeles",
+      "url": "https://vimeo.com/1204133679"
+    },
+    {
+      "rank": 11,
+      "award": "Titanium",
+      "campaign": "Oreo Cows",
+      "brand": "Oreo",
+      "agency": "VML New York",
+      "url": "https://www.youtube.com/watch?v=F2EjJgR0adE"
+    },
+    {
+      "rank": 12,
+      "award": "Creative Business Transformation",
+      "campaign": "The Wedding Rice",
+      "brand": "Wikifarmer",
+      "agency": "McCann Athens",
+      "url": "https://www.youtube.com/watch?v=Xop6AbopFeQ"
+    }
+  ],
+  "nordicSeed": [
+    {
+      "market": "SE",
+      "campaign": "Sweden (not Switzerland)",
+      "brand": "Visit Sweden",
+      "agency": "Forsman & Bodenfors + Mindshare",
+      "note": "The most awarded campaign at Guldägget 2026 — two golds and two silvers.",
+      "url": "https://corporate.visitsweden.com/press/Kampanjen-om-Sverige-%C3%A5rets-mest-prisade/",
+      "source": "Visit Sweden"
+    },
+    {
+      "market": "SE",
+      "campaign": "The Faroe Islands Space Program",
+      "brand": "SKF",
+      "agency": "Nord DDB Stockholm",
+      "note": "Creative B2B Grand Prix at Cannes 2026 — bearings, in orbit.",
+      "url": "https://youtu.be/I182TbpuV0U",
+      "source": "Love The Work More"
+    },
+    {
+      "market": "SE",
+      "campaign": "The Swedish Prescription",
+      "brand": "Visit Sweden",
+      "agency": "Prime Weber Shandwick Stockholm",
+      "note": "Nature prescribed as medicine. A Cannes 2026 Lion winner.",
+      "url": "https://vimeo.com/1157558881",
+      "source": "Love The Work More"
+    },
+    {
+      "market": "SE",
+      "campaign": "The Volvo Cars Safety Standard",
+      "brand": "Volvo Cars",
+      "agency": "Volvo Gothenburg",
+      "note": "Volvo published its own safety research as an open standard, then advertised the act.",
+      "url": "https://youtu.be/jL3XxEk0HX0",
+      "source": "Love The Work More"
+    },
+    {
+      "market": "SE",
+      "campaign": "Guldägget 2026 — the full winners list",
+      "brand": "Sveriges Kommunikationsbyråer",
+      "agency": "—",
+      "note": "Every gold, silver and diploma from Sweden's oldest creative award.",
+      "url": "https://guldagget.se/",
+      "source": "Guldägget"
+    },
+    {
+      "market": "FI",
+      "campaign": "Oodi suomalaiselle ruoalle",
+      "brand": "Atria",
+      "agency": "TBWA\\Helsinki",
+      "note": "Took over 60% of the public vote in Greenpeace's Vuoden Huiputus — Finland's greenwashing anti-award. The year's most argued-about Finnish campaign.",
+      "url": "https://www.greenpeace.org/finland/tiedotteet/greenpeace/vuoden-huiputus-kilpailun-ylivoimaiseksi-voittajaksi-atrian-ja-arman-alizadin-lihantuotantoa-markkinoiva-sarja-oodi-suomalaiselle-ruoalle/",
+      "source": "Greenpeace Suomi"
+    },
+    {
+      "market": "FI",
+      "campaign": "Kuule metsä puilta",
+      "brand": "Metsien Suomi",
+      "agency": "—",
+      "note": "Gold in Audio at Vuoden Huiput 2026, announced 23 April.",
+      "url": "https://metsiensuomi.fi/metsien-suomen-radiomainos-voitti-kultaa-vuoden-huiput-kilpailussa/",
+      "source": "Metsien Suomi"
+    },
+    {
+      "market": "FI",
+      "campaign": "Vuoden Huiput 2026",
+      "brand": "Grafia",
+      "agency": "—",
+      "note": "The 46th edition of Finland's benchmark advertising and design competition.",
+      "url": "https://vuodenhuiput.fi/en/",
+      "source": "Vuoden Huiput"
+    },
+    {
+      "market": "FI",
+      "campaign": "Hän",
+      "brand": "Ministry for Foreign Affairs",
+      "agency": "—",
+      "note": "The Finnish pronoun campaign that took the Vuoden Huiput Grand Prix — still the reference point every Finnish nation-brand brief is measured against.",
+      "url": "https://um.fi/news/-/asset_publisher/GRSnUwaHDPv5/content/h-c3-a4n-kampanjalle-my-c3-b6nnettiin-vuoden-huippujen-p-c3-a4-c3-a4palkinto/35732",
+      "source": "Ministry for Foreign Affairs"
+    }
+  ]
+}

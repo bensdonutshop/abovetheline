@@ -1,0 +1,7 @@
+dist/
+public/img/
+data/live.json
+data/live.json.tmp
+.port
+node_modules/
+.DS_Store

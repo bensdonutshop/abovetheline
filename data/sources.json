@@ -1,0 +1,318 @@
+{
+  "_note": "Adapters: rss = publisher's own feed (carries images). bing = Bing News RSS, used for publishers that block non-browser clients on their own feeds; the real publisher URL is decoded from the wrapper. html = article-card scrape.",
+  "feeds": [
+    {
+      "id": "adweek",
+      "name": "Adweek",
+      "adapter": "rss",
+      "url": "https://www.adweek.com/feed/",
+      "region": "global",
+      "weight": 10
+    },
+    {
+      "id": "muse",
+      "name": "Muse by Clio",
+      "adapter": "rss",
+      "url": "https://musebycl.io/rss.xml",
+      "region": "global",
+      "weight": 9
+    },
+    {
+      "id": "marketingdive",
+      "name": "Marketing Dive",
+      "adapter": "rss",
+      "url": "https://www.marketingdive.com/feeds/news/",
+      "region": "global",
+      "weight": 8
+    },
+    {
+      "id": "digiday",
+      "name": "Digiday",
+      "adapter": "rss",
+      "url": "https://digiday.com/feed/",
+      "region": "global",
+      "weight": 7
+    },
+    {
+      "id": "adland",
+      "name": "Adland",
+      "adapter": "rss",
+      "url": "https://www.adland.tv/rss.xml",
+      "region": "global",
+      "weight": 6
+    },
+    {
+      "id": "adexchanger",
+      "name": "AdExchanger",
+      "adapter": "rss",
+      "url": "https://www.adexchanger.com/feed/",
+      "region": "global",
+      "weight": 5
+    },
+    {
+      "id": "brandingasia",
+      "name": "Branding in Asia",
+      "adapter": "rss",
+      "url": "https://www.brandinginasia.com/feed/",
+      "region": "global",
+      "weight": 5
+    },
+    {
+      "id": "wersm",
+      "name": "WERSM",
+      "adapter": "rss",
+      "url": "https://www.wersm.com/feed/",
+      "region": "global",
+      "weight": 3
+    },
+    {
+      "id": "creativereview",
+      "name": "Creative Review",
+      "adapter": "rss",
+      "url": "https://www.creativereview.co.uk/feed/",
+      "region": "europe",
+      "weight": 10
+    },
+    {
+      "id": "marketingweek",
+      "name": "Marketing Week",
+      "adapter": "rss",
+      "url": "https://www.marketingweek.com/feed/",
+      "region": "europe",
+      "weight": 9
+    },
+    {
+      "id": "moreabout",
+      "name": "More About Advertising",
+      "adapter": "rss",
+      "url": "https://www.moreaboutadvertising.com/feed/",
+      "region": "europe",
+      "weight": 6
+    },
+    {
+      "id": "resume",
+      "name": "Resumé",
+      "adapter": "rss",
+      "url": "https://www.resume.se/rss.xml",
+      "region": "europe",
+      "weight": 8,
+      "market": "SE",
+      "lang": "sv"
+    },
+    {
+      "id": "dagensmedia",
+      "name": "Dagens Media",
+      "adapter": "rss",
+      "url": "https://www.dagensmedia.se/rss.xml",
+      "region": "europe",
+      "weight": 8,
+      "market": "SE",
+      "lang": "sv"
+    },
+    {
+      "id": "dagensanalys",
+      "name": "Dagens Analys",
+      "adapter": "rss",
+      "url": "https://www.dagensanalys.se/feed/",
+      "region": "europe",
+      "weight": 4,
+      "market": "SE",
+      "lang": "sv"
+    },
+    {
+      "id": "csalon",
+      "name": "Creative Salon",
+      "adapter": "html",
+      "url": "https://creative.salon/",
+      "region": "europe",
+      "weight": 9,
+      "base": "https://creative.salon",
+      "linkFilter": "/articles/"
+    },
+    {
+      "id": "adage",
+      "name": "Ad Age",
+      "adapter": "bing",
+      "region": "global",
+      "weight": 10,
+      "queries": [
+        "site:adage.com",
+        "site:adage.com campaign",
+        "site:adage.com agency"
+      ]
+    },
+    {
+      "id": "lbb",
+      "name": "LBBOnline",
+      "adapter": "bing",
+      "region": "global",
+      "weight": 8,
+      "queries": [
+        "site:lbbonline.com",
+        "site:lbbonline.com campaign"
+      ]
+    },
+    {
+      "id": "drum",
+      "name": "The Drum",
+      "adapter": "bing",
+      "region": "global",
+      "weight": 9,
+      "queries": [
+        "site:thedrum.com",
+        "site:thedrum.com advertising",
+        "site:thedrum.com brand"
+      ]
+    },
+    {
+      "id": "campaignuk",
+      "name": "Campaign UK",
+      "adapter": "bing",
+      "region": "europe",
+      "weight": 10,
+      "queries": [
+        "site:campaignlive.co.uk advertising",
+        "site:campaignlive.co.uk campaign",
+        "site:campaignlive.co.uk agency"
+      ]
+    },
+    {
+      "id": "shots",
+      "name": "shots",
+      "adapter": "bing",
+      "region": "europe",
+      "weight": 6,
+      "queries": [
+        "site:shots.net"
+      ]
+    },
+    {
+      "id": "bing-fi",
+      "name": "Finland",
+      "adapter": "bing",
+      "region": "nordic",
+      "weight": 7,
+      "market": "FI",
+      "lang": "fi",
+      "queries": [
+        "mainoskampanja",
+        "mainostoimisto kampanja",
+        "brändi markkinointi kampanja",
+        "mainonta luova toimisto",
+        "markkinointijohtaja brändi"
+      ]
+    },
+    {
+      "id": "bing-se",
+      "name": "Sweden",
+      "adapter": "bing",
+      "region": "nordic",
+      "weight": 7,
+      "market": "SE",
+      "lang": "sv",
+      "queries": [
+        "reklamkampanj",
+        "reklambyrå kampanj",
+        "varumärke ny kampanj",
+        "mediebyrå kampanj",
+        "marknadschef varumärke"
+      ]
+    }
+  ],
+  "nordicAllow": [
+    "resume.se",
+    "dagensmedia.se",
+    "marmai.fi",
+    "markkinointiuutiset.fi",
+    "kauppalehti.fi",
+    "talouselama.fi",
+    "dagensanalys.se",
+    "epressi.com",
+    "sttinfo.fi",
+    "cision.com",
+    "mynewsdesk.com",
+    "mtvuutiset.fi",
+    "yle.fi",
+    "is.fi",
+    "hs.fi",
+    "di.se",
+    "breakit.se",
+    "kntnt.se",
+    "medievarlden.se",
+    "journalisten.se",
+    "hurbra.se",
+    "mediaviikko.fi",
+    "adnews.se",
+    "aamuposti.fi",
+    "iltalehti.fi",
+    "expressen.se",
+    "dn.se",
+    "svd.se",
+    "dagensps.se",
+    "market.se",
+    "habit.se",
+    "resumepremium.se"
+  ],
+  "dropTitle": [
+    "election",
+    "senate race",
+    "congress",
+    "campaign trail",
+    "political ad",
+    "governor",
+    "ballot",
+    "primary race",
+    "attack ad",
+    "vaalit",
+    "eduskuntavaalit",
+    "riksdagsval",
+    "valkampanj"
+  ],
+  "europeHints": [
+    "uk",
+    "britain",
+    "british",
+    "london",
+    "europe",
+    "european",
+    "eu ",
+    "germany",
+    "german",
+    "berlin",
+    "france",
+    "french",
+    "paris",
+    "spain",
+    "spanish",
+    "madrid",
+    "italy",
+    "italian",
+    "milan",
+    "netherlands",
+    "dutch",
+    "amsterdam",
+    "sweden",
+    "swedish",
+    "stockholm",
+    "norway",
+    "norwegian",
+    "oslo",
+    "denmark",
+    "danish",
+    "copenhagen",
+    "finland",
+    "finnish",
+    "helsinki",
+    "poland",
+    "polish",
+    "ireland",
+    "irish",
+    "dublin",
+    "belgium",
+    "portugal",
+    "switzerland",
+    "austria",
+    "greece",
+    "czech"
+  ]
+}

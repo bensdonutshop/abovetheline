@@ -1,0 +1,12 @@
+{
+  "name": "above-the-line",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A live front page for the advertising trade press.",
+  "scripts": {
+    "start": "node server.js",
+    "refresh": "node refresh.js",
+    "check-links": "node check-links.js"
+  },
+  "engines": { "node": ">=18" }
+}
