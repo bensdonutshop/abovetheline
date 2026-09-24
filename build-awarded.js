@@ -20,6 +20,11 @@ const { placeOf } = require('./lib/places');
 const { sectorOf } = require('./lib/classify');
 
 const SRC_URL = 'https://lovetheworkmore.com/2026-2/';
+const CANNES_YEAR = 2026;                 // the index page this is scraped from
+// Which edition of each show these results belong to. Vuoden Huiput 2025 was
+// judged and awarded at the April 2026 gala, so the competition year is 2025.
+const SHOW_YEARS = { 'Cannes Lions': 2026, 'D&AD': 2026, 'Clio': 2026,
+                     'Eurobest': 2025, 'Guld\u00e4gget': 2026, 'Vuoden Huiput': 2025 };
 const LEVELS = { 'GRAND PRIX / TITANIUM': 'Grand Prix', 'GOLD': 'Gold', 'SILVER': 'Silver', 'BRONZE': 'Bronze' };
 const WANT = process.argv.indexOf('--all') >= 0
   ? ['Grand Prix', 'Gold', 'Silver', 'Bronze']
@@ -123,6 +128,7 @@ function cleanCategory(c) {
       url: t.href.replace(/&amp;/g, '&'),
       awards: [{
         show: 'Cannes Lions',
+        year: CANNES_YEAR,
         level: e.category && /GRAND PRIX/i.test(e.category) ? 'Grand Prix'
              : e.category && /TITANIUM/i.test(e.category) ? 'Titanium' : level,
         category: e.category ? noDash(titleCaseCampaign(cleanCategory(e.category)) || 'Titanium') : ''
@@ -140,11 +146,13 @@ function cleanCategory(c) {
       if (hit) {
         x.awards.forEach(a => {
           if (a.show === 'Cannes Lions') return;           // already have it from the index
+          if (!a.year) a.year = SHOW_YEARS[a.show];
           hit.awards.push(a);
         });
         if (x.blurb) hit.blurb = x.blurb;
         merged++;
       } else {
+        x.awards.forEach(a => { if (!a.year) a.year = SHOW_YEARS[a.show]; });
         out.push(Object.assign({
           region: placeOf(x.agency).region,
           country: placeOf(x.agency).country || x.country,

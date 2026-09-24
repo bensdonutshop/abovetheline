@@ -2,7 +2,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314110E'/%3E%3Crect x='6' y='12' width='20' height='3.4' rx='1.4' fill='%23FF4D0F'/%3E%3Crect x='6' y='18.5' width='13' height='3.4' rx='1.4' fill='%23F2EEE8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=Syne:wght@700&display=swap">
 
 <style>
 /* ============================================================ tokens */
@@ -23,7 +23,7 @@
 
   /* One family. Hierarchy comes from weight and size, not from a second face. */
   --display:"Schibsted Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif;
-  --masthead:var(--display);
+  --masthead:"Syne","Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
   --body:var(--display);
   --mono:var(--display);
 
@@ -107,8 +107,8 @@ html{scroll-behavior:smooth}
   box-shadow:0 10px 30px -12px rgba(212,22,15,.45);
 }
 .logo{
-  margin:0; font-family:var(--masthead); font-weight:900;
-  font-size:clamp(36px, 9vw, 116px); line-height:.82; letter-spacing:-.045em;
+  margin:0; font-family:var(--masthead); font-weight:700;
+  font-size:clamp(34px, 8.4vw, 108px); line-height:.9; letter-spacing:-.03em;
   white-space:nowrap;
 }
 .dateline{

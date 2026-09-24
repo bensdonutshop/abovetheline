@@ -12,17 +12,20 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Creative Effectiveness"
+          "category": "Creative Effectiveness",
+          "year": 2026
         },
         {
           "show": "D&AD",
           "level": "Black Pencil",
-          "category": "Impact"
+          "category": "Impact",
+          "year": 2026
         },
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Impact"
+          "category": "Impact",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/pY-03zuV7mE/maxresdefault.jpg"
@@ -38,17 +41,20 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Film Craft"
+          "category": "Film Craft",
+          "year": 2026
         },
         {
           "show": "D&AD",
           "level": "Black Pencil",
-          "category": "Visual Effects"
+          "category": "Visual Effects",
+          "year": 2026
         },
         {
           "show": "D&AD",
           "level": "Black Pencil",
-          "category": "Production Design"
+          "category": "Production Design",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/HQJMzTpckPo/maxresdefault.jpg"
@@ -64,12 +70,14 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Creative Business Transformation"
+          "category": "Creative Business Transformation",
+          "year": 2026
         },
         {
           "show": "Eurobest",
           "level": "Grand Prix",
-          "category": "Creative Commerce"
+          "category": "Creative Commerce",
+          "year": 2025
         }
       ],
       "thumb": "https://i.ytimg.com/vi/Xop6AbopFeQ/maxresdefault.jpg"
@@ -85,12 +93,14 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Pharma"
+          "category": "Pharma",
+          "year": 2026
         },
         {
           "show": "D&AD",
           "level": "Black Pencil",
-          "category": "Art Direction"
+          "category": "Art Direction",
+          "year": 2026
         }
       ],
       "thumb": "https://www.dandad.org/images/social.jpg"
@@ -106,7 +116,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Dan Wieden Titanium"
+          "category": "Dan Wieden Titanium",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/Pwf50R9flkU/maxresdefault.jpg"
@@ -122,7 +133,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Film"
+          "category": "Film",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/NuEXYfbV_PA/maxresdefault.jpg"
@@ -138,7 +150,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Brand Experience & Activation"
+          "category": "Brand Experience & Activation",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/N0WxAUkBuQA/maxresdefault.jpg"
@@ -154,22 +167,26 @@
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Branded Entertainment"
+          "category": "Branded Entertainment",
+          "year": 2026
         },
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Creative Disruption"
+          "category": "Creative Disruption",
+          "year": 2026
         },
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Out of Home"
+          "category": "Out of Home",
+          "year": 2026
         },
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Social Media"
+          "category": "Social Media",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/sFLMnLf2HeI/maxresdefault.jpg"
@@ -185,17 +202,20 @@
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Creative Strategy"
+          "category": "Creative Strategy",
+          "year": 2026
         },
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Direct"
+          "category": "Direct",
+          "year": 2026
         },
         {
           "show": "Clio",
           "level": "Grand Clio",
-          "category": "Use of Influencers"
+          "category": "Use of Influencers",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/hzq9lR5SsNo/maxresdefault.jpg"
@@ -211,12 +231,14 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix for Good",
-          "category": "Grand Prix for Good"
+          "category": "Grand Prix for Good",
+          "year": 2026
         },
         {
           "show": "Cannes Lions",
           "level": "Titanium",
-          "category": "Titanium"
+          "category": "Titanium",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/k2U1G8xCYus/maxresdefault.jpg"
@@ -232,7 +254,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Creative Strategy"
+          "category": "Creative Strategy",
+          "year": 2026
         }
       ],
       "thumb": "https://i.vimeocdn.com/video/2155814097-092d164d02bb3cda5e592c1ef41ef49c36f46dc229f43c3507f4b18f3bf95508-d_1280?region=us"
@@ -248,7 +271,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Creative B2B"
+          "category": "Creative B2B",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/I182TbpuV0U/maxresdefault.jpg"
@@ -264,7 +288,8 @@
         {
           "show": "Eurobest",
           "level": "Grand Prix",
-          "category": "Creative Effectiveness"
+          "category": "Creative Effectiveness",
+          "year": 2025
         }
       ],
       "source": "The North Alliance",
@@ -281,7 +306,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Glass: The Lion for Change"
+          "category": "Glass: The Lion for Change",
+          "year": 2026
         }
       ],
       "thumb": "https://i.vimeocdn.com/video/2023991376-d58aa00f200bd640721328f44ed4cc45269d2d00b4d872bc7a9730f2a1274174-d_1280?region=us"
@@ -297,7 +323,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Innovation"
+          "category": "Innovation",
+          "year": 2026
         }
       ],
       "thumb": "https://i.vimeocdn.com/video/2171775447-d10a53e0927f743cd451bf7f0c716dce31ce379b5aa5514c19ec87f4638339d7-d_1280?region=us"
@@ -313,7 +340,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Design"
+          "category": "Design",
+          "year": 2026
         }
       ]
     },
@@ -328,7 +356,8 @@
         {
           "show": "Cannes Lions",
           "level": "Grand Prix",
-          "category": "Media"
+          "category": "Media",
+          "year": 2026
         }
       ],
       "thumb": "https://i.vimeocdn.com/video/2172395490-1f958ca40a9a10653f4bd7b1ebc52550cc2dde3a7edeefb18f9771a8c74a2469-d_1280?region=us"
@@ -344,7 +373,8 @@
         {
           "show": "Cannes Lions",
           "level": "Titanium",
-          "category": "Titanium"
+          "category": "Titanium",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/F2EjJgR0adE/maxresdefault.jpg"
@@ -360,7 +390,8 @@
         {
           "show": "Cannes Lions",
           "level": "Lion",
-          "category": "PR"
+          "category": "PR",
+          "year": 2026
         }
       ],
       "thumb": "https://i.vimeocdn.com/video/2111289017-ca83c1a06b667b357837409431caa022c9c59f1d92cef42253077b184f367768-d_1280?region=us"
@@ -376,7 +407,8 @@
         {
           "show": "Cannes Lions",
           "level": "Lion",
-          "category": "Creative B2B"
+          "category": "Creative B2B",
+          "year": 2026
         }
       ],
       "thumb": "https://i.ytimg.com/vi/jL3XxEk0HX0/maxresdefault.jpg"
@@ -393,7 +425,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Activation"
+          "category": "Activation",
+          "year": 2026
         }
       ]
     },
@@ -409,7 +442,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Advertising"
+          "category": "Advertising",
+          "year": 2026
         }
       ]
     },
@@ -425,7 +459,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Audio"
+          "category": "Audio",
+          "year": 2026
         }
       ]
     },
@@ -441,7 +476,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Effectiveness"
+          "category": "Effectiveness",
+          "year": 2026
         }
       ]
     },
@@ -457,7 +493,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Packaging design"
+          "category": "Packaging design",
+          "year": 2026
         }
       ]
     },
@@ -473,7 +510,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Graphic design"
+          "category": "Graphic design",
+          "year": 2026
         }
       ]
     },
@@ -489,7 +527,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Craft"
+          "category": "Craft",
+          "year": 2026
         }
       ]
     },
@@ -505,7 +544,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Non-profit"
+          "category": "Non-profit",
+          "year": 2026
         }
       ]
     },
@@ -521,7 +561,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Innovation"
+          "category": "Innovation",
+          "year": 2026
         }
       ]
     },
@@ -537,7 +578,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Film"
+          "category": "Film",
+          "year": 2026
         }
       ]
     },
@@ -553,7 +595,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "Transition"
+          "category": "Transition",
+          "year": 2026
         }
       ]
     },
@@ -569,7 +612,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "PR"
+          "category": "PR",
+          "year": 2026
         }
       ]
     },
@@ -585,7 +629,8 @@
         {
           "show": "Guldägget",
           "level": "Guldägg",
-          "category": "PR"
+          "category": "PR",
+          "year": 2026
         }
       ]
     },
@@ -602,12 +647,14 @@
         {
           "show": "Vuoden Huiput",
           "level": "Grand Prix",
-          "category": "Grand Prix"
+          "category": "Grand Prix",
+          "year": 2025
         },
         {
           "show": "Vuoden Huiput",
           "level": "Kultahuippu",
-          "category": "Photography"
+          "category": "Photography",
+          "year": 2025
         }
       ]
     },
@@ -624,12 +671,14 @@
         {
           "show": "Vuoden Huiput",
           "level": "Kultahuippu",
-          "category": "Copy"
+          "category": "Copy",
+          "year": 2025
         },
         {
           "show": "Vuoden Huiput",
           "level": "Kultahuippu",
-          "category": "Advertisements"
+          "category": "Advertisements",
+          "year": 2025
         }
       ]
     },
@@ -646,7 +695,8 @@
         {
           "show": "Vuoden Huiput",
           "level": "Kultahuippu",
-          "category": "Experiential"
+          "category": "Experiential",
+          "year": 2025
         }
       ]
     },
@@ -662,7 +712,8 @@
         {
           "show": "Vuoden Huiput",
           "level": "Kultahuippu",
-          "category": "Audio"
+          "category": "Audio",
+          "year": 2025
         }
       ]
     }
