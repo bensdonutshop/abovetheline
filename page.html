@@ -504,8 +504,10 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   var TOP_AWARDS = /grand prix|black pencil|grand clio|titanium|grand prix for good/i;
 
   function cardShot(pic, fallbackLabel, ribbon) {
+    // No lazy loading here: the card views swap in and out of a hidden
+    // container, and a lazy image parsed while hidden never starts loading.
     var inner = pic
-      ? '<img src="' + esc(pic) + '" alt="" loading="lazy" decoding="async" ' +
+      ? '<img src="' + esc(pic) + '" alt="" decoding="async" ' +
         'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
         'data-fb="' + esc(tile(fallbackLabel) + (ribbon || '')) + '">'
       : tile(fallbackLabel);
