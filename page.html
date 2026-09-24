@@ -20,7 +20,7 @@
   --flare-grad-v:linear-gradient(168deg, #FF8A1F 0%, #FF4A00 46%, #D4160F 100%);
   --shadow:0 1px 2px rgba(18,22,31,.06), 0 14px 40px -22px rgba(18,22,31,.30);
   --wash:rgba(255,74,0,.06);
-  --wash-a:rgba(255,74,0,.075); --wash-b:rgba(212,22,15,.055);
+  --wash-a:rgba(255,74,0,.11); --wash-b:rgba(212,22,15,.075);
 
   /* One family. Hierarchy comes from weight and size, not from a second face. */
   --display:"Schibsted Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -43,7 +43,7 @@
   --flare-grad-v:linear-gradient(168deg, #FFA24A 0%, #FF6A2B 46%, #E22A1C 100%);
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 16px 44px -24px rgba(0,0,0,.9);
   --wash:rgba(255,106,43,.09);
-  --wash-a:rgba(255,106,43,.13); --wash-b:rgba(226,42,28,.10);
+  --wash-a:rgba(255,106,43,.17); --wash-b:rgba(226,42,28,.13);
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
@@ -55,7 +55,7 @@
   --flare-grad-v:linear-gradient(168deg, #FFA24A 0%, #FF6A2B 46%, #E22A1C 100%);
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 16px 44px -24px rgba(0,0,0,.9);
   --wash:rgba(255,106,43,.09);
-  --wash-a:rgba(255,106,43,.13); --wash-b:rgba(226,42,28,.10);
+  --wash-a:rgba(255,106,43,.17); --wash-b:rgba(226,42,28,.13);
 }
 
 *{box-sizing:border-box}
@@ -98,20 +98,48 @@ html{scroll-behavior:smooth}
    behind the wordmark and fades out well before any boundary, so the top of
    the page has a little life without anything to see the end of. */
 .masthead{position:relative; isolation:isolate; overflow:hidden; background:var(--paper)}
+
+/* Two glow layers that wander on different clocks, so their overlap never
+   repeats the same way and the top of the page is never quite still. */
 .masthead::before{
-  content:""; position:absolute; left:-15%; right:-15%; top:-55%; height:210%;
+  content:""; position:absolute; left:-20%; right:-20%; top:-60%; height:220%;
   z-index:0; pointer-events:none;
   background:
-    radial-gradient(42% 46% at 28% 46%, var(--wash-a), transparent 68%),
-    radial-gradient(36% 42% at 74% 56%, var(--wash-b), transparent 70%);
-  animation:mastdrift 34s ease-in-out infinite alternate;
+    radial-gradient(40% 44% at 26% 44%, var(--wash-a), transparent 66%),
+    radial-gradient(34% 40% at 71% 58%, var(--wash-b), transparent 68%);
+  animation:mastdrift 41s ease-in-out infinite;
   will-change:transform;
 }
-@keyframes mastdrift{
-  from{transform:translate3d(-2.5%, -1.5%, 0) scale(1.02)}
-  to  {transform:translate3d(3%, 2%, 0) scale(1.07)}
+/* The grain sits in the light rather than over the whole band, so the glow
+   reads as textured instead of as a flat wash. */
+.masthead::after{
+  content:""; position:absolute; left:-20%; right:-20%; top:-60%; height:220%;
+  z-index:0; pointer-events:none; opacity:.55; mix-blend-mode:soft-light;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E"),
+    radial-gradient(38% 42% at 52% 48%, var(--wash-a), transparent 64%);
+  background-size:200px 200px, 100% 100%;
+  animation:mastdrift2 29s ease-in-out infinite;
+  will-change:transform;
 }
-@media (prefers-reduced-motion:reduce){ .masthead::before{animation:none} }
+/* Wandering, not ping-ponging: several stops so the path never doubles back
+   on itself the same way twice. */
+@keyframes mastdrift{
+  0%   {transform:translate3d(-3%, -2%, 0) scale(1.02)}
+  27%  {transform:translate3d(2.5%, 1%, 0)  scale(1.07)}
+  53%  {transform:translate3d(4%, -1.5%, 0) scale(1.04)}
+  78%  {transform:translate3d(-1%, 2.5%, 0) scale(1.08)}
+  100% {transform:translate3d(-3%, -2%, 0)  scale(1.02)}
+}
+@keyframes mastdrift2{
+  0%   {transform:translate3d(3%, 1.5%, 0)   scale(1.05)}
+  31%  {transform:translate3d(-2.5%, -1%, 0) scale(1.09)}
+  64%  {transform:translate3d(-4%, 2%, 0)    scale(1.03)}
+  100% {transform:translate3d(3%, 1.5%, 0)   scale(1.05)}
+}
+@media (prefers-reduced-motion:reduce){
+  .masthead::before, .masthead::after{animation:none}
+}
 .masthead-in{
   position:relative; z-index:1;
   max-width:var(--max); margin:0 auto; padding:44px var(--gutter) 22px;
@@ -303,6 +331,16 @@ html{scroll-behavior:smooth}
 
 .swap{animation:swapin .34s cubic-bezier(.2,.8,.3,1) both}
 @keyframes swapin{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+
+/* A bright light catching the top edge of anything filled with the gradient. */
+.views .glider,
+.flag em,
+.ribbon span.top,
+.chip.key[aria-pressed="true"],
+.atl-rule{
+  box-shadow:inset 0 1px 0 rgba(255,228,176,.62), inset 0 -1px 0 rgba(120,26,4,.20);
+}
+.views .glider{box-shadow:inset 0 1.5px 0 rgba(255,232,186,.68), inset 0 -1px 0 rgba(120,26,4,.22)}
 
 /* ============================================================ cards */
 .cards{display:grid; gap:26px 22px; grid-template-columns:repeat(auto-fill,minmax(262px,1fr))}

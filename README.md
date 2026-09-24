@@ -112,10 +112,17 @@ masthead scrolls away; the sticky bar below it carries the abbreviation, ATL, wh
 the industry actually says out loud.
 
 **The masthead.** No band and no edge: the masthead background is the page background, so
-there is nothing to see the end of. A very faint warm wash drifts behind the wordmark on a
-34-second cycle and fades to transparent well before any boundary. It is two radial gradients
-on a pseudo-element moved with `transform`, so it costs a compositor layer and nothing else,
-and it holds still under `prefers-reduced-motion`.
+there is nothing to see the end of. Two faint warm glow layers wander behind the wordmark on
+different clocks, 41 and 29 seconds, each following a multi-stop path rather than a two-point
+ping-pong, so their overlap never repeats the same way and the top of the page is never quite
+still. The second layer carries a fine grain at `soft-light`, so the glow reads as textured
+light rather than a flat wash. Both are pseudo-elements moved with `transform`, costing a
+compositor layer and no JavaScript, and both hold still under `prefers-reduced-motion`.
+
+**Light on the gradient.** Anything filled with the accent gradient - the active view tab, the
+lead badge, top-award ribbons, the campaign-work chip, the masthead rule - carries a warm
+inset highlight along its top edge and a darker one beneath, so it reads as a solid object
+catching a light rather than a flat fill.
 
 **The line ends in an asterisk.** Seven flat-ended bars radiating from a solid centre, evenly
 spaced at 51.43 degrees, with three of them reaching about a quarter further. Flat ends rather
