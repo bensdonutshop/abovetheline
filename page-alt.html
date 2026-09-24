@@ -1165,6 +1165,18 @@ html{scroll-behavior:smooth}
   }
 
   /* ----------------------------------------------------------- filters */
+  // The Media filter hides itself until the tagging can carry it. Coverage sat
+  // at 11 of 262 campaigns, so every choice but one came back empty, which
+  // reads as a broken site rather than a thin field. Raise the tagging and the
+  // control comes back on its own.
+  var CHANNEL_MIN_COVERAGE = 0.8;
+  function channelCovered(list) {
+    if (!list || !list.length) return false;
+    var n = 0;
+    for (var i = 0; i < list.length; i++) if (list[i].channel) n++;
+    return n / list.length >= CHANNEL_MIN_COVERAGE;
+  }
+
   var KIND_LABEL = { work: 'Campaign work', industry: 'Agency business',
     media: 'Media and adtech', other: 'Other' };
 
@@ -1197,6 +1209,10 @@ html{scroll-behavior:smooth}
     return '<button class="chip' + (isKey ? ' key' : '') + '" aria-pressed="' + (active ? 'true' : 'false') +
       '" data-key="' + key + '" data-val="' + esc(val) + '">' + esc(label) +
       (count != null ? '<i>' + count + '</i>' : '') + '</button>';
+  }
+
+  function clearHiddenChannel(list) {
+    if (state.channel && !channelCovered(list)) state.channel = '';
   }
 
   function renderFilters() {
@@ -1264,7 +1280,9 @@ html{scroll-behavior:smooth}
           secs2.map(function (x) { return chip(x, state.sector === x, 'sector', x, cnt('sector', x)); }).join('') +
           '</div>';
       }
-      var ch2 = f2.channels.filter(function (x) { return cnt('channel', x); });
+      clearHiddenChannel(pool);
+      var ch2 = channelCovered(pool)
+        ? f2.channels.filter(function (x) { return cnt('channel', x); }) : [];
       if (ch2.length) {
         h2 += '<div class="fgroup"><span class="flabel">Media</span>' +
           chip('All', !state.channel, 'channel', '', null) +
@@ -1296,7 +1314,9 @@ html{scroll-behavior:smooth}
           }).join('') + '</div>';
       }
 
-      var chans = facets.channels.filter(function (x) { return countBy(work, 'channel', x); });
+      clearHiddenChannel(work);
+      var chans = channelCovered(work)
+        ? facets.channels.filter(function (x) { return countBy(work, 'channel', x); }) : [];
       if (chans.length) {
         html += '<div class="fgroup"><span class="flabel">Media</span>' +
           chip('All', !state.channel, 'channel', '', null) +
