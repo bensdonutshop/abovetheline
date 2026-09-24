@@ -152,12 +152,12 @@ html{scroll-behavior:smooth}
   background:var(--flare-grad); border-radius:2px;
 }
 .atl-spark{
-  position:absolute; right:-16px; top:50%; width:46px; height:46px;
+  position:absolute; right:-21px; top:50%; width:46px; height:46px;
   transform:translateY(-50%); fill:#D4160F; display:block;
 }
 :root[data-theme="dark"] .atl-spark, :root:not([data-theme="light"]) .atl-spark{fill:#E22A1C}
 @media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .atl-spark{fill:#D4160F} }
-@media (max-width:700px){ .atl-spark{width:34px; height:34px; right:-12px} }
+@media (max-width:700px){ .atl-spark{width:34px; height:34px; right:-15px} }
 .logo{
   margin:0; font-family:var(--masthead); font-weight:700;
   font-size:clamp(34px, 8.4vw, 108px); line-height:.9; letter-spacing:-.03em;
@@ -568,16 +568,19 @@ html{scroll-behavior:smooth}
          name means. Above the line: the bought media, the work everybody sees. -->
     <h1 class="logo">Above the Line</h1>
     <div class="atl-rule" aria-hidden="true">
-      <svg class="atl-spark" viewBox="-60 -60 120 120" role="presentation" focusable="false">
-        <!-- Seven flat-ended bars, evenly spaced, three reaching further. -->
-        <circle cx="0" cy="0" r="11.5"/>
-        <rect x="-8" y="-51" width="16" height="51" transform="rotate(0)"/>
-        <rect x="-8" y="-40" width="16" height="40" transform="rotate(51.43)"/>
-        <rect x="-8" y="-51" width="16" height="51" transform="rotate(102.86)"/>
-        <rect x="-8" y="-40" width="16" height="40" transform="rotate(154.29)"/>
-        <rect x="-8" y="-51" width="16" height="51" transform="rotate(205.71)"/>
-        <rect x="-8" y="-40" width="16" height="40" transform="rotate(257.14)"/>
-        <rect x="-8" y="-40" width="16" height="40" transform="rotate(308.57)"/>
+      <svg class="atl-spark" viewBox="-56 -56 112 112" role="presentation" focusable="false">
+        <!-- Seven equal arms, evenly spaced. One runs left into the rule, which
+             also makes the mark mirror-symmetric about the horizontal axis: the
+             only orientation in which an odd arm count sits still. Arm width
+             matches the rule's height, so the line reads as flowing into it. -->
+        <circle cx="0" cy="0" r="9.9"/>
+        <rect x="-8" y="-44" width="16" height="44" transform="rotate(270)"/>
+        <rect x="-8" y="-44" width="16" height="44" transform="rotate(321.43)"/>
+        <rect x="-8" y="-44" width="16" height="44" transform="rotate(12.86)"/>
+        <rect x="-8" y="-44" width="16" height="44" transform="rotate(64.29)"/>
+        <rect x="-8" y="-44" width="16" height="44" transform="rotate(115.71)"/>
+        <rect x="-8" y="-44" width="16" height="44" transform="rotate(167.14)"/>
+        <rect x="-8" y="-44" width="16" height="44" transform="rotate(218.57)"/>
       </svg>
     </div>
     <p class="dateline"><span id="dateline-date"></span><b id="dateline-wire">The advertising wire</b></p>
