@@ -92,16 +92,19 @@ Twenty-one sources, pulled server-side:
 |---|---|
 | Publisher RSS | Adweek, Muse by Clio, Marketing Dive, Digiday, AdExchanger, Adland, Branding in Asia, WERSM, Creative Review, Marketing Week, More About Advertising, Resumé, Dagens Media, Dagens Analys |
 | Article scrape | Creative Salon |
-| Bing News RSS | Ad Age, The Drum, LBBOnline, Campaign UK, shots, plus Finnish and Swedish market searches |
+| Bing News RSS | Ad Age, The Drum, LBBOnline, Campaign UK, shots |
 
 Ad Age, The Drum, LBBOnline and Campaign UK all return `403` to non-browser clients on their
 own feeds, so those come through Bing News RSS, which carries the real publisher URL inside
 the wrapper — `lib/parse.js` unwraps it. Nothing links to an aggregator; every headline goes
 straight to the publisher.
 
-Finnish trade press is the one genuine gap: *Markkinointi & Mainonta*, *Markkinointiuutiset*
-and *Kauppalehti* publish no reachable feed, so Finland arrives through Finnish-language news
-searches plus the hand-checked list under **Landmark work**.
+There is no Finland and Sweden module. It was removed in September 2026: the Finnish trade
+press publishes no reachable feed — *Markkinointi & Mainonta*, *Markkinointiuutiset* and
+*Kauppalehti* all return nothing usable — so the module only ever showed Swedish work under a
+heading that promised both. The Swedish trade press it did carry, *Resumé*, *Dagens Media* and
+*Dagens Analys*, is tagged `europe` and still runs in the Europe column, where 29 of the
+module's 30 items already appeared.
 
 ## Design system
 
@@ -392,9 +395,9 @@ content hash; anything no longer on the front page is pruned on the next run.
 
 ## The hand-curated rails
 
-`data/curated.json` holds the three ranked lists — most talked-about campaigns of the past 12
-months, Cannes Lions 2026 case films, and Nordic landmark work — plus the ten topics the left
-column cycles through. These are researched and ranked by hand, not generated.
+`data/curated.json` holds the ranked lists — most talked-about campaigns of the past 12
+months, Cannes Lions 2026 case films, and a deeper bench of campaign work — plus the ten topics
+the left column cycles through. These are researched and ranked by hand, not generated.
 
 Cannes case links are indexed by [lovetheworkmore.com](https://www.lovetheworkmore.com), the
 free index of every Lion-winning campaign, which exists so the work isn't behind the Cannes

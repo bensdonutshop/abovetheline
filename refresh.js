@@ -26,7 +26,7 @@ const NO_IMG = process.argv.indexOf('--no-img') >= 0;
 const HOSTED = process.argv.indexOf('--hosted') >= 0;
 
 const MAX_AGE_DAYS = 21;
-const PER_COLUMN = { global: 110, europe: 110, nordic: 30 };
+const PER_COLUMN = { global: 110, europe: 110 };
 const INSPECT_BUDGET = 360;    // articles we open to read their picture and paywall state
 // 'locked' is always dropped. Set KEEP_METERED=false to drop metered titles
 // (Digiday, Marketing Week, Campaign UK) as well.
@@ -95,12 +95,6 @@ function normalise(it, f) {
   const low = title.toLowerCase();
   if ((SRC.dropTitle || []).some(w => low.indexOf(w) >= 0)) return null;
 
-  // Nordic sources are broad news searches — keep only known trade/business outlets.
-  if (f.region === 'nordic') {
-    const ok = (SRC.nordicAllow || []).some(d => host === d || host.endsWith('.' + d));
-    if (!ok) return null;
-  }
-
   let ts = Date.parse(it.date || '');
   if (!isFinite(ts)) ts = 0;
 
@@ -158,9 +152,7 @@ const EU_RE = new RegExp('(^|[^a-z])(' +
   ')([^a-z]|$)', 'i');
 
 function classify(a) {
-  if (a.region === 'nordic') return 'nordic';
-  if (a.market && a.rel >= 2) return 'europe+nordic';
-  if (a.region === 'europe') return 'europe';
+  if (a.region === 'europe' || a.market) return 'europe';
   if (EU_RE.test(a.title + ' ' + a.summary)) return 'both';
   return 'global';
 }
@@ -265,7 +257,7 @@ function pruneImages(keep) {
   all = all.filter(a => !isOffTopic(a));
   // And the mixed sources have to clear a relevance floor; the trade press does not.
   all = all.filter(a => { const min = strictnessFor(a); return !min || a.rel >= min; });
-  all = all.filter(a => (a.region === 'nordic' ? a.rel >= 2 : a.rel > -1));
+  all = all.filter(a => a.rel > -1);
   log('after dedupe + relevance', all.length);
 
   // Rank first, then look closely at only the plausible front-page candidates -
@@ -288,22 +280,20 @@ function pruneImages(keep) {
   pool2 = cluster(pool2);
   log('clustered', preCluster, '->', pool2.length, 'distinct stories');
 
-  const buckets = { global: [], europe: [], nordic: [] };
+  const buckets = { global: [], europe: [] };
   for (const a of pool2) {
     const c = classify(a);
-    if (c === 'nordic') buckets.nordic.push(a);
-    else if (c === 'europe+nordic') { buckets.europe.push(a); buckets.nordic.push(a); }
-    else if (c === 'europe') buckets.europe.push(a);
+    if (c === 'europe') buckets.europe.push(a);
     else if (c === 'both') { buckets.global.push(a); buckets.europe.push(a); }
     else buckets.global.push(a);
   }
 
   for (const k of Object.keys(buckets)) {
     buckets[k].sort((x, y) => score(y, now) - score(x, now));
-    buckets[k] = diversify(buckets[k], PER_COLUMN[k], k === 'nordic' ? 8 : 9);
+    buckets[k] = diversify(buckets[k], PER_COLUMN[k], 9);
   }
 
-  const picked = [].concat(buckets.global, buckets.europe, buckets.nordic);
+  const picked = [].concat(buckets.global, buckets.europe);
   const unique = Array.from(new Set(picked));
 
   if (!NO_IMG && !HOSTED) await cacheImages(unique);
@@ -324,14 +314,13 @@ function pruneImages(keep) {
   const out = {
     generatedAt: new Date().toISOString(),
     mode: HOSTED ? 'hosted' : 'local',
-    counts: { global: buckets.global.length, europe: buckets.europe.length, nordic: buckets.nordic.length },
+    counts: { global: buckets.global.length, europe: buckets.europe.length },
     policy: { paywalled: 'dropped', metered: KEEP_METERED ? 'kept and labelled' : 'dropped' },
     facets: { sectors: SECTORS, channels: CHANNELS },
-    sources: Array.from(new Set([].concat(buckets.global, buckets.europe, buckets.nordic)
+    sources: Array.from(new Set([].concat(buckets.global, buckets.europe)
               .map(a => a.source))).sort(),
     global: buckets.global.map(shape),
     europe: buckets.europe.map(shape),
-    nordic: buckets.nordic.map(shape)
   };
 
   // Write via a temp file so a crash mid-write can never leave a half-parsed feed.
@@ -343,6 +332,6 @@ function pruneImages(keep) {
   if (!NO_IMG && !HOSTED) pruneImages(unique.filter(a => a.thumb).map(a => a.thumb));
 
   log('wrote data/live.json —', out.counts.global, 'global /', out.counts.europe, 'europe /',
-      out.counts.nordic, 'nordic, with images:', unique.filter(a => a.thumb).length,
+      'with images:', unique.filter(a => a.thumb).length,
       '— took', ((Date.now() - t0) / 1000).toFixed(1) + 's');
 })();

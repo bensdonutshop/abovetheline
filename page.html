@@ -560,22 +560,6 @@ html{scroll-behavior:smooth}
   padding:2px 5px; margin-bottom:5px}
 .award[data-gp="1"]{border-color:var(--flare); color:var(--flare)}
 
-.nordic-item{display:grid; grid-template-columns:24px minmax(0,1fr); gap:10px; padding:10px 0; border-top:1px solid var(--rule-soft)}
-.nordic-item:first-of-type{border-top:0}
-.mk{font-size:12px; font-weight:500; letter-spacing:.04em; color:var(--ink-2);
-  border:1px solid var(--rule); border-radius:var(--r-xs); padding:2px 0; text-align:center; height:fit-content}
-.mk[data-m="FI"]{border-color:#0B5FC4; color:#0B5FC4}
-.mk[data-m="SE"]{border-color:#B08300; color:#8A6800}
-:root[data-theme="dark"] .mk[data-m="FI"], :root:not([data-theme="light"]) .mk[data-m="FI"]{color:#6FA8FF; border-color:#3D6FB5}
-:root[data-theme="dark"] .mk[data-m="SE"], :root:not([data-theme="light"]) .mk[data-m="SE"]{color:#E8C24A; border-color:#8A7226}
-@media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .mk[data-m="FI"]{color:#0B5FC4; border-color:#0B5FC4}
-  :root:not([data-theme="dark"]) .mk[data-m="SE"]{color:#8A6800; border-color:#B08300} }
-.nordic-item .meta{display:flex; flex-wrap:wrap; gap:0 8px}
-.nordic-item .meta b{font-weight:600; color:var(--ink-2)}
-.nordic-item h4{margin:0 0 3px; font-family:var(--display); font-weight:600; font-size:14px; line-height:1.26}
-.nordic-item a:hover h4{text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--flare)}
-
-.subhead{font-size:12px; letter-spacing:-.004em; color:var(--ink-3); margin:18px 0 8px; padding-top:13px; border-top:1px solid var(--rule)}
 .credit{margin:11px 0 0; font-size:12px; line-height:1.5; color:var(--ink-3); font-family:var(--display); font-weight:400}
 .credit a{border-bottom:1px solid var(--rule)}
 .credit a:hover{color:var(--ink); border-color:var(--flare)}
@@ -681,12 +665,6 @@ html{scroll-behavior:smooth}
       <div class="head"><h2>Cannes Lions 2026</h2><span>Case films</span></div>
       <div id="m-cannes"></div>
       <p class="credit">Case links collected by <a href="https://www.lovetheworkmore.com" target="_blank" rel="noopener">lovetheworkmore.com</a>, the free index of every Lion-winning campaign.</p>
-    </section>
-    <section class="mod">
-      <div class="head"><h2>Finland and Sweden</h2><span>Campaign work</span></div>
-      <div id="m-nordic-live"></div>
-      <p class="subhead">Landmark work</p>
-      <div id="m-nordic-seed"></div>
     </section>
   </aside>
 </main>
@@ -944,7 +922,7 @@ html{scroll-behavior:smooth}
   function campaignPool() {
     var d = state.live || {};
     var eu = state.region === 'europe';
-    var wire = eu ? (d.europe || []) : [].concat(d.global || [], d.europe || [], d.nordic || []);
+    var wire = eu ? (d.europe || []) : [].concat(d.global || [], d.europe || []);
 
     var items = [];
     wire.forEach(function (a) { if (a.kind === 'work') items.push(wireItem(a)); });
@@ -1530,24 +1508,6 @@ html{scroll-behavior:smooth}
         '<div class="meta"><b>' + esc(x.brand) + '</b><span>' + esc(x.agency) + '</span></div></div></a>';
     }).join('');
 
-    var live = (state.live && state.live.nordic) || [];
-    $('#m-nordic-live').innerHTML = live.length
-      ? live.slice(0, 8).map(function (x) {
-          return '<a class="nordic-item" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
-            '<span class="mk" data-m="' + esc(x.market || '') + '">' + esc(x.market || '--') + '</span><div>' +
-            '<h4>' + esc(x.title) + '</h4>' +
-            '<div class="meta" style="font-size:12.5px;color:var(--ink-3)">' +
-            '<b>' + esc(x.source) + '</b>' + (x.ts ? '<span>' + esc(ago(x.ts)) + '</span>' : '') + '</div></div></a>';
-        }).join('')
-      : '<p style="color:var(--ink-3);font-size:13px">Nothing new off the Nordic wire right now.</p>';
-
-    $('#m-nordic-seed').innerHTML = c.nordicSeed.map(function (x) {
-      return '<a class="nordic-item" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
-        '<span class="mk" data-m="' + esc(x.market) + '">' + esc(x.market) + '</span><div>' +
-        '<h4>' + esc(x.campaign) + '</h4>' +
-        '<div class="meta" style="font-size:12.5px;color:var(--ink-3)">' +
-        '<b>' + esc(x.brand) + '</b>' + (x.agency ? '<span>' + esc(x.agency) + '</span>' : '') + '</div></div></a>';
-    }).join('');
   }
 
   /* ----------------------------------------------------- topic cycler */
@@ -1951,7 +1911,7 @@ html{scroll-behavior:smooth}
   mq.addEventListener ? mq.addEventListener('change', onMQ) : mq.addListener(onMQ);
 
   document.addEventListener('keydown', function (e) {
-    if (e.target.matches('input,textarea')) return;
+    if (e.target && e.target.matches && e.target.matches('input,textarea')) return;
     if (!state.cur) return;
     if (e.key === 'ArrowLeft' && e.altKey) goTopic(state.topic - 1);
     if (e.key === 'ArrowRight' && e.altKey) goTopic(state.topic + 1);
