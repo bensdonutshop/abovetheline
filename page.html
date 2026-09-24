@@ -387,19 +387,28 @@ html{scroll-behavior:smooth}
 .card figure{margin:0; aspect-ratio:16/10; overflow:hidden; background:var(--sunk); position:relative}
 .card figure img{width:100%; height:100%; object-fit:cover; transition:transform .55s cubic-bezier(.2,.7,.3,1)}
 .card:hover figure img{transform:scale(1.04)}
+/* Each block holds a fixed slot, so a two-line title in one card and a
+   three-line title in the next still put the credits, the blurb and the tags
+   on the same line across the row. The clamp caps the content; the min-height
+   reserves the space the clamp would have used. */
 .card h3{
   margin:0; font-family:var(--display); font-weight:700; font-size:18px; line-height:1.16; letter-spacing:-.014em; text-wrap:balance;
   display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  min-height:calc(1.16em * 3);
 }
 .card--feature h3{-webkit-line-clamp:2; line-clamp:2}
 .card:hover h3{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; text-decoration-color:var(--flare)}
-.card .who{margin-top:auto; padding-top:6px; font-size:13px; line-height:1.45; color:var(--ink-3);
-  display:flex; flex-direction:column}
+.card .who{padding-top:6px; font-size:13px; line-height:1.45; color:var(--ink-3);
+  display:flex; flex-direction:column; min-height:calc(1.45em * 3 + 6px)}
+/* One credit per line. A long agency name that wrapped added a fourth line and
+   knocked that card's blurb and tags out of step with the rest of the row. */
+.card .who > *{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0}
 .card .who b{font-weight:600; color:var(--ink-2); text-transform:uppercase}
 .card .who i{font-style:normal; color:var(--ink-3); text-transform:none}
 .card .who{text-transform:uppercase}
 .card .blurb{margin:0; font-size:14px; line-height:1.46; color:var(--ink-2); font-weight:300; text-wrap:pretty;
-  display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+  display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+  min-height:calc(1.46em * 2)}
 .card .tags{display:flex; flex-wrap:wrap; gap:5px; padding-top:2px}
 .tag{font-size:11.5px; letter-spacing:-.004em; border:1px solid var(--rule); border-radius:var(--r-xs); padding:2px 5px; color:var(--ink-3);
   white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis}
@@ -1050,9 +1059,9 @@ html{scroll-behavior:smooth}
           '<span class="onshot"><b>' + esc(a.brand || a.source) + '</b>' +
           (a.ts ? esc(ago(a.ts)) : '') + '</span>', idx, !!film) +
         '<h3>' + esc(a.title) + '</h3>' +
-        (a.blurb ? '<p class="blurb">' + esc(a.blurb) + '</p>' : '') +
         '<div class="who">' + credit + '</div>' +
-        (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') +
+        '<p class="blurb">' + esc(a.blurb || '') + '</p>' +
+        '<div class="tags">' + tags.join('') + '</div>' +
         '</a>';
     }).join('') + '</div>';
 
@@ -1129,9 +1138,9 @@ html{scroll-behavior:smooth}
           agency: c.agency, country: c.country, blurb: c.blurb, tags: tags.join('') }) + '"' : '') + '>' +
         cardShot(c.thumb || '', c.brand, ribbon, idx, !!film) +
         '<h3>' + esc(c.campaign) + '</h3>' +
-        '<div class="who"><b>' + esc(c.brand) + '</b>' + esc(c.agency) +
+        '<div class="who"><b>' + esc(c.brand) + '</b><span>' + esc(c.agency) + '</span>' +
           (c.country ? '<i>' + esc(c.country) + '</i>' : '') + '</div>' +
-        (c.blurb ? '<p class="blurb">' + esc(c.blurb) + '</p>' : '') +
+        '<p class="blurb">' + esc(c.blurb || '') + '</p>' +
         '<div class="tags">' + tags.join('') + '</div>' +
         '</a>';
     }).join('') + '</div>';
