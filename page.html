@@ -144,10 +144,13 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .bar i{position:absolute; inset:0 auto 0 0; width:100%; background:var(--flare);
   transform:scaleX(0); transform-origin:0 50%; will-change:transform}
 .cycler-in{padding:16px 17px 14px; display:flex; flex-direction:column; min-height:224px}
-.cyc-kicker{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--flare); margin-bottom:9px}
+.cyc-top{display:grid; grid-template-columns:72px minmax(0,1fr); gap:12px; align-items:start; margin-bottom:10px}
+.cyc-shot{aspect-ratio:1/1; border-radius:3px; overflow:hidden; background:var(--sunk)}
+.cyc-shot img{width:100%; height:100%; object-fit:cover}
+.cyc-kicker{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--flare); margin-bottom:6px}
 .cyc-h{
-  margin:0 0 9px; font-family:var(--display); font-weight:700; font-stretch:84%;
-  font-size:21px; line-height:1.14; letter-spacing:-.014em; text-wrap:balance;
+  margin:0; font-family:var(--display); font-weight:700; font-stretch:84%;
+  font-size:19px; line-height:1.16; letter-spacing:-.014em; text-wrap:balance;
 }
 .cyc-p{margin:0; font-size:14.5px; line-height:1.52; color:var(--ink-2); font-weight:300}
 .cyc-src{margin-top:10px; font-family:var(--mono); font-size:10px; letter-spacing:.05em;
@@ -165,6 +168,53 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .pip{width:5px; height:5px; border-radius:50%; background:var(--rule); padding:0; transition:.2s}
 .pip[aria-current="true"]{background:var(--flare); transform:scale(1.35)}
 .count{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; color:var(--ink-3); font-variant-numeric:tabular-nums}
+
+/* ============================================================ views */
+.views .tab{font-size:12.5px}
+.views .tab[aria-selected="true"]{background:var(--flare); color:var(--flare-ink)}
+.shell[data-view="campaigns"] .col-topics,
+.shell[data-view="campaigns"] .col-lists,
+.shell[data-view="awarded"] .col-topics,
+.shell[data-view="awarded"] .col-lists{display:none}
+.shell[data-view="campaigns"],
+.shell[data-view="awarded"]{grid-template-columns:minmax(0,1fr); grid-template-areas:"main"}
+
+/* ============================================================ cards */
+.cards{display:grid; gap:26px 22px; grid-template-columns:repeat(auto-fill,minmax(262px,1fr))}
+.card{display:flex; flex-direction:column; gap:10px; min-width:0}
+.card figure{margin:0; aspect-ratio:16/10; border-radius:3px; overflow:hidden; background:var(--sunk); position:relative}
+.card figure img{width:100%; height:100%; object-fit:cover; transition:transform .55s cubic-bezier(.2,.7,.3,1)}
+.card:hover figure img{transform:scale(1.04)}
+.card h3{
+  margin:0; font-family:var(--display); font-weight:700; font-stretch:86%;
+  font-size:18px; line-height:1.16; letter-spacing:-.014em; text-wrap:balance;
+}
+.card:hover h3{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; text-decoration-color:var(--flare)}
+.card .who{font-family:var(--mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3)}
+.card .blurb{margin:0; font-size:14px; line-height:1.46; color:var(--ink-2); font-weight:300}
+.card .tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:auto; padding-top:4px}
+.tag{font-family:var(--mono); font-size:9px; letter-spacing:.05em; text-transform:uppercase;
+  border:1px solid var(--rule); border-radius:2px; padding:2px 5px; color:var(--ink-3);
+  white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis}
+.card .tags{min-width:0}
+.tag.top{border-color:var(--flare); color:var(--flare)}
+.tag.plain{border-style:dashed}
+
+/* the award ribbon sits on the picture so a scan reads "why is this here" first */
+.ribbon{position:absolute; left:8px; top:8px; display:flex; flex-direction:column; gap:4px; align-items:flex-start}
+.ribbon span{font-family:var(--display); font-weight:700; font-stretch:88%; font-size:9.5px;
+  letter-spacing:.07em; text-transform:uppercase; padding:3px 7px; border-radius:2px;
+  background:rgba(12,10,8,.78); color:#fff; backdrop-filter:blur(3px)}
+.ribbon span.top{background:var(--flare); color:var(--flare-ink)}
+.card .count{font-family:var(--mono); font-size:9.5px; color:var(--ink-3)}
+
+@media (max-width:620px){
+  .cards{grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:20px 14px}
+  .card h3{font-size:15px}
+  .card .blurb{display:none}
+  /* Long award labels must fold inside their card, never across the gutter. */
+  .tag{white-space:normal; overflow-wrap:anywhere; line-height:1.3}
+}
 
 /* ============================================================ filters */
 .filters{margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--rule)}
@@ -306,7 +356,12 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       <b>Above the Line</b>
       <i>Campaign desk</i>
     </div>
-    <div class="tabs" role="tablist" aria-label="News region">
+    <div class="tabs views" role="tablist" aria-label="View">
+      <button class="tab" role="tab" id="view-news" aria-selected="true">News</button>
+      <button class="tab" role="tab" id="view-campaigns" aria-selected="false">Campaigns</button>
+      <button class="tab" role="tab" id="view-awarded" aria-selected="false">Awarded</button>
+    </div>
+    <div class="tabs" role="tablist" aria-label="News region" id="regions">
       <button class="tab" role="tab" id="tab-global" aria-selected="true" aria-controls="feed">Global</button>
       <button class="tab" role="tab" id="tab-europe" aria-selected="false" aria-controls="feed">Europe</button>
     </div>
@@ -315,7 +370,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   </div>
 </header>
 
-<main class="shell">
+<main class="shell" id="shell" data-view="news">
   <aside class="col-topics">
     <div class="head"><h2>The Last 90 Days</h2><span id="cyc-count">—</span></div>
     <section class="cycler" id="cycler" aria-roledescription="carousel" aria-label="Most discussed topics of the past three months">
@@ -341,6 +396,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     <div class="filters" id="filters"></div>
     <div class="head"><h2 id="feed-title">Global — This Week</h2><span id="feed-note">—</span></div>
     <div id="feed" role="tabpanel" aria-labelledby="tab-global"></div>
+    <div id="cards" hidden></div>
   </div>
 
   <aside class="col-lists">
@@ -371,8 +427,9 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
   var $ = function (s) { return document.querySelector(s); };
   var state = { region: 'global', live: null, cur: null, topic: 0, stamp: '', raf: null, paused: false, expanded: false, liveHost: false,
-    kind: '', sector: '', channel: '', showUnsorted: false };
-  var CYCLE_MS = 5000;
+    kind: '', sector: '', channel: '', showUnsorted: false,
+    view: 'news', awarded: null, show: '' };
+  var CYCLE_MS = 8000;
 
   /* ------------------------------------------------------------ helpers */
   function esc(s) {
@@ -443,6 +500,122 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
            chip + also + '</div>';
   }
 
+  /* ------------------------------------------------------------- cards */
+  var TOP_AWARDS = /grand prix|black pencil|grand clio|titanium|grand prix for good/i;
+
+  function cardShot(pic, fallbackLabel, ribbon) {
+    var inner = pic
+      ? '<img src="' + esc(pic) + '" alt="" loading="lazy" decoding="async" ' +
+        'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
+        'data-fb="' + esc(tile(fallbackLabel) + (ribbon || '')) + '">'
+      : tile(fallbackLabel);
+    return '<figure>' + inner + (ribbon || '') + '</figure>';
+  }
+
+  // Campaign work, shown as something you scan rather than read.
+  function renderCampaigns() {
+    var list = ((state.live && state.live[state.region]) || [])
+      .filter(function (a) { return a.kind === 'work'; });
+    if (state.sector) list = list.filter(function (a) { return a.sector === state.sector; });
+    if (state.channel) list = list.filter(function (a) { return a.channel === state.channel; });
+
+    // A card feed is carried by its pictures, so lead with the work that has one.
+    list = list.slice().sort(function (x, y) {
+      return (picture(y) ? 1 : 0) - (picture(x) ? 1 : 0);
+    });
+
+    var host = $('#cards');
+    if (!list.length) {
+      host.innerHTML = '<p class="empty">No campaign work matches that in this pull. ' +
+        'Try clearing the filters, or look under News.</p>';
+      return;
+    }
+
+    host.innerHTML = '<div class="cards">' + list.map(function (a) {
+      var tags = [];
+      if (a.sector) tags.push('<span class="tag">' + esc(a.sector) + '</span>');
+      if (a.channel) tags.push('<span class="tag">' + esc(a.channel) + '</span>');
+      if (a.access === 'metered') tags.push('<span class="tag plain">Metered</span>');
+      return '<a class="card" href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
+        cardShot(picture(a), a.source, '') +
+        '<h3>' + esc(a.title) + '</h3>' +
+        (a.summary ? '<p class="blurb">' + esc(a.summary) + '</p>' : '') +
+        '<div class="who">' + esc(a.source) + (a.ts ? ' \u00b7 ' + esc(ago(a.ts)) : '') + '</div>' +
+        (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') +
+        '</a>';
+    }).join('') + '</div>';
+
+    $('#feed-title').textContent = 'Campaign work' +
+      (state.sector ? ' \u00b7 ' + state.sector : '') + (state.channel ? ' \u00b7 ' + state.channel : '');
+    $('#feed-note').textContent = list.length + ' campaigns';
+  }
+
+  // Award-winning cases, tagged with where they won and why.
+  function renderAwarded() {
+    var cases = (state.awarded && state.awarded.cases) || [];
+    if (state.show) {
+      cases = cases.filter(function (c) {
+        return c.awards.some(function (a) { return a.show === state.show; });
+      });
+    }
+    // Most decorated first: more shows beats more statues beats a bigger statue.
+    cases = cases.slice().sort(function (x, y) {
+      var sx = new Set(x.awards.map(function (a) { return a.show; })).size;
+      var sy = new Set(y.awards.map(function (a) { return a.show; })).size;
+      if (sx !== sy) return sy - sx;
+      if (x.awards.length !== y.awards.length) return y.awards.length - x.awards.length;
+      var tx = x.awards.filter(function (a) { return TOP_AWARDS.test(a.level); }).length;
+      var ty = y.awards.filter(function (a) { return TOP_AWARDS.test(a.level); }).length;
+      return ty - tx;
+    });
+
+    var host = $('#cards');
+    if (!cases.length) { host.innerHTML = '<p class="empty">No cases from that show yet.</p>'; return; }
+
+    host.innerHTML = '<div class="cards">' + cases.map(function (c) {
+      var shows = [];
+      c.awards.forEach(function (a) { if (shows.indexOf(a.show) < 0) shows.push(a.show); });
+      var ribbon = '<div class="ribbon">' + shows.slice(0, 3).map(function (sh) {
+        var top = c.awards.some(function (a) { return a.show === sh && TOP_AWARDS.test(a.level); });
+        return '<span class="' + (top ? 'top' : '') + '">' + esc(sh) + '</span>';
+      }).join('') + '</div>';
+
+      var tags = c.awards.slice(0, 4).map(function (a) {
+        return '<span class="tag' + (TOP_AWARDS.test(a.level) ? ' top' : '') + '">' +
+          esc(a.level) + ' \u2014 ' + esc(a.category) + '</span>';
+      });
+      if (c.awards.length > 4) tags.push('<span class="tag plain">+' + (c.awards.length - 4) + '</span>');
+
+      return '<a class="card" href="' + esc(c.url) + '" target="_blank" rel="noopener">' +
+        cardShot(c.thumb || '', c.brand, ribbon) +
+        '<h3>' + esc(c.campaign) + '</h3>' +
+        '<div class="who">' + esc(c.brand) + ' \u00b7 ' + esc(c.agency) +
+          (c.country ? ' \u00b7 ' + esc(c.country) : '') + '</div>' +
+        (c.blurb ? '<p class="blurb">' + esc(c.blurb) + '</p>' : '') +
+        '<div class="tags">' + tags.join('') + '</div>' +
+        '</a>';
+    }).join('') + '</div>';
+
+    $('#feed-title').textContent = state.show ? state.show + ' \u2014 winning cases' : 'Most awarded cases';
+    $('#feed-note').textContent = cases.length + ' cases';
+  }
+
+  // One entry point, so every path through the app agrees on what is on screen.
+  function renderView() {
+    var news = state.view === 'news';
+    $('#shell').dataset.view = state.view;
+    $('#regions').hidden = !news;
+    $('#feed').hidden = !news;
+    $('#cards').hidden = news;
+    ['news', 'campaigns', 'awarded'].forEach(function (v) {
+      $('#view-' + v).setAttribute('aria-selected', String(v === state.view));
+    });
+    renderFilters();
+    if (news) renderFeed();
+    else if (state.view === 'campaigns') renderCampaigns();
+    else renderAwarded();
+  }
+
   /* ----------------------------------------------------------- filters */
   var KIND_LABEL = { work: 'Campaign work', industry: 'Industry', media: 'Media' };
 
@@ -478,9 +651,52 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   }
 
   function renderFilters() {
-    var list = (state.live && state.live[state.region]) || [];
     var host = $('#filters');
+
+    // Awarded has its own axis: which show gave the award.
+    if (state.view === 'awarded') {
+      var cases = (state.awarded && state.awarded.cases) || [];
+      if (!cases.length) { host.innerHTML = ''; return; }
+      var countShow = function (sh) {
+        return cases.filter(function (c) {
+          return c.awards.some(function (a) { return a.show === sh; });
+        }).length;
+      };
+      host.innerHTML = '<div class="fgroup"><span class="flabel">Show</span>' +
+        chip('All shows', !state.show, 'show', '', cases.length) +
+        (state.awarded.shows || []).filter(countShow).map(function (sh) {
+          return chip(sh, state.show === sh, 'show', sh, countShow(sh), true);
+        }).join('') + '</div>';
+      wireChips(host);
+      return;
+    }
+
+    var list = (state.live && state.live[state.region]) || [];
     if (!list.length) { host.innerHTML = ''; return; }
+
+    // Campaigns is already only work, so the kind switch would be a no-op there.
+    if (state.view === 'campaigns') {
+      var work = list.filter(function (a) { return a.kind === 'work'; });
+      var f2 = (state.live.facets) || { sectors: [], channels: [] };
+      var h2 = '';
+      var secs2 = f2.sectors.filter(function (x) { return countBy(work, 'sector', x); });
+      if (secs2.length) {
+        h2 += '<div class="fgroup"><span class="flabel">Industry</span>' +
+          chip('All', !state.sector, 'sector', '', work.length) +
+          secs2.map(function (x) { return chip(x, state.sector === x, 'sector', x, countBy(work, 'sector', x)); }).join('') +
+          '</div>';
+      }
+      var ch2 = f2.channels.filter(function (x) { return countBy(work, 'channel', x); });
+      if (ch2.length) {
+        h2 += '<div class="fgroup"><span class="flabel">Media</span>' +
+          chip('All', !state.channel, 'channel', '', null) +
+          ch2.map(function (x) { return chip(x, state.channel === x, 'channel', x, countBy(work, 'channel', x)); }).join('') +
+          '</div>';
+      }
+      host.innerHTML = h2;
+      wireChips(host);
+      return;
+    }
 
     var html = '<div class="fgroup"><span class="flabel">Show</span>' +
       chip('Everything', !state.kind, 'kind', '', list.length) +
@@ -513,6 +729,10 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     }
 
     host.innerHTML = html;
+    wireChips(host);
+  }
+
+  function wireChips(host) {
     Array.prototype.forEach.call(host.querySelectorAll('.chip'), function (b) {
       b.addEventListener('click', function () {
         var k = b.dataset.key, v = b.dataset.val;
@@ -520,7 +740,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
         if (k === 'kind' && state.kind !== 'work') { state.sector = ''; state.channel = ''; }
         state.showUnsorted = false;
         state.expanded = false;
-        renderFilters(); renderFeed();
+        renderView();
       });
     });
   }
@@ -661,10 +881,18 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   /* ----------------------------------------------------- topic cycler */
   function paintTopic() {
     var t = state.cur.topics[state.topic];
+    var pic = t.thumb || '';
     $('#cyc-body').innerHTML =
       '<div class="cyc-fade">' +
-      '<div class="cyc-kicker">' + esc(t.kicker) + '</div>' +
-      '<h3 class="cyc-h">' + esc(t.headline) + '</h3>' +
+      '<div class="cyc-top">' +
+        '<div class="cyc-shot">' + (pic
+          ? '<img src="' + esc(pic) + '" alt="" decoding="async" ' +
+            'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
+            'data-fb="' + esc(tile(t.kicker)) + '">'
+          : tile(t.kicker)) + '</div>' +
+        '<div><div class="cyc-kicker">' + esc(t.kicker) + '</div>' +
+        '<h3 class="cyc-h">' + esc(t.headline) + '</h3></div>' +
+      '</div>' +
       '<p class="cyc-p">' + esc(t.ingress) + '</p>' +
       '<div class="cyc-src">Read it at <u>' + esc(t.source) + '</u> &rarr;</div>' +
       '</div>';
@@ -776,7 +1004,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       var changed = state.stamp && d.generatedAt !== state.stamp;
       state.live = d;
       state.stamp = d.generatedAt;
-      renderFilters(); renderFeed(); renderRails(); setStatus(); renderFooter();
+      renderView(); renderRails(); setStatus(); renderFooter();
       if (changed && announce) toast('Wire updated');
       return true;
     } catch (e) {
@@ -803,6 +1031,8 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       $('#cyc-body').innerHTML = '<p class="cyc-p">Could not load the archive.</p>';
       return;
     }
+    try { state.awarded = await getJSON('data/awarded.json'); }
+    catch (e) { state.awarded = null; }
     wireCycler();
     renderRails();
     await loadLive(false);
@@ -813,7 +1043,23 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   }
 
   // Wired before any data arrives, so a click in the first moments is never lost.
+  function switchView(v) {
+    if (state.view === v) return;
+    state.view = v;
+    state.showUnsorted = false;
+    state.expanded = false;
+    // Sector and channel mean the same thing in both feed views, so they carry
+    // across; kind and show do not apply outside their own view.
+    if (v !== 'awarded') state.show = '';
+    if (v === 'campaigns') state.kind = '';
+    renderView();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function wireControls() {
+    ['news', 'campaigns', 'awarded'].forEach(function (v) {
+      $('#view-' + v).addEventListener('click', function () { switchView(v); });
+    });
     $('#tab-global').addEventListener('click', function () { switchTab('global'); });
     $('#tab-europe').addEventListener('click', function () { switchTab('europe'); });
     $('#refresh').addEventListener('click', async function () {
@@ -842,7 +1088,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     state.showUnsorted = false;
     var f = $('#feed');
     f.style.opacity = '0';
-    setTimeout(function () { renderFilters(); renderFeed(); f.style.opacity = '1'; }, 110);
+    setTimeout(function () { renderView(); f.style.opacity = '1'; }, 110);
     f.style.transition = 'opacity .18s ease';
   }
 
@@ -850,7 +1096,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
   // Re-render when the layout crosses the phone breakpoint so the cap matches the column count.
   var mq = window.matchMedia('(max-width:860px)');
-  var onMQ = function () { if (state.live) renderFeed(); };
+  var onMQ = function () { if (state.live) renderView(); };
   mq.addEventListener ? mq.addEventListener('change', onMQ) : mq.addListener(onMQ);
 
   document.addEventListener('keydown', function (e) {

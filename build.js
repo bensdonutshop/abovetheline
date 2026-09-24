@@ -44,7 +44,7 @@ fs.mkdirSync(path.join(DIST, 'data'), { recursive: true });
 fs.writeFileSync(path.join(DIST, 'index.html'),
   HEAD + fs.readFileSync(path.join(ROOT, 'page.html'), 'utf8') + '\n</body></html>');
 
-for (const f of ['live.json', 'curated.json']) {
+for (const f of ['live.json', 'curated.json', 'awarded.json']) {
   fs.copyFileSync(path.join(ROOT, 'data', f), path.join(DIST, 'data', f));
 }
 

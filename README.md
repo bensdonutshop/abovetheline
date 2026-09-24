@@ -103,6 +103,32 @@ Finnish trade press is the one genuine gap: *Markkinointi & Mainonta*, *Markkino
 and *Kauppalehti* publish no reachable feed, so Finland arrives through Finnish-language news
 searches plus the hand-checked list under **Landmark work**.
 
+## Three views
+
+`News` · `Campaigns` · `Awarded`, switched in the masthead. Global/Europe only appears on
+News, since it is a news-wire distinction.
+
+**News** is the three-column front page: cycling 90-day archive on the left, ranked wire in
+the middle, campaign and Cannes rails on the right.
+
+**Campaigns** is a card feed of campaign work only, sorted so the work with pictures leads,
+filterable by industry and channel. Built from the live wire — it is whatever the trade press
+is showing today.
+
+**Awarded** is a card feed of cases that won at Cannes Lions, D&AD, Clio and Eurobest, from
+`data/awarded.json`. Each card carries ribbons for the shows that recognised it and tags for
+the level and category, so it is obvious why a case is there. Ordered by how many *shows*
+recognised it, then how many statues, then how high — which puts genuinely cross-show work
+like AXA's *Three Words* (Cannes Grand Prix, D&AD Black Pencil, Grand Clio) at the top.
+
+Case thumbnails come from the video hosts themselves: YouTube exposes one per video id, and
+Vimeo answers oEmbed. Neither needs a key. `node enrich-curated.js data/awarded.json`
+resolves them.
+
+**Verify the case links** with the YouTube oEmbed endpoint rather than fetching the watch
+page — a watch URL returns `200` even for a video that no longer exists, while oEmbed returns
+`404`. That is how a bad link was caught before it shipped.
+
 ## Filters
 
 Above the feed: **Everything / Campaign work / Industry / Media**, and when you pick Campaign
@@ -216,6 +242,8 @@ lib/cluster.js     groups the same story across outlets, prefers the readable on
 lib/classify.js    kind / sector / channel classification from article text
 data/sources.json  feed roster and filter vocabulary
 data/curated.json  the hand-researched rails
+data/awarded.json  award-winning cases, tagged by show, level and category
+enrich-curated.js  resolves thumbnails for curated entries (og:image, YouTube, Vimeo)
 data/live.json     generated — the current wire
 public/img/        generated — cached thumbnails
 .port              generated — the port the running server picked
