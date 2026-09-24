@@ -13,7 +13,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { get, pool } = require('./lib/fetch');
 const P = require('./lib/parse');
-const { relevance, isOffTopic, isSponsored, isNonArticleUrl } = require('./lib/relevance');
+const { relevance, isOffTopic, isSponsored, isNonArticleUrl, strictnessFor } = require('./lib/relevance');
 const { detectAccess, sourceAccess } = require('./lib/paywall');
 const { cluster } = require('./lib/cluster');
 const { kindOf, sectorOf, channelOf, SECTORS, CHANNELS } = require('./lib/classify');
@@ -189,14 +189,14 @@ async function inspect(items) {
       // Classify on the article's own text - a headline alone cannot tell
       // "Nike launches a film" from "Nike reviews its media account".
       const body = prose.slice(0, 6000);
-      a.kind = kindOf(a.title, body);
+      a.kind = kindOf(a.title, body) || 'other';
       a.sector = sectorOf(a.title, body);
       a.channel = channelOf(a.title, body);
     } else {
       // The publisher refused us, so fall back to what we know about them.
       blocked++;
       a.access = sourceAccess(a.source);
-      a.kind = kindOf(a.title, a.summary);
+      a.kind = kindOf(a.title, a.summary) || 'other';
       a.sector = sectorOf(a.title, a.summary);
       a.channel = channelOf(a.title, a.summary);
     }
@@ -261,7 +261,10 @@ function pruneImages(keep) {
   const beforeSpon = all.length;
   all = all.filter(a => !isSponsored(a));
   log('dropped', beforeSpon - all.length, 'sponsored / partner posts');
-  all = all.filter(a => !(a.region === 'nordic' && isOffTopic(a)));
+  // Off-topic copy is dropped everywhere now, not only in the Nordic column.
+  all = all.filter(a => !isOffTopic(a));
+  // And the mixed sources have to clear a relevance floor; the trade press does not.
+  all = all.filter(a => { const min = strictnessFor(a); return !min || a.rel >= min; });
   all = all.filter(a => (a.region === 'nordic' ? a.rel >= 2 : a.rel > -1));
   log('after dedupe + relevance', all.length);
 

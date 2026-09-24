@@ -492,6 +492,7 @@ html{scroll-behavior:smooth}
 .k-work{background:var(--flare-wash); color:var(--flare-text)}
 .k-industry{background:var(--sunk); color:var(--ink-2)}
 .k-media{background:var(--sunk); color:var(--ink-2)}
+.k-other{background:transparent; color:var(--ink-3); box-shadow:inset 0 0 0 1px var(--rule)}
 
 /* ============================================================ story feed */
 .daymark{display:flex; align-items:center; gap:12px; margin:26px 0 14px}
@@ -1186,7 +1187,8 @@ html{scroll-behavior:smooth}
   }
 
   /* ----------------------------------------------------------- filters */
-  var KIND_LABEL = { work: 'Campaign work', industry: 'Agency business', media: 'Media and adtech' };
+  var KIND_LABEL = { work: 'Campaign work', industry: 'Agency business',
+    media: 'Media and adtech', other: 'Other' };
 
   // A story passes if it matches every active filter.
   function passes(a) {
@@ -1298,7 +1300,7 @@ html{scroll-behavior:smooth}
 
     var html = '<div class="fgroup"><span class="flabel">Show</span>' +
       chip('Everything', !state.kind, 'kind', '', list.length) +
-      ['work', 'industry', 'media'].map(function (k) {
+      ['work', 'industry', 'media', 'other'].map(function (k) {
         return chip(KIND_LABEL[k], state.kind === k, 'kind', k, countBy(list, 'kind', k), k === 'work');
       }).join('') + '</div>';
 
