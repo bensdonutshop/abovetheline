@@ -48,22 +48,6 @@ for (const f of ['live.json', 'curated.json', 'awarded.json']) {
   fs.copyFileSync(path.join(ROOT, 'data', f), path.join(DIST, 'data', f));
 }
 
-// The redesign ships alongside the current site at /next/ so the two can be
-// compared on the same data. Its data files are copied in because the page
-// resolves them relative to its own directory.
-const nextSrc = path.join(ROOT, 'page-next.html');
-if (fs.existsSync(nextSrc)) {
-  fs.mkdirSync(path.join(DIST, 'next', 'data'), { recursive: true });
-  fs.writeFileSync(path.join(DIST, 'next', 'index.html'),
-    HEAD + fs.readFileSync(nextSrc, 'utf8') + '\n</body></html>');
-  for (const f of ['live.json', 'curated.json', 'awarded.json']) {
-    fs.copyFileSync(path.join(ROOT, 'data', f), path.join(DIST, 'next', 'data', f));
-  }
-  if (!HOSTED && fs.existsSync(path.join(ROOT, 'public', 'img'))) {
-    copyDir(path.join(ROOT, 'public', 'img'), path.join(DIST, 'next', 'img'));
-  }
-}
-
 // Stops GitHub Pages running the output through Jekyll.
 fs.writeFileSync(path.join(DIST, '.nojekyll'), '');
 
