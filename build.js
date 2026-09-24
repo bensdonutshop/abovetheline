@@ -48,6 +48,19 @@ for (const f of ['live.json', 'curated.json', 'awarded.json']) {
   fs.copyFileSync(path.join(ROOT, 'data', f), path.join(DIST, 'data', f));
 }
 
+// The colour study ships alongside at /alt/ so the two can be compared on the
+// same data. Its data files are copied in because the page resolves them
+// relative to its own directory.
+const altSrc = path.join(ROOT, 'page-alt.html');
+if (fs.existsSync(altSrc)) {
+  fs.mkdirSync(path.join(DIST, 'alt', 'data'), { recursive: true });
+  fs.writeFileSync(path.join(DIST, 'alt', 'index.html'),
+    HEAD + fs.readFileSync(altSrc, 'utf8') + '\n</body></html>');
+  for (const f of ['live.json', 'curated.json', 'awarded.json']) {
+    fs.copyFileSync(path.join(ROOT, 'data', f), path.join(DIST, 'alt', 'data', f));
+  }
+}
+
 // Stops GitHub Pages running the output through Jekyll.
 fs.writeFileSync(path.join(DIST, '.nojekyll'), '');
 

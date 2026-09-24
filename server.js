@@ -88,6 +88,13 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const p = url.pathname;
 
+  if (p === '/alt' || p === '/alt/') {
+    return fs.readFile(path.join(ROOT, 'page-alt.html'), 'utf8', (err, html) => {
+      if (err) return send(res, 500, 'page-alt.html missing');
+      send(res, 200, SHELL_HEAD + html + SHELL_FOOT, TYPES['.html']);
+    });
+  }
+
   if (p === '/' || p === '/index.html') {
     return fs.readFile(path.join(ROOT, 'page.html'), 'utf8', (err, html) => {
       if (err) return send(res, 500, 'page.html missing');
