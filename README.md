@@ -223,6 +223,32 @@ Classification is lexicon-based and deliberately abstains when two categories sc
 together, which is why a third of stories stay unclassified rather than being confidently
 mislabelled.
 
+## Industry filtering
+
+Both card views filter by industry. `lib/classify.js` holds 18 sectors, each a list of brand
+names plus the category words that describe the field, matched against the brand, campaign,
+agency and article text.
+
+| | Classified |
+|---|---|
+| Awarded cases | 187 of 198 (94%) |
+| Campaign work from the wire | ~69% |
+
+Awarded classifies far better because each case carries a real `brand` field. The wire has to
+find the brand inside a headline, and a story about an agency hire names no brand at all.
+
+Two rules make the matching work:
+
+- **Brand names need a boundary in front but not behind.** `pepsi` has to match *PepsiCo* and
+  `volvo` has to match *Volvo's*, while `on` must not match *online*. Terms of four characters
+  or fewer need a boundary on both sides; longer ones only in front.
+- **Curly apostrophes and accents are folded first.** Sources write `DE'LONGHI`, `LAY'S` and
+  `L'ORÉAL` with typographic apostrophes, which would otherwise miss every brand spelled with
+  a straight one.
+
+Counts on the industry chips follow the show selection, so the number on a chip is what you
+will actually get rather than a global total.
+
 ## Paywalls
 
 Articles the publisher marks as subscriber-only never reach the page. The check is

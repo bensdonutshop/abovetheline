@@ -17,6 +17,7 @@ const path = require('path');
 const { get } = require('./lib/fetch');
 const P = require('./lib/parse');
 const { placeOf } = require('./lib/places');
+const { sectorOf } = require('./lib/classify');
 
 const SRC_URL = 'https://lovetheworkmore.com/2026-2/';
 const LEVELS = { 'GRAND PRIX / TITANIUM': 'Grand Prix', 'GOLD': 'Gold', 'SILVER': 'Silver', 'BRONZE': 'Bronze' };
@@ -110,7 +111,10 @@ function cleanCategory(c) {
     seen.add(key);
 
     const place = placeOf(e.agency);
+    // The brand is the strongest signal for what industry a case belongs to.
+    const sector = sectorOf(e.brand, [e.brand, e.campaign, e.agency, e.category].join(' '));
     out.push({
+      sector: sector,
       campaign: noDash(titleCaseCampaign(e.campaign)),
       brand: noDash(e.brand),
       agency: noDash(e.agency),
@@ -141,7 +145,11 @@ function cleanCategory(c) {
         if (x.blurb) hit.blurb = x.blurb;
         merged++;
       } else {
-        out.push(Object.assign({ region: placeOf(x.agency).region, country: placeOf(x.agency).country || x.country }, x));
+        out.push(Object.assign({
+          region: placeOf(x.agency).region,
+          country: placeOf(x.agency).country || x.country,
+          sector: sectorOf(x.brand, [x.brand, x.campaign, x.agency, x.blurb || ''].join(' '))
+        }, x));
       }
     }
   }
@@ -149,8 +157,13 @@ function cleanCategory(c) {
   const shows = [];
   out.forEach(c => c.awards.forEach(a => { if (shows.indexOf(a.show) < 0) shows.push(a.show); }));
 
+  const sectors = [];
+  out.forEach(c => { if (c.sector && sectors.indexOf(c.sector) < 0) sectors.push(c.sector); });
+  sectors.sort();
+
   const doc = {
     generated: new Date().toISOString().slice(0, 10),
+    sectors: sectors,
     note: 'Cannes Lions winners indexed by lovetheworkmore.com, with D&AD, Clio and Eurobest recognition researched separately and merged in.',
     shows,
     levels: WANT,
@@ -162,6 +175,8 @@ function cleanCategory(c) {
   out.forEach(c => { const l = c.awards[0].level; byLevel[l] = (byLevel[l] || 0) + 1; });
   console.log('[awarded]', out.length, 'cases |', JSON.stringify(byLevel));
   console.log('[awarded] cross-show merges:', merged, '| shows:', shows.join(', '));
+  console.log('[awarded] sectors:', sectors.length, '| classified:',
+    out.filter(c => c.sector).length + '/' + out.length);
   console.log('[awarded] region split:', JSON.stringify(
     out.reduce((m, c) => (m[c.region] = (m[c.region] || 0) + 1, m), {})));
 })();

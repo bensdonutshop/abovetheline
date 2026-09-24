@@ -564,7 +564,7 @@ html{scroll-behavior:smooth}
   var $ = function (s) { return document.querySelector(s); };
   var state = { region: 'global', live: null, cur: null, topic: 0, stamp: '', raf: null, paused: false, expanded: false, liveHost: false,
     kind: '', sector: '', channel: '', showUnsorted: false,
-    view: 'news', awarded: null, show: '' };
+    view: 'news', awarded: null, show: '', awSector: '' };
   var CYCLE_MS = 8000;
 
   /* ------------------------------------------------------------ helpers */
@@ -740,6 +740,9 @@ html{scroll-behavior:smooth}
         return c.awards.some(function (a) { return a.show === state.show; });
       });
     }
+    if (state.awSector) {
+      cases = cases.filter(function (c) { return c.sector === state.awSector; });
+    }
     // Most decorated first: more shows beats more statues beats a bigger statue.
     cases = cases.slice().sort(function (x, y) {
       var sx = new Set(x.awards.map(function (a) { return a.show; })).size;
@@ -782,6 +785,12 @@ html{scroll-behavior:smooth}
     }).join('') + '</div>';
 
     var where = state.region === 'europe' ? 'European' : '';
+    if (state.awSector) {
+      $('#feed-title').textContent = state.awSector +
+        (state.show ? ', ' + state.show : '') + (where ? ' in Europe' : '');
+      $('#feed-note').textContent = cases.length + (cases.length === 1 ? ' case' : ' cases');
+      return;
+    }
     $('#feed-title').textContent = (state.show ? state.show : (where ? where + ' awarded' : 'Most awarded')) +
       (state.show && where ? ' in Europe' : '') + (state.show ? ' winning cases' : ' cases');
     $('#feed-note').textContent = cases.length + ' cases';
@@ -859,11 +868,33 @@ html{scroll-behavior:smooth}
           return c.awards.some(function (a) { return a.show === sh; });
         }).length;
       };
-      host.innerHTML = '<div class="fgroup"><span class="flabel">Show</span>' +
+      // Sector counts follow the show selection, so the numbers on the chips
+      // are what you will actually get rather than a global total.
+      var inShow = state.show
+        ? cases.filter(function (c) {
+            return c.awards.some(function (a) { return a.show === state.show; });
+          })
+        : cases;
+      var countSector = function (x) {
+        return inShow.filter(function (c) { return c.sector === x; }).length;
+      };
+      var sectors = (state.awarded.sectors || []).filter(countSector)
+        .sort(function (a, b) { return countSector(b) - countSector(a); });
+
+      var h = '<div class="fgroup"><span class="flabel">Show</span>' +
         chip('All shows', !state.show, 'show', '', cases.length) +
         (state.awarded.shows || []).filter(countShow).map(function (sh) {
           return chip(sh, state.show === sh, 'show', sh, countShow(sh), true);
         }).join('') + '</div>';
+
+      if (sectors.length) {
+        h += '<div class="fgroup"><span class="flabel">Industry</span>' +
+          chip('All', !state.awSector, 'awSector', '', inShow.length) +
+          sectors.map(function (x) {
+            return chip(x, state.awSector === x, 'awSector', x, countSector(x));
+          }).join('') + '</div>';
+      }
+      host.innerHTML = h;
       wireChips(host);
       return;
     }
@@ -1275,7 +1306,7 @@ html{scroll-behavior:smooth}
     state.expanded = false;
     // Sector and channel mean the same thing in both feed views, so they carry
     // across; kind and show do not apply outside their own view.
-    if (v !== 'awarded') state.show = '';
+    if (v !== 'awarded') { state.show = ''; state.awSector = ''; }
     if (v === 'campaigns') state.kind = '';
     renderView();
     swap(state.view === 'news' ? $('#feed') : $('#cards'));
