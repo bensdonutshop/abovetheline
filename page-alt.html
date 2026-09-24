@@ -549,10 +549,12 @@ html{scroll-behavior:smooth}
 
 /* ============================================================ rail modules */
 .mod{margin-bottom:34px}
-.mod--card{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r-md);
-  overflow:hidden; box-shadow:var(--shadow); padding:16px 17px 6px}
-.mod--card .head{margin-bottom:14px}
-.mod--card .rank:first-of-type{border-top:0}
+/* Same as the cycler: the heading sits on the page and the card holds only the
+   content, so both columns read the same way down the page. */
+.mod-card{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r-md);
+  overflow:hidden; box-shadow:var(--shadow); padding:14px 17px 6px}
+.mod-card .windows{margin-top:0}
+.mod-card .rank:first-of-type{border-top:0}
 .rank{display:grid; grid-template-columns:24px 58px minmax(0,1fr); gap:10px; padding:11px 0;
   border-top:1px solid var(--rule-soft); align-items:start}
 .rank .pic{aspect-ratio:4/3; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
@@ -672,10 +674,12 @@ html{scroll-behavior:smooth}
   </div>
 
   <aside class="col-lists">
-    <section class="mod mod--card">
+    <section class="mod">
       <div class="head"><h2>Most talked about</h2><span id="talked-note"></span></div>
-      <div class="windows" id="windows" role="group" aria-label="Time window"></div>
-      <div id="m-12"></div>
+      <div class="mod-card">
+        <div class="windows" id="windows" role="group" aria-label="Time window"></div>
+        <div id="m-12"></div>
+      </div>
     </section>
     <section class="mod">
       <div class="head"><h2>Cannes Lions 2026</h2><span>Case films</span></div>
