@@ -111,22 +111,15 @@ Syne Bold, used *only* for the masthead so it never competes with the headlines.
 masthead scrolls away; the sticky bar below it carries the abbreviation, ATL, which is what
 the industry actually says out loud.
 
-**The masthead surface.** One deliberate dark band at the top of the page, drawn on canvas.
-The plate is basalt: a dark grain with crystalline flecks through it, generated once and
-reused each frame. A warm light wanders over it, and the flecks answer it - bright and warm
-near the beam, dim and cool away from it - so the rock is revealed rather than lit flatly.
-The beam's path is two sine sums at different frequencies with random phase, so it wanders
-rather than sweeping on rails.
+**The masthead.** No band and no edge: the masthead background is the page background, so
+there is nothing to see the end of. A very faint warm wash drifts behind the wordmark on a
+34-second cycle and fades to transparent well before any boundary. It is two radial gradients
+on a pseudo-element moved with `transform`, so it costs a compositor layer and nothing else,
+and it holds still under `prefers-reduced-motion`.
 
-**The rule is a fuse.** The line is the brand mark, so it burns: a white-hot spark runs its
-length throwing embers, the burnt stretch behind it glows and fades, then it rests and runs
-again. A fuse rather than a laser sparkle because the site is called *Above the Line*, the
-accent already burns orange into red, and a fuse says something is about to go off. The CSS
-gradient stays underneath as the fallback if the canvas never paints.
-
-Both stop dead under `prefers-reduced-motion`, when the masthead scrolls out of view
-(IntersectionObserver) and when the tab is hidden. Canvases are capped at 2x device pixel
-ratio and rebuilt debounced on resize.
+**The line ends in a sparkle.** A six-point star, flat and solid, sitting on the hot end of
+the gradient rule. Drawn as one SVG path with a generous waist so the points read as chunky
+rather than filigree. It is static - the line is the brand mark and a mark should hold still.
 
 **Type.** Syne Bold for the masthead, Schibsted Grotesk for everything else. Schibsted Grotesk
 is the face a Nordic news group commissioned for its own papers, so hierarchy comes from
