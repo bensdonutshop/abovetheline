@@ -238,6 +238,28 @@ Classification is lexicon-based and deliberately abstains when two categories sc
 together, which is why a third of stories stay unclassified rather than being confidently
 mislabelled.
 
+## Most talked about, over a window you choose
+
+Month / 6 months / Year, ranked from the same pool the Campaigns gallery uses, so the rail
+answers "what is being talked about" with the same evidence: how many outlets ran it, how many
+juries recognised it, whether it made the researched list. Each entry states what earned its
+place - "1 award, 2 outlets" - rather than asserting a rank.
+
+The window filters on **when the work broke**, not when the wire happened to see it, which
+needs every item dated. The wire has real timestamps. Curated campaigns carry the month they
+broke. Awarded cases take the month of their earliest recognition, from the show's announcement
+month and edition year - and Vuoden Huiput 2025 dates to April 2026, because that is when its
+gala was.
+
+So Month surfaces this month's wire, and 6 months brings the Cannes-era work back up.
+
+## Story categories
+
+Each story in the wire carries its kind: campaign work, agency business, or media and adtech.
+The tag sits in the byline as metadata rather than above the headline as an eyebrow, because
+it is information about the story rather than a label on the section. Around 70% of stories
+carry one; the classifier abstains rather than guessing.
+
 ## Campaigns: two lenses over one deduplicated pool
 
 Campaigns draws on three sources at once: the live wire, the award archive and the

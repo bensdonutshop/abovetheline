@@ -23,6 +23,9 @@ const SRC_URL = 'https://lovetheworkmore.com/2026-2/';
 const CANNES_YEAR = 2026;                 // the index page this is scraped from
 // Which edition of each show these results belong to. Vuoden Huiput 2025 was
 // judged and awarded at the April 2026 gala, so the competition year is 2025.
+// The month each show announces, so an awarded case can sit on a timeline.
+const SHOW_MONTH = { 'Cannes Lions': '06', 'D&AD': '09', 'Clio': '05',
+                     'Eurobest': '12', 'Guld\u00e4gget': '04', 'Vuoden Huiput': '04' };
 const SHOW_YEARS = { 'Cannes Lions': 2026, 'D&AD': 2026, 'Clio': 2026,
                      'Eurobest': 2025, 'Guld\u00e4gget': 2026, 'Vuoden Huiput': 2025 };
 const LEVELS = { 'GRAND PRIX / TITANIUM': 'Grand Prix', 'GOLD': 'Gold', 'SILVER': 'Silver', 'BRONZE': 'Bronze' };
@@ -164,6 +167,21 @@ function cleanCategory(c) {
 
   const shows = [];
   out.forEach(c => c.awards.forEach(a => { if (shows.indexOf(a.show) < 0) shows.push(a.show); }));
+
+  // The earliest recognition is the date the case belongs on.
+  out.forEach(c => {
+    var best = null;
+    c.awards.forEach(a => {
+      var m = SHOW_MONTH[a.show] || '06';
+      var y = a.year || SHOW_YEARS[a.show];
+      // Vuoden Huiput 2025 was awarded at the April 2026 gala.
+      if (a.show === 'Vuoden Huiput' && y === 2025) y = 2026;
+      if (!y) return;
+      var d = y + '-' + m;
+      if (!best || d < best) best = d;
+    });
+    if (best) c.date = best;
+  });
 
   const sectors = [];
   out.forEach(c => { if (c.sector && sectors.indexOf(c.sector) < 0) sectors.push(c.sector); });
