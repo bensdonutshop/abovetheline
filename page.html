@@ -564,7 +564,7 @@ html{scroll-behavior:smooth}
     <h1 class="logo">Above the Line</h1>
     <svg class="atl-mark" id="atl-mark" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <linearGradient id="atlGrad" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id="atlGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
           <stop offset="0" stop-color="#FF8A1F"/>
           <stop offset="0.44" stop-color="#FF4A00"/>
           <stop offset="1" stop-color="#D4160F"/>
@@ -753,6 +753,17 @@ html{scroll-behavior:smooth}
 
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
 
+    // One gradient across the whole mark, in user space. Left in object-bounding
+    // -box units it repeats inside every single arm.
+    var grad = svg.querySelector('#atlGrad');
+    if (grad) {
+      grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      grad.setAttribute('x1', '0');
+      grad.setAttribute('y1', '0');
+      grad.setAttribute('x2', String(W));
+      grad.setAttribute('y2', '0');
+    }
+
     var out = [];
     // The arm that points left, run all the way out. This is the line.
     out.push('<rect x="0" y="' + (cy - half) + '" width="' + cx + '" height="' + w + '"/>');
@@ -867,9 +878,10 @@ html{scroll-behavior:smooth}
   function curatedItem(x) {
     return {
       title: x.campaign, url: x.url, pic: x.thumb || '', brand: x.brand || '',
-      agency: x.agency || '', source: x.source || '', ts: 0,
-      sector: '', channel: '', access: 'open', outlets: 1, awardCount: 0,
-      showCount: 0, curated: 11 - (x.rank || 10), origin: 'curated', blurb: x.note || ''
+      agency: x.agency || '', source: x.source || '', ts: monthTs(x.date),
+      sector: x.sector || '', channel: '', access: 'open', outlets: 1, awardCount: 0,
+      showCount: 0, curated: 11 - (x.rank || 10), origin: 'curated',
+      blurb: x.note || x.blurb || ''
     };
   }
 
@@ -885,6 +897,11 @@ html{scroll-behavior:smooth}
       items.push(awardItem(c));
     });
     ((state.cur && state.cur.campaigns12m) || []).forEach(function (x) {
+      items.push(curatedItem(x));
+    });
+    // The deeper curated bench, region-scoped the same way the award index is.
+    ((state.cur && state.cur.campaignsMore) || []).forEach(function (x) {
+      if (eu && x.region !== 'europe') return;
       items.push(curatedItem(x));
     });
 
@@ -1358,10 +1375,20 @@ html{scroll-behavior:smooth}
     var host = $('#m-12');
     if (!host) return;
     var cutoff = Date.now() - state.window * 30.44 * 864e5;
-    var pool = campaignPool()
+    var ranked = campaignPool()
       .filter(function (a) { return a.ts && a.ts >= cutoff; })
-      .sort(function (a, b) { return b.trend - a.trend; })
-      .slice(0, 10);
+      .sort(function (a, b) { return b.trend - a.trend; });
+
+    // Most talked about has to mean talked about in more than one place. Without
+    // a cap, one showcase publishing thirty campaigns in a month takes the whole
+    // rail on recency alone, which is the opposite of what the ranking is for.
+    var PER_SOURCE = 3, seen = {}, pool = [], spill = [];
+    ranked.forEach(function (a) {
+      var k = a.source || a.origin;
+      if ((seen[k] = (seen[k] || 0) + 1) <= PER_SOURCE) pool.push(a);
+      else spill.push(a);
+    });
+    pool = pool.concat(spill).slice(0, 10);
 
     var wins = $('#windows');
     if (wins) {

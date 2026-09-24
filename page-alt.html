@@ -31,27 +31,27 @@
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
   color-scheme:dark;
   /* The reference's own dark half: aubergine ground, lilac type. */
-  --paper:#2E0B18; --surface:#3D1425; --sunk:#4A1B2E;
-  --ink:#EBD3E5; --ink-2:#C39BB4; --ink-3:#946D84;
-  --rule:#4E2036; --rule-soft:#3A1526;
+  --paper:#140510; --surface:#1D0918; --sunk:#261020;
+  --ink:#E6CFE0; --ink-2:#B694AC; --ink-3:#9C7791;
+  --rule:#35182B; --rule-soft:#24101E;
   --flare:#FF6238; --flare-ink:#2B0810; --flare-text:#FF6238; --flare-wash:rgba(255,98,56,.16);
   --flare-grad:linear-gradient(100deg, #FF9159 0%, #FF6238 42%, #C21B38 100%);
   --flare-grad-v:linear-gradient(168deg, #FF9159 0%, #FF6238 44%, #C21B38 100%);
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 16px 44px -24px rgba(0,0,0,.9);
-  --wash:rgba(255,98,56,.10);
-  --wash-a:rgba(255,98,56,.19); --wash-b:rgba(194,27,56,.14);
+  --wash:rgba(255,98,56,.07);
+  --wash-a:rgba(255,98,56,.13); --wash-b:rgba(194,27,56,.09);
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --paper:#2E0B18; --surface:#3D1425; --sunk:#4A1B2E;
-  --ink:#EBD3E5; --ink-2:#C39BB4; --ink-3:#946D84;
-  --rule:#4E2036; --rule-soft:#3A1526;
+  --paper:#140510; --surface:#1D0918; --sunk:#261020;
+  --ink:#E6CFE0; --ink-2:#B694AC; --ink-3:#9C7791;
+  --rule:#35182B; --rule-soft:#24101E;
   --flare:#FF6238; --flare-ink:#2B0810; --flare-text:#FF6238; --flare-wash:rgba(255,98,56,.16);
   --flare-grad:linear-gradient(100deg, #FF9159 0%, #FF6238 42%, #C21B38 100%);
   --flare-grad-v:linear-gradient(168deg, #FF9159 0%, #FF6238 44%, #C21B38 100%);
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 16px 44px -24px rgba(0,0,0,.9);
-  --wash:rgba(255,98,56,.10);
-  --wash-a:rgba(255,98,56,.19); --wash-b:rgba(194,27,56,.14);
+  --wash:rgba(255,98,56,.07);
+  --wash-a:rgba(255,98,56,.13); --wash-b:rgba(194,27,56,.09);
 }
 
 *{box-sizing:border-box}
@@ -144,26 +144,13 @@ html{scroll-behavior:smooth}
 /* Rule and mark are one object: the line is simply one of the asterisk's seven
    arms, run out to full width. Same stroke weight throughout, one gradient
    across the whole shape, so there is nothing sitting on top of anything. */
-.atl-mark{display:block; width:100%; height:48px; margin-top:14px; overflow:visible}
-@media (max-width:700px){ .atl-mark{height:38px; margin-top:10px} }
-/* A lockup rather than a sentence: the two strong words tracked tight enough
-   to read as one object, and the connecting word tucked small between them,
-   which is how mastheads have always handled a word nobody needs to read. */
+.atl-mark{display:block; width:100%; height:48px; margin-top:-16px; overflow:visible}
+@media (max-width:700px){ .atl-mark{height:38px; margin-top:-13px} }
 .logo{
   margin:0; font-family:var(--masthead); font-weight:700;
   font-size:clamp(34px, 8.6vw, 112px); line-height:.86;
-  white-space:nowrap; display:flex; align-items:baseline; gap:0;
+  white-space:nowrap; letter-spacing:-.04em; font-feature-settings:"kern" 1;
 }
-.logo span{letter-spacing:-.055em; font-feature-settings:"kern" 1}
-.logo em{
-  font-style:normal; font-weight:700; font-size:.34em; letter-spacing:.02em;
-  align-self:center; padding:0 .34em; opacity:.62;
-  transform:translateY(-.12em);
-}
-/* Syne sets a wide V and E, so the joins need pulling in by hand. */
-.logo span:first-of-type{margin-right:-.01em}
-.logo span:last-of-type{margin-left:-.01em}
-@media (max-width:700px){ .logo em{font-size:.38em; padding:0 .3em} }
 .dateline{
   margin:16px 0 0; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
   font-size:14px; color:var(--ink-3);
@@ -570,10 +557,10 @@ html{scroll-behavior:smooth}
   <div class="masthead-in">
     <!-- The wordmark sits above the rule, because that is literally what the
          name means. Above the line: the bought media, the work everybody sees. -->
-    <h1 class="logo"><span>Above</span><em>the</em><span>Line</span></h1>
+    <h1 class="logo">Above the Line</h1>
     <svg class="atl-mark" id="atl-mark" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <linearGradient id="atlGrad" x1="0" y1="0" x2="1" y2="0">
+        <linearGradient id="atlGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="0">
           <stop offset="0" stop-color="#FF7A3C"/>
           <stop offset="0.44" stop-color="#F04E24"/>
           <stop offset="1" stop-color="#A81230"/>
@@ -762,6 +749,17 @@ html{scroll-behavior:smooth}
 
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
 
+    // One gradient across the whole mark, in user space. Left in object-bounding
+    // -box units it repeats inside every single arm.
+    var grad = svg.querySelector('#atlGrad');
+    if (grad) {
+      grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      grad.setAttribute('x1', '0');
+      grad.setAttribute('y1', '0');
+      grad.setAttribute('x2', String(W));
+      grad.setAttribute('y2', '0');
+    }
+
     var out = [];
     // The arm that points left, run all the way out. This is the line.
     out.push('<rect x="0" y="' + (cy - half) + '" width="' + cx + '" height="' + w + '"/>');
@@ -876,9 +874,10 @@ html{scroll-behavior:smooth}
   function curatedItem(x) {
     return {
       title: x.campaign, url: x.url, pic: x.thumb || '', brand: x.brand || '',
-      agency: x.agency || '', source: x.source || '', ts: 0,
-      sector: '', channel: '', access: 'open', outlets: 1, awardCount: 0,
-      showCount: 0, curated: 11 - (x.rank || 10), origin: 'curated', blurb: x.note || ''
+      agency: x.agency || '', source: x.source || '', ts: monthTs(x.date),
+      sector: x.sector || '', channel: '', access: 'open', outlets: 1, awardCount: 0,
+      showCount: 0, curated: 11 - (x.rank || 10), origin: 'curated',
+      blurb: x.note || x.blurb || ''
     };
   }
 
@@ -894,6 +893,11 @@ html{scroll-behavior:smooth}
       items.push(awardItem(c));
     });
     ((state.cur && state.cur.campaigns12m) || []).forEach(function (x) {
+      items.push(curatedItem(x));
+    });
+    // The deeper curated bench, region-scoped the same way the award index is.
+    ((state.cur && state.cur.campaignsMore) || []).forEach(function (x) {
+      if (eu && x.region !== 'europe') return;
       items.push(curatedItem(x));
     });
 
@@ -1367,10 +1371,20 @@ html{scroll-behavior:smooth}
     var host = $('#m-12');
     if (!host) return;
     var cutoff = Date.now() - state.window * 30.44 * 864e5;
-    var pool = campaignPool()
+    var ranked = campaignPool()
       .filter(function (a) { return a.ts && a.ts >= cutoff; })
-      .sort(function (a, b) { return b.trend - a.trend; })
-      .slice(0, 10);
+      .sort(function (a, b) { return b.trend - a.trend; });
+
+    // Most talked about has to mean talked about in more than one place. Without
+    // a cap, one showcase publishing thirty campaigns in a month takes the whole
+    // rail on recency alone, which is the opposite of what the ranking is for.
+    var PER_SOURCE = 3, seen = {}, pool = [], spill = [];
+    ranked.forEach(function (a) {
+      var k = a.source || a.origin;
+      if ((seen[k] = (seen[k] || 0) + 1) <= PER_SOURCE) pool.push(a);
+      else spill.push(a);
+    });
+    pool = pool.concat(spill).slice(0, 10);
 
     var wins = $('#windows');
     if (wins) {
