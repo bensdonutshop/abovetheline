@@ -88,6 +88,13 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const p = url.pathname;
 
+  if (p === '/next' || p === '/next/') {
+    return fs.readFile(path.join(ROOT, 'page-next.html'), 'utf8', (err, html) => {
+      if (err) return send(res, 500, 'page-next.html missing');
+      send(res, 200, SHELL_HEAD + html + SHELL_FOOT, TYPES['.html']);
+    });
+  }
+
   if (p === '/' || p === '/index.html') {
     return fs.readFile(path.join(ROOT, 'page.html'), 'utf8', (err, html) => {
       if (err) return send(res, 500, 'page.html missing');

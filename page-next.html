@@ -1,0 +1,1337 @@
+<title>Above The Line</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314110E'/%3E%3Crect x='6' y='12' width='20' height='3.4' rx='1.4' fill='%23FF4D0F'/%3E%3Crect x='6' y='18.5' width='13' height='3.4' rx='1.4' fill='%23F2EEE8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&display=swap">
+
+<style>
+/* ============================================================ tokens */
+:root{
+  /* Cool grey and blue-black, deliberately not the warm-cream-and-clay palette.
+     The orange is signal orange, the colour of safety tape and press marks,
+     not the terracotta that every generated page reaches for. */
+  --paper:#E9EBEE; --surface:#FFFFFF; --sunk:#DFE3E8;
+  --ink:#12161F; --ink-2:#4E5766; --ink-3:#8A93A1;
+  --rule:#CDD3DB; --rule-soft:#DEE3E9;
+  --flare:#FF4A00; --flare-ink:#FFFFFF; --flare-wash:rgba(255,74,0,.09);
+  --shadow:0 1px 2px rgba(18,22,31,.06), 0 14px 40px -22px rgba(18,22,31,.30);
+  --wash:rgba(255,74,0,.06);
+
+  /* One family. Hierarchy comes from weight and size, not from a second face. */
+  --display:"Schibsted Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --masthead:var(--display);
+  --body:var(--display);
+  --mono:var(--display);
+
+  --gutter:22px; --rail-l:290px; --rail-r:330px; --max:1520px;
+  --r-xs:3px; --r-sm:6px; --r-md:10px; --r-pill:999px;
+  --z-base:0; --z-raised:1; --z-sticky:50; --z-toast:80; --z-grain:90;
+  --ease:cubic-bezier(.2,.8,.3,1);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  color-scheme:dark;
+  --paper:#0B0E14; --surface:#141924; --sunk:#1C2230;
+  --ink:#E9ECF2; --ink-2:#9AA4B4; --ink-3:#6B7484;
+  --rule:#242B39; --rule-soft:#1A2029;
+  --flare:#FF6A2B; --flare-ink:#140A03; --flare-wash:rgba(255,106,43,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 16px 44px -24px rgba(0,0,0,.9);
+  --wash:rgba(255,106,43,.09);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#0B0E14; --surface:#141924; --sunk:#1C2230;
+  --ink:#E9ECF2; --ink-2:#9AA4B4; --ink-3:#6B7484;
+  --rule:#242B39; --rule-soft:#1A2029;
+  --flare:#FF6A2B; --flare-ink:#140A03; --flare-wash:rgba(255,106,43,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 16px 44px -24px rgba(0,0,0,.9);
+  --wash:rgba(255,106,43,.09);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:16px; line-height:1.55;
+  font-feature-settings:"tnum" 1, "ss01" 1;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+a{color:inherit; text-decoration:none}
+img{display:block; max-width:100%}
+:focus-visible{outline:2px solid var(--flare); outline-offset:3px; border-radius:2px}
+button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
+
+/* A fixed grain plate. Fixed and pointer-events:none so it never repaints on scroll. */
+body::after{
+  content:""; position:fixed; inset:0; z-index:var(--z-grain); pointer-events:none; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) body::after{opacity:.055} }
+:root[data-theme="dark"] body::after{opacity:.055}
+
+html{scroll-behavior:smooth}
+
+.skip{
+  position:absolute; left:16px; top:-100px; z-index:calc(var(--z-sticky) + 5);
+  background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:var(--r-pill);
+  font-family:var(--display); font-weight:700; font-size:12px; letter-spacing:-.004em;
+  transition:top .2s var(--ease);
+}
+.skip:focus{top:calc(env(safe-area-inset-top, 0px) + 12px)}
+
+/* Press feedback. Nothing here moves more than a pixel. */
+.tab:active, .chip:active, .refresh:active, .more:active,
+.unsorted:active, .arrow:active{transform:translateY(1px)}
+.card:active figure{transform:scale(.995)}
+
+/* ============================================================ front-page masthead */
+.masthead{
+  border-bottom:1px solid var(--rule);
+  background:
+    radial-gradient(120% 140% at 50% 0%, var(--wash) 0%, transparent 62%),
+    var(--paper);
+}
+.masthead-in{
+  max-width:var(--max); margin:0 auto; padding:40px var(--gutter) 20px;
+  display:flex; flex-direction:column; align-items:flex-start; text-align:left;
+}
+.atl-rule{
+  display:block; width:100%; height:6px; background:var(--flare);
+  border-radius:2px; margin-top:18px;
+}
+.logo{
+  margin:0; font-family:var(--masthead); font-weight:900;
+  font-size:clamp(36px, 9vw, 116px); line-height:.82; letter-spacing:-.045em;
+  white-space:nowrap;
+}
+.dateline{
+  margin:14px 0 0; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+  font-size:14px; color:var(--ink-3);
+}
+.dateline b{font-weight:400; color:var(--ink-2)}
+.dateline span, .dateline b{position:relative}
+.dateline b::before{
+  content:""; position:absolute; left:-6px; top:50%; width:3px; height:3px; border-radius:50%;
+  background:var(--rule); transform:translateY(-50%);
+}
+@media (max-width:700px){
+  .masthead-in{padding:22px var(--gutter) 16px}
+  .atl-rule{height:4px; margin-top:12px}
+  .dateline{gap:4px; font-size:9.5px; flex-direction:column; line-height:1.7}
+  /* the hairline divider only makes sense on one line */
+  .dateline b::before{display:none}
+  /* the dateline above already carries freshness, so the sticky bar drops a row */
+  .mast .status{display:none}
+}
+
+/* The abbreviation is the industry term, so the sticky bar can use it alone. */
+.monogram{display:flex; align-items:center; gap:8px; margin-right:auto; padding:12px 0}
+.monogram .rule-dash{width:18px; height:3px; background:var(--flare); border-radius:2px}
+.monogram b{
+  font-family:var(--display); font-weight:800; font-size:17px;
+  letter-spacing:.04em; line-height:1;
+}
+.monogram:hover b{color:var(--flare)}
+
+/* ============================================================ masthead */
+.mast{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:var(--z-sticky);
+  background:var(--paper); border-bottom:1px solid var(--rule);
+}
+.mast-in{
+  max-width:var(--max); margin:0 auto; padding:0 var(--gutter);
+  display:flex; align-items:center; gap:18px; min-height:64px; flex-wrap:wrap;
+}
+.wordmark{display:flex; align-items:baseline; gap:9px; margin-right:auto; padding:14px 0 12px}
+.wordmark b{
+  font-family:var(--display); font-weight:800; font-size:26px; letter-spacing:-.022em; line-height:1; }
+.wordmark .rule-dash{width:26px; height:4px; background:var(--flare); border-radius:2px; transform:translateY(-4px)}
+.wordmark i{
+  font-style:normal; font-size:13px; letter-spacing:-.005em;
+  color:var(--ink-3); padding-bottom:1px;
+}
+
+.tabs{display:flex; gap:2px; padding:4px; background:var(--sunk); border-radius:var(--r-pill); position:relative}
+/* A single pill that slides between tabs, rather than each tab lighting up. */
+.glider{position:absolute; top:4px; bottom:4px; left:0; width:0; border-radius:var(--r-pill);
+  background:var(--ink); z-index:0; opacity:0;
+  transition:transform .34s cubic-bezier(.4,0,.2,1), width .34s cubic-bezier(.4,0,.2,1), opacity .2s}
+.glider[data-ready="1"]{opacity:1}
+.views .glider{background:var(--flare)}
+.tab{
+  font-family:var(--display); font-weight:700; font-size:12.5px;
+  letter-spacing:-.005em; color:var(--ink-2);
+  padding:8px 17px; border-radius:var(--r-pill); white-space:nowrap;
+  position:relative; z-index:1; transition:color .24s ease;
+}
+.tab[aria-selected="true"]{color:var(--paper)}
+.views .tab[aria-selected="true"]{color:var(--flare-ink)}
+.tab:hover:not([aria-selected="true"]){color:var(--ink)}
+
+.status{display:flex; align-items:center; gap:8px; font-size:12.5px;
+  letter-spacing:-.004em; color:var(--ink-3); white-space:nowrap}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--flare); flex:none;
+  box-shadow:0 0 0 0 var(--flare-wash); animation:ping 2.6s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 var(--flare-wash)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.status b{color:var(--ink-2); font-weight:500}
+.refresh{border:1px solid var(--rule); border-radius:var(--r-pill); padding:6px 14px;
+  font-size:10.5px; letter-spacing:-.004em; color:var(--ink-2); transition:.18s}
+.refresh:hover{border-color:var(--ink); color:var(--ink)}
+.refresh[data-busy="1"]{opacity:.5; pointer-events:none}
+
+@media (max-width:700px){
+  .mast-in{min-height:0; padding-top:11px; padding-bottom:10px; gap:9px 10px}
+  .wordmark{padding:0}
+  .wordmark b{font-size:19px}
+  .wordmark .rule-dash{width:18px; height:3px; transform:translateY(-3px)}
+  .wordmark i{display:none}
+  .refresh{order:2; padding:5px 11px; font-size:9.5px}
+  .tabs{order:3; padding:3px}
+  .tab{padding:7px 15px; font-size:11.5px}
+  .status{order:4; margin-left:auto; font-size:9.5px; gap:6px}
+}
+@media (max-width:400px){
+  .status b{display:none}
+  .status{font-size:9px}
+}
+
+/* ============================================================ show-more */
+.more{display:block; width:100%; margin:22px 0 4px; padding:13px; border:1px solid var(--rule);
+  border-radius:var(--r-md); background:var(--surface); font-family:var(--display); font-weight:700;
+  font-size:12px; letter-spacing:-.004em; transition:.18s}
+.more:hover{border-color:var(--ink); background:var(--sunk)}
+
+/* ============================================================ shell */
+.shell{
+  max-width:var(--max); margin:0 auto; padding:26px var(--gutter) 72px;
+  display:grid; gap:34px; align-items:start;
+  grid-template-columns:var(--rail-l) minmax(0,1fr) var(--rail-r);
+  grid-template-areas:"topics main lists";
+}
+.col-topics{grid-area:topics; position:sticky; top:calc(env(safe-area-inset-top,0px) + 88px)}
+.col-main{grid-area:main; min-width:0}
+.col-lists{grid-area:lists}
+
+@media (max-width:1180px){
+  .shell{grid-template-columns:minmax(0,1fr) var(--rail-r); grid-template-areas:"topics topics" "main lists"; gap:28px}
+  .col-topics{position:static}
+}
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr); grid-template-areas:"main" "topics" "lists"; gap:34px}
+}
+
+/* ============================================================ section heads */
+.mod,.col-topics,.col-main{scroll-margin-top:104px}
+.head{display:flex; align-items:baseline; gap:12px; padding-bottom:10px;
+  border-bottom:1px solid var(--rule); margin-bottom:20px}
+.head h2{
+  margin:0; font-family:var(--display); font-weight:700;
+  font-size:19px; letter-spacing:-.016em; line-height:1.1;
+}
+.head span{margin-left:auto; font-size:13px; font-variant-numeric:tabular-nums;
+  color:var(--ink-3); white-space:nowrap}
+
+/* ============================================================ topic cycler */
+.cycler{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow)}
+.bar{height:3px; background:var(--rule-soft); position:relative; overflow:hidden}
+.bar i{position:absolute; inset:0 auto 0 0; width:100%; background:var(--flare);
+  transform:scaleX(0); transform-origin:0 50%; will-change:transform}
+.cycler-in{padding:16px 17px 14px; display:flex; flex-direction:column; min-height:224px}
+.cyc-top{display:grid; grid-template-columns:72px minmax(0,1fr); gap:12px; align-items:start; margin-bottom:10px}
+.cyc-shot{aspect-ratio:1/1; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
+.cyc-shot img{width:100%; height:100%; object-fit:cover}
+.cyc-kicker{font-size:12px; letter-spacing:.1em; color:var(--flare); margin-bottom:6px}
+.cyc-h{
+  margin:0; font-family:var(--display); font-weight:700; font-size:19px; line-height:1.16; letter-spacing:-.014em; text-wrap:balance;
+}
+.cyc-p{margin:0; font-size:14.5px; line-height:1.52; color:var(--ink-2); font-weight:300; text-wrap:pretty}
+.cyc-src{margin-top:10px; font-size:12px; letter-spacing:-.004em;
+  color:var(--ink-3)}
+.cyc-src u{text-decoration:none; border-bottom:1px solid var(--rule); padding-bottom:1px}
+.cyc-fade{animation:fadeup .38s ease both}
+@keyframes fadeup{from{opacity:0; transform:translateY(7px)}to{opacity:1; transform:none}}
+
+.cyc-nav{display:flex; align-items:center; gap:7px; margin-top:auto; padding-top:15px; border-top:1px solid var(--rule-soft)}
+.arrow{width:29px; height:29px; border:1px solid var(--rule); border-radius:50%; display:grid; place-items:center;
+  color:var(--ink-2); transition:.16s; flex:none}
+.arrow:hover{border-color:var(--ink); color:var(--ink); background:var(--sunk)}
+.arrow svg{width:13px; height:13px}
+.pips{display:flex; gap:4px; margin:0 auto}
+.pip{width:5px; height:5px; border-radius:50%; background:var(--rule); padding:0; transition:.2s}
+.pip[aria-current="true"]{background:var(--flare); transform:scale(1.35)}
+.count{font-size:12.5px; letter-spacing:-.004em; color:var(--ink-3); font-variant-numeric:tabular-nums}
+
+/* ============================================================ views */
+.views .tab{font-size:14px}
+.shell[data-view="campaigns"] .col-topics,
+.shell[data-view="campaigns"] .col-lists,
+.shell[data-view="awarded"] .col-topics,
+.shell[data-view="awarded"] .col-lists{display:none}
+.shell[data-view="campaigns"],
+.shell[data-view="awarded"]{grid-template-columns:minmax(0,1fr); grid-template-areas:"main"}
+
+.swap{animation:swapin .34s cubic-bezier(.2,.8,.3,1) both}
+@keyframes swapin{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+
+/* ============================================================ cards */
+.cards{display:grid; gap:26px 22px; grid-template-columns:repeat(auto-fill,minmax(262px,1fr))}
+.card{display:flex; flex-direction:column; gap:10px; min-width:0}
+.card figure{margin:0; aspect-ratio:16/10; border-radius:var(--r-md); overflow:hidden; background:var(--sunk); position:relative}
+.card figure img{width:100%; height:100%; object-fit:cover; transition:transform .55s cubic-bezier(.2,.7,.3,1)}
+.card:hover figure img{transform:scale(1.04)}
+.card h3{
+  margin:0; font-family:var(--display); font-weight:700; font-size:18px; line-height:1.16; letter-spacing:-.014em; text-wrap:balance;
+  display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.card--feature h3{-webkit-line-clamp:2; line-clamp:2}
+.card:hover h3{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; text-decoration-color:var(--flare)}
+.card .who{margin-top:auto; padding-top:6px; font-size:13px; line-height:1.45; color:var(--ink-3);
+  display:flex; flex-direction:column}
+.card .who b{font-weight:600; color:var(--ink-2)}
+.card .who i{font-style:normal; color:var(--ink-3)}
+.card .blurb{margin:0; font-size:14px; line-height:1.46; color:var(--ink-2); font-weight:300; text-wrap:pretty;
+  display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+.card .tags{display:flex; flex-wrap:wrap; gap:5px; padding-top:2px}
+.tag{font-size:11.5px; letter-spacing:-.004em; border:1px solid var(--rule); border-radius:var(--r-xs); padding:2px 5px; color:var(--ink-3);
+  white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis}
+.card .tags{min-width:0}
+.tag.top{border-color:var(--flare); color:var(--flare)}
+.tag.plain{border-style:dashed}
+
+/* the award ribbon sits on the picture so a scan reads "why is this here" first */
+.ribbon{position:absolute; left:8px; top:8px; display:flex; flex-direction:column; gap:4px; align-items:flex-start}
+.ribbon span{font-family:var(--display); font-weight:700; font-size:9.5px;
+  letter-spacing:-.004em; padding:3px 7px; border-radius:var(--r-xs);
+  background:rgba(12,10,8,.78); color:#fff; backdrop-filter:blur(3px)}
+.ribbon span.top{background:var(--flare); color:var(--flare-ink)}
+.card .count{font-size:12px; color:var(--ink-3)}
+
+/* The first card carries the section. Breaking the uniform grid is the whole
+   difference between a gallery and a wall of equal rectangles. */
+/* Campaigns is looked at before it is read, so the picture leads and the
+   chrome gets out of the way. The source only surfaces on hover. */
+.shell[data-view="campaigns"] .cards{grid-template-columns:repeat(auto-fill,minmax(288px,1fr)); gap:30px 22px}
+.shell[data-view="campaigns"] .card figure{aspect-ratio:4/3}
+.shell[data-view="campaigns"] .card .blurb{-webkit-line-clamp:2; line-clamp:2}
+.shell[data-view="campaigns"] .card figure::after{
+  content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s var(--ease);
+  background:linear-gradient(to top, rgba(10,8,6,.72) 0%, rgba(10,8,6,.15) 42%, transparent 70%);
+}
+.shell[data-view="campaigns"] .card:hover figure::after{opacity:1}
+.shell[data-view="campaigns"] .card .onshot b{font-weight:600; margin-right:8px}
+.shell[data-view="campaigns"] .card .onshot{
+  position:absolute; left:12px; right:12px; bottom:11px; z-index:2;
+  font-size:12px; letter-spacing:-.004em; color:#fff; opacity:0; transform:translateY(6px);
+  transition:opacity .3s var(--ease), transform .3s var(--ease);
+}
+.shell[data-view="campaigns"] .card:hover .onshot{opacity:1; transform:none}
+
+@media (min-width:920px){
+  .card--feature{grid-column:span 2}
+  .card--feature figure{aspect-ratio:16/9}
+  .card--feature h3{font-size:27px; letter-spacing:-.02em; line-height:1.08}
+  .card--feature .blurb{font-size:15px; max-width:56ch}
+  .card--feature .ribbon span{font-size:10.5px; padding:4px 9px}
+}
+
+/* Cards rise in sequence rather than all at once. */
+.cards .card{animation:rise .5s var(--ease) both; animation-delay:calc(var(--i, 0) * 34ms)}
+@keyframes rise{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
+
+@media (max-width:620px){
+  .cards{grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:20px 14px}
+  .card h3{font-size:15px}
+  .card .blurb{display:none}
+  /* Long award labels must fold inside their card, never across the gutter. */
+  .tag{white-space:normal; overflow-wrap:anywhere; line-height:1.3}
+}
+
+/* ============================================================ filters */
+.filters{margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--rule)}
+.fgroup{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-top:11px}
+.fgroup:first-child{margin-top:0}
+.flabel{font-size:12.5px; font-weight:500; color:var(--ink-3); width:66px; flex:none}
+@media (max-width:520px){ .flabel{width:100%} }
+.chip{
+  font-family:var(--display); font-weight:600; font-size:11.5px;
+  letter-spacing:-.005em; color:var(--ink-2);
+  border:1px solid var(--rule); border-radius:var(--r-pill); padding:5px 12px; transition:.16s;
+  display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+}
+.chip:hover{border-color:var(--ink); color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper)}
+.chip i{font-style:normal; font-size:12px; opacity:.55; font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"] i{opacity:.75}
+.chip.key[aria-pressed="true"]{background:var(--flare); border-color:var(--flare); color:var(--flare-ink)}
+.unsorted{display:block; width:100%; margin:20px 0 4px; padding:11px; border:1px dashed var(--rule);
+  border-radius:var(--r-md); font-size:12.5px; letter-spacing:-.004em;
+  color:var(--ink-3); transition:.16s; background:none}
+.unsorted:hover{border-color:var(--ink-3); color:var(--ink-2)}
+.empty{padding:26px 0; color:var(--ink-2); font-size:15px}
+
+/* ============================================================ lead story */
+.lead{display:block; margin-bottom:26px}
+.lead figure{margin:0 0 18px; position:relative; border-radius:var(--r-md); overflow:hidden; background:var(--sunk); aspect-ratio:16/9}
+.lead figure img{width:100%; height:100%; object-fit:cover; transition:transform .6s cubic-bezier(.2,.7,.3,1)}
+.lead:hover figure img{transform:scale(1.025)}
+.lead h1{
+  margin:0 0 12px; font-family:var(--display); font-weight:800;
+  font-size:clamp(29px,3.7vw,44px); line-height:1.04; letter-spacing:-.035em; text-wrap:balance;
+}
+.lead:hover h1{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px; text-decoration-color:var(--flare)}
+.lead p{margin:0 0 12px; font-size:18px; line-height:1.48; color:var(--ink-2); font-weight:300; max-width:60ch; text-wrap:pretty}
+
+.flag{display:inline-flex; align-items:center; gap:7px; margin-bottom:11px;
+  font-size:12.5px; font-weight:500; letter-spacing:-.005em}
+.flag em{font-style:normal; background:var(--flare); color:var(--flare-ink); padding:3px 7px; border-radius:var(--r-xs); font-weight:500}
+.flag s{text-decoration:none; color:var(--ink-3)}
+
+.byline{display:flex; align-items:baseline; gap:10px; font-size:13px; color:var(--ink-3); flex-wrap:wrap}
+.byline b{color:var(--ink); font-weight:500}
+.byline .sep{width:3px; height:3px; border-radius:50%; background:var(--rule); flex:none}
+
+/* ============================================================ story feed */
+.daymark{display:flex; align-items:center; gap:12px; margin:26px 0 14px}
+.daymark span{font-size:12px; letter-spacing:-.004em; color:var(--ink-3); white-space:nowrap}
+.daymark i{flex:1; height:1px; background:var(--rule)}
+
+.story{display:grid; grid-template-columns:112px minmax(0,1fr); gap:16px; padding:15px 0;
+  border-top:1px solid var(--rule-soft); align-items:start}
+.daymark + .story{border-top:0}
+.story .shot{aspect-ratio:4/3; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
+.story .shot img{width:100%; height:100%; object-fit:cover; transition:transform .5s cubic-bezier(.2,.7,.3,1)}
+.story:hover .shot img{transform:scale(1.05)}
+.story h3{
+  margin:0 0 6px; font-family:var(--display); font-weight:600; font-size:17.5px; line-height:1.21; letter-spacing:-.011em; text-wrap:balance;
+}
+.story:hover h3{text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:3px; text-decoration-color:var(--flare)}
+.story p{margin:0 0 7px; font-size:14px; line-height:1.48; color:var(--ink-2); font-weight:300;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-clamp:2; overflow:hidden}
+@media (max-width:520px){ .story{grid-template-columns:86px minmax(0,1fr); gap:13px} .story h3{font-size:16px} .story p{display:none} }
+
+/* fallback tile when a publisher gives us no picture */
+.tile{width:100%; height:100%; display:grid; place-items:center; position:relative; overflow:hidden}
+.tile::after{content:""; position:absolute; inset:0;
+  background:linear-gradient(120deg,transparent 42%,rgba(255,255,255,.14) 50%,transparent 58%)}
+.tile b{font-family:var(--display); font-weight:800; font-size:clamp(15px,26%,40px);
+  letter-spacing:.02em; color:rgba(255,255,255,.94); z-index:1; text-align:center; padding:0 6px; line-height:1}
+
+.meter{display:inline-flex; align-items:center; gap:4px; font-size:11.5px;
+  letter-spacing:-.004em; color:var(--ink-3);
+  border:1px solid var(--rule); border-radius:var(--r-xs); padding:1px 5px}
+.meter b{font-weight:400; color:var(--ink-3)}
+
+/* ============================================================ rail modules */
+.mod{margin-bottom:34px}
+.rank{display:grid; grid-template-columns:26px minmax(0,1fr); gap:11px; padding:11px 0;
+  border-top:1px solid var(--rule-soft); align-items:baseline}
+.rank:first-of-type{border-top:0; padding-top:2px}
+.rank .n{font-size:13px; font-weight:600; color:var(--flare); font-variant-numeric:tabular-nums; letter-spacing:-.03em}
+.rank h4{margin:0 0 3px; font-family:var(--display); font-weight:600; font-size:14.5px; line-height:1.24; letter-spacing:-.008em}
+.rank a:hover h4{text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--flare)}
+.rank .meta{font-size:12px; letter-spacing:.04em; color:var(--ink-3)}
+.rank .note{margin:5px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2); font-weight:300}
+
+.award{display:inline-block; font-size:11.5px; letter-spacing:-.004em;
+  color:var(--ink-2); border:1px solid var(--rule); border-radius:var(--r-xs);
+  padding:2px 5px; margin-bottom:5px}
+.award[data-gp="1"]{border-color:var(--flare); color:var(--flare)}
+
+.nordic-item{display:grid; grid-template-columns:24px minmax(0,1fr); gap:10px; padding:10px 0; border-top:1px solid var(--rule-soft)}
+.nordic-item:first-of-type{border-top:0}
+.mk{font-size:12px; font-weight:500; letter-spacing:.04em; color:var(--ink-2);
+  border:1px solid var(--rule); border-radius:var(--r-xs); padding:2px 0; text-align:center; height:fit-content}
+.mk[data-m="FI"]{border-color:#0B5FC4; color:#0B5FC4}
+.mk[data-m="SE"]{border-color:#B08300; color:#8A6800}
+:root[data-theme="dark"] .mk[data-m="FI"], :root:not([data-theme="light"]) .mk[data-m="FI"]{color:#6FA8FF; border-color:#3D6FB5}
+:root[data-theme="dark"] .mk[data-m="SE"], :root:not([data-theme="light"]) .mk[data-m="SE"]{color:#E8C24A; border-color:#8A7226}
+@media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .mk[data-m="FI"]{color:#0B5FC4; border-color:#0B5FC4}
+  :root:not([data-theme="dark"]) .mk[data-m="SE"]{color:#8A6800; border-color:#B08300} }
+.nordic-item h4{margin:0 0 3px; font-family:var(--display); font-weight:600; font-size:14px; line-height:1.26}
+.nordic-item a:hover h4{text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--flare)}
+
+.subhead{font-size:12px; letter-spacing:-.004em; color:var(--ink-3); margin:18px 0 8px; padding-top:13px; border-top:1px solid var(--rule)}
+.credit{margin:11px 0 0; font-size:12px; line-height:1.5; color:var(--ink-3); font-family:var(--display); font-weight:400}
+.credit a{border-bottom:1px solid var(--rule)}
+.credit a:hover{color:var(--ink); border-color:var(--flare)}
+
+/* ============================================================ misc */
+.toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(140%);
+  background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:var(--r-pill);
+  font-size:13px; letter-spacing:-.004em; z-index:var(--z-toast); transition:transform .42s cubic-bezier(.2,.8,.3,1); box-shadow:var(--shadow);
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+.toast[data-show="1"]{transform:translateX(-50%) translateY(0)}
+.skel{background:var(--sunk); border-radius:var(--r-xs); animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.foot{max-width:var(--max); margin:0 auto; padding:26px var(--gutter) 46px; border-top:1px solid var(--rule);
+  font-family:var(--display); font-size:12.5px; line-height:1.65; color:var(--ink-3)}
+.foot a{border-bottom:1px solid var(--rule)} .foot a:hover{color:var(--ink)}
+.foot strong{color:var(--ink-2); font-weight:600}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
+}
+</style>
+
+<a class="skip" href="#feed-title">Skip to the stories</a>
+
+<header class="masthead" id="top">
+  <div class="masthead-in">
+    <!-- The wordmark sits above the rule, because that is literally what the
+         name means. Above the line: the bought media, the work everybody sees. -->
+    <h1 class="logo">Above the Line</h1>
+    <span class="atl-rule" aria-hidden="true"></span>
+    <p class="dateline"><span id="dateline-date"></span><b id="dateline-wire">The advertising wire</b></p>
+  </div>
+</header>
+
+<header class="mast">
+  <div class="mast-in">
+    <a class="monogram" href="#top" aria-label="Above the Line, back to top">
+      <span class="rule-dash" aria-hidden="true"></span>
+      <b>ATL</b>
+    </a>
+    <div class="tabs views" role="tablist" aria-label="View"><span class="glider" aria-hidden="true"></span>
+      <button class="tab" role="tab" id="view-news" aria-selected="true">News</button>
+      <button class="tab" role="tab" id="view-campaigns" aria-selected="false">Campaigns</button>
+      <button class="tab" role="tab" id="view-awarded" aria-selected="false">Awarded</button>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Region" id="regions"><span class="glider" aria-hidden="true"></span>
+      <button class="tab" role="tab" id="tab-global" aria-selected="true" aria-controls="feed">Global</button>
+      <button class="tab" role="tab" id="tab-europe" aria-selected="false" aria-controls="feed">Europe</button>
+    </div>
+    <div class="status"><span class="dot" aria-hidden="true"></span><span id="status">Loading the wire…</span></div>
+    <button class="refresh" id="refresh" title="Pull the feeds again">Refresh</button>
+  </div>
+</header>
+
+<main class="shell" id="shell" data-view="news">
+  <aside class="col-topics">
+    <div class="head"><h2>The last 90 days</h2><span id="cyc-count"></span></div>
+    <section class="cycler" id="cycler" aria-roledescription="carousel" aria-label="Most discussed topics of the past three months">
+      <div class="bar"><i id="bar"></i></div>
+      <div class="cycler-in">
+        <div id="cyc-body" aria-live="polite">
+          <div class="skel" style="height:11px;width:40%;margin-bottom:12px"></div>
+          <div class="skel" style="height:22px;width:92%;margin-bottom:8px"></div>
+          <div class="skel" style="height:22px;width:66%;margin-bottom:14px"></div>
+          <div class="skel" style="height:60px;width:100%"></div>
+        </div>
+        <div class="cyc-nav">
+          <button class="arrow" id="prev" aria-label="Previous topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="arrow" id="next" aria-label="Next topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+          <div class="pips" id="pips" role="tablist" aria-label="Choose topic"></div>
+          <span class="count" id="cyc-idx">01/10</span>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <div class="col-main">
+    <div class="filters" id="filters"></div>
+    <div class="head"><h2 id="feed-title">Global this week</h2><span id="feed-note"></span></div>
+    <div id="feed" role="tabpanel" aria-labelledby="tab-global"></div>
+    <div id="cards" hidden></div>
+  </div>
+
+  <aside class="col-lists">
+    <section class="mod">
+      <div class="head"><h2>Most talked about</h2><span>Past 12 months</span></div>
+      <div id="m-12"></div>
+    </section>
+    <section class="mod">
+      <div class="head"><h2>Cannes Lions 2026</h2><span>Case films</span></div>
+      <div id="m-cannes"></div>
+      <p class="credit">Case links collected by <a href="https://www.lovetheworkmore.com" target="_blank" rel="noopener">lovetheworkmore.com</a>, the free index of every Lion-winning campaign.</p>
+    </section>
+    <section class="mod">
+      <div class="head"><h2>Finland and Sweden</h2><span>Campaign work</span></div>
+      <div id="m-nordic-live"></div>
+      <p class="subhead">Landmark work</p>
+      <div id="m-nordic-seed"></div>
+    </section>
+  </aside>
+</main>
+
+<footer class="foot" id="foot"></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (s) { return document.querySelector(s); };
+  var state = { region: 'global', live: null, cur: null, topic: 0, stamp: '', raf: null, paused: false, expanded: false, liveHost: false,
+    kind: '', sector: '', channel: '', showUnsorted: false,
+    view: 'news', awarded: null, show: '' };
+  var CYCLE_MS = 8000;
+
+  /* ------------------------------------------------------------ helpers */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function ago(ts) {
+    if (!ts) return '';
+    var m = Math.round((Date.now() - ts) / 60000);
+    if (m < 2) return 'just now';
+    if (m < 60) return m + ' min ago';
+    var h = Math.round(m / 60);
+    if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+    var d = Math.round(h / 24);
+    if (d < 8) return d + (d === 1 ? ' day ago' : ' days ago');
+    return new Date(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  }
+
+  var BANDS = ['Today', 'Yesterday', 'Earlier this week', 'Earlier this month', 'Undated'];
+
+  function bandIndex(ts) {
+    if (!ts) return 4;
+    var a = new Date(), b = new Date(ts);
+    var d0 = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+    var d1 = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+    var days = Math.round((d0 - d1) / 864e5);
+    if (days <= 0) return 0;
+    if (days === 1) return 1;
+    if (days <= 6) return 2;
+    return 3;
+  }
+
+  // Deterministic colour tile for stories a publisher gives us no picture for.
+  function tile(label) {
+    var s = String(label || '?'), h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+    var a = h, b = (h + 34) % 360;
+    var words = s.split(/\s+/).filter(Boolean);
+    var mark = words.length > 1 ? words.slice(0, 2).map(function (w) { return w[0]; }).join('') : s.slice(0, 3);
+    return '<div class="tile" style="background:linear-gradient(140deg,hsl(' + a + ' 58% 42%),hsl(' + b + ' 64% 30%))">' +
+           '<b>' + esc(mark) + '</b></div>';
+  }
+
+  function picture(item) { return item.thumb || item.src || ''; }
+
+  function shot(item, cls) {
+    var pic = picture(item);
+    if (pic) {
+      return '<div class="' + cls + '"><img src="' + esc(pic) + '" alt="" loading="lazy" decoding="async" ' +
+             'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
+             'data-fb="' + esc(tile(item.source)) + '"></div>';
+    }
+    return '<div class="' + cls + '">' + tile(item.source) + '</div>';
+  }
+
+  function byline(item) {
+    var t = ago(item.ts);
+    // Paywalled stories never reach the page; metered ones do, so say so
+    // rather than letting the reader find out by clicking.
+    var chip = item.access === 'metered'
+      ? '<span class="sep"></span><span class="meter">Metered</span>' : '';
+    var also = (item.alsoIn && item.alsoIn.length)
+      ? '<span class="sep"></span><span>also in ' + esc(item.alsoIn.join(', ')) + '</span>' : '';
+    return '<div class="byline"><b>' + esc(item.source) + '</b>' +
+           (t ? '<span>' + esc(t) + '</span>' : '') + chip + also + '</div>';
+  }
+
+  /* -------------------------------------------------------- tab glider */
+  function moveGlider(tabs) {
+    if (!tabs) return;
+    var g = tabs.querySelector('.glider');
+    var on = tabs.querySelector('[aria-selected="true"]');
+    if (!g || !on) return;
+    g.style.width = on.offsetWidth + 'px';
+    g.style.transform = 'translateX(' + on.offsetLeft + 'px)';
+    g.dataset.ready = '1';
+  }
+
+  function moveGliders() {
+    moveGlider(document.querySelector('.views'));
+    moveGlider($('#regions'));
+  }
+
+  // Replays the enter animation on whichever panel is now on screen.
+  function swap(el) {
+    if (!el) return;
+    el.classList.remove('swap');
+    void el.offsetWidth;          // restart the animation
+    el.classList.add('swap');
+  }
+
+  /* ------------------------------------------------------------- cards */
+  var TOP_AWARDS = /grand prix|black pencil|grand clio|titanium|grand prix for good/i;
+
+  // `eager` matters for the cards above the fold: these views render into a
+  // container that was hidden a moment earlier, and a lazy image parsed while
+  // its container is hidden may never begin loading at all. Cards further down
+  // stay lazy so a phone does not pull the whole gallery at once.
+  function cardShot(pic, fallbackLabel, ribbon, idx) {
+    var load = (idx == null || idx < 6) ? 'eager' : 'lazy';
+    var inner = pic
+      ? '<img src="' + esc(pic) + '" alt="" loading="' + load + '" decoding="async" ' +
+        'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
+        'data-fb="' + esc(tile(fallbackLabel) + (ribbon || '')) + '">'
+      : tile(fallbackLabel);
+    return '<figure>' + inner + (ribbon || '') + '</figure>';
+  }
+
+  // Campaign work, shown as something you scan rather than read.
+  function renderCampaigns() {
+    // Campaigns is a gallery, not a wire. Global means every campaign we found,
+    // not just the stories that happened to sort into the global bucket.
+    var d = state.live || {};
+    var pool = state.region === 'europe'
+      ? (d.europe || [])
+      : [].concat(d.global || [], d.europe || [], d.nordic || []);
+    var seenUrl = {};
+    var list = pool.filter(function (a) {
+      if (a.kind !== 'work') return false;
+      if (seenUrl[a.url]) return false;
+      seenUrl[a.url] = 1;
+      return true;
+    });
+    if (state.sector) list = list.filter(function (a) { return a.sector === state.sector; });
+    if (state.channel) list = list.filter(function (a) { return a.channel === state.channel; });
+
+    // A card feed is carried by its pictures, so lead with the work that has one.
+    list = list.slice().sort(function (x, y) {
+      return (picture(y) ? 1 : 0) - (picture(x) ? 1 : 0);
+    });
+
+    var host = $('#cards');
+    if (!list.length) {
+      host.innerHTML = '<p class="empty">No campaign work matches that in this pull. ' +
+        'Try clearing the filters, or look under News.</p>';
+      return;
+    }
+
+    host.innerHTML = '<div class="cards">' + list.map(function (a, idx) {
+      var tags = [];
+      if (a.sector) tags.push('<span class="tag">' + esc(a.sector) + '</span>');
+      if (a.channel) tags.push('<span class="tag">' + esc(a.channel) + '</span>');
+      if (a.access === 'metered') tags.push('<span class="tag plain">Metered</span>');
+      var feat = idx === 0 && picture(a) ? ' card--feature' : '';
+      return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
+        esc(a.url) + '" target="_blank" rel="noopener">' +
+        cardShot(picture(a), a.source,
+          '<span class="onshot"><b>' + esc(a.source) + '</b>' + (a.ts ? esc(ago(a.ts)) : '') + '</span>', idx) +
+        '<h3>' + esc(a.title) + '</h3>' +
+        (a.summary ? '<p class="blurb">' + esc(a.summary) + '</p>' : '') +
+        '<div class="who"><b>' + esc(a.source) + '</b>' + (a.ts ? '<i>' + esc(ago(a.ts)) + '</i>' : '') + '</div>' +
+        (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') +
+        '</a>';
+    }).join('') + '</div>';
+
+    $('#feed-title').textContent = (state.region === 'europe' ? 'European campaign work' : 'Campaign work') +
+      (state.sector ? ', ' + state.sector.toLowerCase() : '') + (state.channel ? ', ' + state.channel.toLowerCase() : '');
+    $('#feed-note').textContent = list.length + ' campaigns';
+  }
+
+  // Award-winning cases, tagged with where they won and why.
+  function renderAwarded() {
+    var cases = (state.awarded && state.awarded.cases) || [];
+    // Global means everything; Europe narrows to work made in Europe.
+    if (state.region === 'europe') {
+      cases = cases.filter(function (c) { return c.region === 'europe'; });
+    }
+    if (state.show) {
+      cases = cases.filter(function (c) {
+        return c.awards.some(function (a) { return a.show === state.show; });
+      });
+    }
+    // Most decorated first: more shows beats more statues beats a bigger statue.
+    cases = cases.slice().sort(function (x, y) {
+      var sx = new Set(x.awards.map(function (a) { return a.show; })).size;
+      var sy = new Set(y.awards.map(function (a) { return a.show; })).size;
+      if (sx !== sy) return sy - sx;
+      if (x.awards.length !== y.awards.length) return y.awards.length - x.awards.length;
+      var tx = x.awards.filter(function (a) { return TOP_AWARDS.test(a.level); }).length;
+      var ty = y.awards.filter(function (a) { return TOP_AWARDS.test(a.level); }).length;
+      return ty - tx;
+    });
+
+    var host = $('#cards');
+    if (!cases.length) { host.innerHTML = '<p class="empty">No cases from that show yet.</p>'; return; }
+
+    host.innerHTML = '<div class="cards">' + cases.map(function (c, idx) {
+      var shows = [];
+      c.awards.forEach(function (a) { if (shows.indexOf(a.show) < 0) shows.push(a.show); });
+      var ribbon = '<div class="ribbon">' + shows.slice(0, 3).map(function (sh) {
+        var top = c.awards.some(function (a) { return a.show === sh && TOP_AWARDS.test(a.level); });
+        return '<span class="' + (top ? 'top' : '') + '">' + esc(sh) + '</span>';
+      }).join('') + '</div>';
+
+      var tags = c.awards.slice(0, 4).map(function (a) {
+        var label = a.category ? a.level + ', ' + a.category.toLowerCase() : a.level;
+        return '<span class="tag' + (TOP_AWARDS.test(a.level) ? ' top' : '') + '" title="' +
+          esc(a.show + ': ' + label) + '">' + esc(label) + '</span>';
+      });
+      if (c.awards.length > 4) tags.push('<span class="tag plain">+' + (c.awards.length - 4) + '</span>');
+
+      var feat = idx === 0 && c.thumb ? ' card--feature' : '';
+      return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
+        esc(c.url) + '" target="_blank" rel="noopener">' +
+        cardShot(c.thumb || '', c.brand, ribbon, idx) +
+        '<h3>' + esc(c.campaign) + '</h3>' +
+        '<div class="who"><b>' + esc(c.brand) + '</b>' + esc(c.agency) +
+          (c.country ? '<i>' + esc(c.country) + '</i>' : '') + '</div>' +
+        (c.blurb ? '<p class="blurb">' + esc(c.blurb) + '</p>' : '') +
+        '<div class="tags">' + tags.join('') + '</div>' +
+        '</a>';
+    }).join('') + '</div>';
+
+    var where = state.region === 'europe' ? 'European' : '';
+    $('#feed-title').textContent = (state.show ? state.show : (where ? where + ' awarded' : 'Most awarded')) +
+      (state.show && where ? ' in Europe' : '') + (state.show ? ' winning cases' : ' cases');
+    $('#feed-note').textContent = cases.length + ' cases';
+  }
+
+  // One entry point, so every path through the app agrees on what is on screen.
+  function cardSkeletons(n) {
+    var one = '<div class="card" aria-hidden="true">' +
+      '<div class="skel" style="aspect-ratio:16/10;border-radius:var(--r-md)"></div>' +
+      '<div class="skel" style="height:15px;width:85%"></div>' +
+      '<div class="skel" style="height:15px;width:55%"></div>' +
+      '<div class="skel" style="height:10px;width:40%"></div></div>';
+    return '<div class="cards">' + new Array(n + 1).join(one) + '</div>';
+  }
+
+  function renderView() {
+    var news = state.view === 'news';
+    $('#shell').dataset.view = state.view;
+    $('#feed').hidden = !news;
+    $('#cards').hidden = news;
+    ['news', 'campaigns', 'awarded'].forEach(function (v) {
+      $('#view-' + v).setAttribute('aria-selected', String(v === state.view));
+    });
+    renderFilters();
+    if (news) renderFeed();
+    else if (!state.live && !state.awarded) $('#cards').innerHTML = cardSkeletons(8);
+    else if (state.view === 'campaigns') renderCampaigns();
+    else renderAwarded();
+    moveGliders();
+  }
+
+  /* ----------------------------------------------------------- filters */
+  var KIND_LABEL = { work: 'Campaign work', industry: 'Agency business', media: 'Media and adtech' };
+
+  // A story passes if it matches every active filter.
+  function passes(a) {
+    if (state.kind && a.kind !== state.kind) return false;
+    if (state.kind === 'work') {
+      if (state.sector && a.sector !== state.sector) return false;
+      if (state.channel && a.channel !== state.channel) return false;
+    }
+    return true;
+  }
+
+  // Excluded only because we could not classify it - never because it is
+  // the wrong kind of story. Those are offered rather than dropped.
+  function isUnsorted(a) {
+    if (state.kind && !a.kind) return true;
+    if (state.kind && a.kind === state.kind) {
+      if (state.sector && !a.sector) return true;
+      if (state.channel && !a.channel) return true;
+    }
+    return false;
+  }
+
+  function countBy(list, key, val) {
+    return list.filter(function (a) { return a[key] === val; }).length;
+  }
+
+  function chip(label, active, key, val, count, isKey) {
+    return '<button class="chip' + (isKey ? ' key' : '') + '" aria-pressed="' + (active ? 'true' : 'false') +
+      '" data-key="' + key + '" data-val="' + esc(val) + '">' + esc(label) +
+      (count != null ? '<i>' + count + '</i>' : '') + '</button>';
+  }
+
+  function renderFilters() {
+    var host = $('#filters');
+
+    // Awarded has its own axis: which show gave the award.
+    if (state.view === 'awarded') {
+      var cases = (state.awarded && state.awarded.cases) || [];
+      if (!cases.length) { host.innerHTML = ''; return; }
+      var countShow = function (sh) {
+        return cases.filter(function (c) {
+          return c.awards.some(function (a) { return a.show === sh; });
+        }).length;
+      };
+      host.innerHTML = '<div class="fgroup"><span class="flabel">Show</span>' +
+        chip('All shows', !state.show, 'show', '', cases.length) +
+        (state.awarded.shows || []).filter(countShow).map(function (sh) {
+          return chip(sh, state.show === sh, 'show', sh, countShow(sh), true);
+        }).join('') + '</div>';
+      wireChips(host);
+      return;
+    }
+
+    var list = (state.live && state.live[state.region]) || [];
+    if (!list.length) { host.innerHTML = ''; return; }
+
+    // Campaigns is already only work, so the kind switch would be a no-op there.
+    if (state.view === 'campaigns') {
+      var cd = state.live || {};
+      var cpool = state.region === 'europe'
+        ? (cd.europe || [])
+        : [].concat(cd.global || [], cd.europe || [], cd.nordic || []);
+      var cseen = {};
+      var work = cpool.filter(function (a) {
+        if (a.kind !== 'work' || cseen[a.url]) return false;
+        cseen[a.url] = 1; return true;
+      });
+      var f2 = (state.live.facets) || { sectors: [], channels: [] };
+      var h2 = '';
+      var secs2 = f2.sectors.filter(function (x) { return countBy(work, 'sector', x); });
+      if (secs2.length) {
+        h2 += '<div class="fgroup"><span class="flabel">Industry</span>' +
+          chip('All', !state.sector, 'sector', '', work.length) +
+          secs2.map(function (x) { return chip(x, state.sector === x, 'sector', x, countBy(work, 'sector', x)); }).join('') +
+          '</div>';
+      }
+      var ch2 = f2.channels.filter(function (x) { return countBy(work, 'channel', x); });
+      if (ch2.length) {
+        h2 += '<div class="fgroup"><span class="flabel">Media</span>' +
+          chip('All', !state.channel, 'channel', '', null) +
+          ch2.map(function (x) { return chip(x, state.channel === x, 'channel', x, countBy(work, 'channel', x)); }).join('') +
+          '</div>';
+      }
+      host.innerHTML = h2;
+      wireChips(host);
+      return;
+    }
+
+    var html = '<div class="fgroup"><span class="flabel">Show</span>' +
+      chip('Everything', !state.kind, 'kind', '', list.length) +
+      ['work', 'industry', 'media'].map(function (k) {
+        return chip(KIND_LABEL[k], state.kind === k, 'kind', k, countBy(list, 'kind', k), k === 'work');
+      }).join('') + '</div>';
+
+    // Sector and channel only describe campaign work, so only offer them there.
+    if (state.kind === 'work') {
+      var work = list.filter(function (a) { return a.kind === 'work'; });
+      var facets = (state.live.facets) || { sectors: [], channels: [] };
+
+      var secs = facets.sectors.filter(function (x) { return countBy(work, 'sector', x); });
+      if (secs.length) {
+        html += '<div class="fgroup"><span class="flabel">Industry</span>' +
+          chip('All', !state.sector, 'sector', '', null) +
+          secs.map(function (x) {
+            return chip(x, state.sector === x, 'sector', x, countBy(work, 'sector', x));
+          }).join('') + '</div>';
+      }
+
+      var chans = facets.channels.filter(function (x) { return countBy(work, 'channel', x); });
+      if (chans.length) {
+        html += '<div class="fgroup"><span class="flabel">Media</span>' +
+          chip('All', !state.channel, 'channel', '', null) +
+          chans.map(function (x) {
+            return chip(x, state.channel === x, 'channel', x, countBy(work, 'channel', x));
+          }).join('') + '</div>';
+      }
+    }
+
+    host.innerHTML = html;
+    wireChips(host);
+  }
+
+  function wireChips(host) {
+    Array.prototype.forEach.call(host.querySelectorAll('.chip'), function (b) {
+      b.addEventListener('click', function () {
+        var k = b.dataset.key, v = b.dataset.val;
+        state[k] = (state[k] === v) ? '' : v;
+        if (k === 'kind' && state.kind !== 'work') { state.sector = ''; state.channel = ''; }
+        state.showUnsorted = false;
+        state.expanded = false;
+        renderView();
+      });
+    });
+  }
+
+  /* -------------------------------------------------------------- feed */
+  function renderFeed() {
+    var full = (state.live && state.live[state.region]) || [];
+    var host = $('#feed');
+    if (!full.length) {
+      host.innerHTML = '<p class="empty">No stories on the wire yet. Hit Refresh to pull the feeds.</p>';
+      return;
+    }
+
+    var list = full.filter(passes);
+    var unsorted = full.filter(function (a) { return !passes(a) && isUnsorted(a); });
+    if (state.showUnsorted) list = list.concat(unsorted);
+
+    if (!list.length) {
+      host.innerHTML = '<p class="empty">Nothing matches that filter in this pull.' +
+        (unsorted.length ? ' ' + unsorted.length + ' stories could not be classified.' : '') + '</p>' +
+        (unsorted.length ? '<button class="unsorted" id="unsorted">Show ' + unsorted.length +
+          ' unclassified ' + (unsorted.length === 1 ? 'story' : 'stories') + '</button>' : '');
+      var ub0 = $('#unsorted');
+      if (ub0) ub0.addEventListener('click', function () { state.showUnsorted = true; renderFeed(); });
+      return;
+    }
+
+    // On a phone the rails sit below the feed, so don't bury them under 34 stories.
+    var narrow = window.matchMedia('(max-width:860px)').matches;
+    var cap = narrow && !state.expanded ? 12 : list.length;
+
+    // The lead carries a full-width picture, so never lead with a story that
+    // has none - promote the best-ranked one in the top few that does.
+    var leadIdx = 0;
+    for (var i = 0; i < Math.min(6, list.length); i++) {
+      if (picture(list[i])) { leadIdx = i; break; }
+    }
+    var lead = list[leadIdx];
+    var others = list.filter(function (_, i) { return i !== leadIdx; });
+    var rest = others.slice(0, cap - 1);
+    var hidden = others.length - rest.length;
+    var html = '<a class="lead" href="' + esc(lead.url) + '" target="_blank" rel="noopener">' +
+      (picture(lead)
+        ? '<figure><img src="' + esc(picture(lead)) + '" alt="" decoding="async" ' +
+          'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
+          'data-fb="' + esc(tile(lead.source)) + '"></figure>'
+        : '<figure>' + tile(lead.source) + '</figure>') +
+      '<div class="flag"><em>Lead</em><s>' + esc(state.region === 'europe' ? 'Europe' : 'Global') + '</s></div>' +
+      '<h1>' + esc(lead.title) + '</h1>' +
+      (lead.summary ? '<p>' + esc(lead.summary) + '</p>' : '') +
+      byline(lead) + '</a>';
+
+    // Rank inside each day, but always run the days newest-first so the
+    // datelines read as a timeline instead of following the score.
+    var groups = BANDS.map(function () { return []; });
+    rest.forEach(function (it) { groups[bandIndex(it.ts)].push(it); });
+
+    groups.forEach(function (items, i) {
+      if (!items.length) return;
+      html += '<div class="daymark"><span>' + esc(BANDS[i]) + '</span><i></i>' +
+              '<span>' + items.length + '</span></div>';
+      items.forEach(function (it) {
+        html += '<a class="story" href="' + esc(it.url) + '" target="_blank" rel="noopener">' +
+          shot(it, 'shot') +
+          '<div><h3>' + esc(it.title) + '</h3>' +
+          (it.summary ? '<p>' + esc(it.summary) + '</p>' : '') +
+          byline(it) + '</div></a>';
+      });
+    });
+
+    if (hidden > 0) {
+      html += '<button class="more" id="more">Show ' + hidden + ' more ' +
+              (hidden === 1 ? 'story' : 'stories') + '</button>';
+    }
+    if (unsorted.length && !state.showUnsorted) {
+      html += '<button class="unsorted" id="unsorted">+ ' + unsorted.length +
+        ' we could not classify. Show ' + (unsorted.length === 1 ? 'it' : 'them') + '</button>';
+    }
+
+    host.innerHTML = html;
+    if (hidden > 0) {
+      $('#more').addEventListener('click', function () { state.expanded = true; renderFeed(); });
+    }
+    var ub = $('#unsorted');
+    if (ub) ub.addEventListener('click', function () { state.showUnsorted = true; renderFeed(); });
+    var scope = (state.region === 'europe' ? 'Europe' : 'Global');
+    var bits = [];
+    if (state.kind) bits.push(KIND_LABEL[state.kind]);
+    if (state.sector) bits.push(state.sector);
+    if (state.channel) bits.push(state.channel);
+    $('#feed-title').textContent = bits.length ? scope + ': ' + bits.join(', ').toLowerCase() : scope + ' this week';
+    $('#feed-note').textContent = list.length + ' of ' + full.length + ' stories';
+    $('#feed').setAttribute('aria-labelledby', 'tab-' + state.region);
+  }
+
+  /* ------------------------------------------------------------- rails */
+  function renderRails() {
+    var c = state.cur;
+    if (!c) return;
+
+    $('#m-12').innerHTML = c.campaigns12m.map(function (x) {
+      return '<a class="rank" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
+        '<span class="n">' + String(x.rank).padStart(2, '0') + '</span><div>' +
+        '<h4>' + esc(x.campaign) + '</h4>' +
+        '<div class="meta">' + esc(x.brand) + (x.agency ? ' · ' + esc(x.agency) : '') + '</div>' +
+        '<p class="note">' + esc(x.note) + '</p></div></a>';
+    }).join('');
+
+    $('#m-cannes').innerHTML = c.cannes2026.slice(0, 10).map(function (x) {
+      var gp = /Grand Prix/i.test(x.award) ? '1' : '0';
+      return '<a class="rank" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
+        '<span class="n">' + String(x.rank).padStart(2, '0') + '</span><div>' +
+        '<span class="award" data-gp="' + gp + '">' + esc(x.award) + '</span>' +
+        '<h4>' + esc(x.campaign) + '</h4>' +
+        '<div class="meta">' + esc(x.brand) + ' · ' + esc(x.agency) + '</div></div></a>';
+    }).join('');
+
+    var live = (state.live && state.live.nordic) || [];
+    $('#m-nordic-live').innerHTML = live.length
+      ? live.slice(0, 8).map(function (x) {
+          return '<a class="nordic-item" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
+            '<span class="mk" data-m="' + esc(x.market || '') + '">' + esc(x.market || '··') + '</span><div>' +
+            '<h4>' + esc(x.title) + '</h4>' +
+            '<div class="meta" style="font-size:12.5px;color:var(--ink-3)">' +
+            esc(x.source) + (x.ts ? ' · ' + esc(ago(x.ts)) : '') + '</div></div></a>';
+        }).join('')
+      : '<p style="color:var(--ink-3);font-size:13px">Nothing new off the Nordic wire right now.</p>';
+
+    $('#m-nordic-seed').innerHTML = c.nordicSeed.map(function (x) {
+      return '<a class="nordic-item" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
+        '<span class="mk" data-m="' + esc(x.market) + '">' + esc(x.market) + '</span><div>' +
+        '<h4>' + esc(x.campaign) + '</h4>' +
+        '<div class="meta" style="font-size:12.5px;color:var(--ink-3)">' +
+        esc(x.brand) + (x.agency ? ' · ' + esc(x.agency) : '') + '</div></div></a>';
+    }).join('');
+  }
+
+  /* ----------------------------------------------------- topic cycler */
+  function paintTopic() {
+    var t = state.cur.topics[state.topic];
+    var pic = t.thumb || '';
+    $('#cyc-body').innerHTML =
+      '<div class="cyc-fade">' +
+      '<div class="cyc-top">' +
+        '<div class="cyc-shot">' + (pic
+          ? '<img src="' + esc(pic) + '" alt="" decoding="async" ' +
+            'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
+            'data-fb="' + esc(tile(t.kicker)) + '">'
+          : tile(t.kicker)) + '</div>' +
+        '<div><div class="cyc-kicker">' + esc(t.kicker) + '</div>' +
+        '<h3 class="cyc-h">' + esc(t.headline) + '</h3></div>' +
+      '</div>' +
+      '<p class="cyc-p">' + esc(t.ingress) + '</p>' +
+      '<div class="cyc-src">Read it at <u>' + esc(t.source) + '</u></div>' +
+      '</div>';
+    $('#cyc-idx').textContent = String(state.topic + 1).padStart(2, '0') + '/' + String(state.cur.topics.length).padStart(2, '0');
+    Array.prototype.forEach.call($('#pips').children, function (p, i) {
+      p.setAttribute('aria-current', i === state.topic ? 'true' : 'false');
+    });
+    $('#cycler').dataset.href = t.url;
+  }
+
+  function goTopic(i) {
+    var n = state.cur.topics.length;
+    state.topic = ((i % n) + n) % n;
+    paintTopic();
+    restartCycle();
+  }
+
+  function restartCycle() {
+    if (state.raf) cancelAnimationFrame(state.raf);
+    var bar = $('#bar');
+    var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    if (reduced) { bar.style.transform = 'scaleX(0)'; return; }
+    var start = performance.now();
+    (function step(now) {
+      if (state.paused) { start += 16; state.raf = requestAnimationFrame(step); return; }
+      var p = Math.min(1, (now - start) / CYCLE_MS);
+      bar.style.transform = 'scaleX(' + p + ')';
+      if (p >= 1) { goTopic(state.topic + 1); return; }
+      state.raf = requestAnimationFrame(step);
+    })(start);
+  }
+
+  function wireCycler() {
+    var pips = $('#pips');
+    pips.innerHTML = state.cur.topics.map(function (t, i) {
+      return '<button class="pip" role="tab" aria-current="false" aria-label="Topic ' + (i + 1) + ': ' + esc(t.headline) + '"></button>';
+    }).join('');
+    Array.prototype.forEach.call(pips.children, function (p, i) {
+      p.addEventListener('click', function () { goTopic(i); });
+    });
+    $('#prev').addEventListener('click', function () { goTopic(state.topic - 1); });
+    $('#next').addEventListener('click', function () { goTopic(state.topic + 1); });
+
+    var box = $('#cycler');
+    ['mouseenter', 'focusin'].forEach(function (e) { box.addEventListener(e, function () { state.paused = true; }); });
+    ['mouseleave', 'focusout'].forEach(function (e) { box.addEventListener(e, function () { state.paused = false; }); });
+    box.addEventListener('click', function (ev) {
+      if (ev.target.closest('button')) return;
+      if (box.dataset.href) window.open(box.dataset.href, '_blank', 'noopener');
+    });
+    box.style.cursor = 'pointer';
+    document.addEventListener('visibilitychange', function () { state.paused = document.hidden; });
+
+    $('#cyc-count').textContent = state.cur.topics.length + ' topics';
+    goTopic(0);
+  }
+
+  /* -------------------------------------------------------------- data */
+  function toast(msg) {
+    var t = $('#toast');
+    t.textContent = msg;
+    t.dataset.show = '1';
+    clearTimeout(t._t);
+    t._t = setTimeout(function () { t.dataset.show = '0'; }, 3200);
+  }
+
+  function setDateline() {
+    var d = new Date();
+    var el = $('#dateline-date');
+    if (el) el.textContent = d.toLocaleDateString(undefined,
+      { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    var w = $('#dateline-wire');
+    if (w && state.live) {
+      var n = (state.live.sources || []).length;
+      var when = ago(Date.parse(state.live.generatedAt));
+      w.textContent = n + ' titles on the wire, updated ' + when;
+    }
+  }
+
+  function setStatus() {
+    var d = state.live;
+    if (!d) { $('#status').textContent = 'Offline'; return; }
+    var n = (d.sources || []).length;
+    var when = ago(Date.parse(d.generatedAt));
+    var refreshed = state.liveHost || d.mode === 'hosted';
+    $('#status').innerHTML = (refreshed ? 'Wire updated ' : 'Snapshot taken ') +
+      '<b>' + esc(when) + '</b> from ' + n + ' sources';
+  }
+
+  function renderFooter() {
+    var d = state.live, c = state.cur;
+    var srcs = (d && d.sources) || [];
+    $('#foot').innerHTML =
+      '<p style="max-width:76ch;margin:0 0 10px"><strong>Above the Line</strong> ' +
+      ((state.liveHost || (d && d.mode === 'hosted'))
+        ? 'pulls the advertising trade press every few minutes and ranks it by '
+        : 'is showing a saved pull of the advertising trade press, ranked by ') +
+      'recency, masthead and how squarely the story is about the work. Every headline links straight to the publisher, and nothing is rewritten here.</p>' +
+      '<p style="max-width:76ch;margin:0 0 10px">Articles the publisher marks as subscriber-only are dropped before they reach this page, ' +
+      'checked per article rather than per masthead, so a paywalled title\'s open journalism still gets through. Where the same story ran in ' +
+      'several outlets, the version you can actually read wins. Titles marked <span class="meter">Metered</span> allow a few free reads a month.</p>' +
+      '<p style="max-width:76ch;margin:0 0 10px">On the wire right now: ' + srcs.map(esc).join(' · ') + '.</p>' +
+      '<p style="margin:0">Cannes Lions case films are indexed by <a href="https://www.lovetheworkmore.com" target="_blank" rel="noopener">lovetheworkmore.com</a>. ' +
+      'Rankings in the right-hand rails were compiled ' + esc(c ? c.generated : '') + ' and are reviewed by hand.</p>';
+  }
+
+  // Some static hosts refuse a query string on a published file, so retry bare.
+  async function getJSON(path) {
+    var tries = [path + '?t=' + Date.now(), path];
+    for (var i = 0; i < tries.length; i++) {
+      try {
+        var r = await fetch(tries[i], { cache: 'no-store' });
+        if (r.ok) return await r.json();
+      } catch (e) { /* try the next form */ }
+    }
+    throw new Error('could not load ' + path);
+  }
+
+  async function loadLive(announce) {
+    try {
+      var d = await getJSON('data/live.json');
+      var changed = state.stamp && d.generatedAt !== state.stamp;
+      state.live = d;
+      state.stamp = d.generatedAt;
+      renderView(); renderRails(); setStatus(); setDateline(); renderFooter();
+      if (changed && announce) toast('Wire updated');
+      return true;
+    } catch (e) {
+      setStatus();
+      if (!state.live) {
+        $('#feed').innerHTML =
+          '<p class="empty"><strong>The wire did not load.</strong><br>' +
+          (state.liveHost
+            ? 'The refresher may still be running. Try Refresh in a moment.'
+            : 'This copy of the page cannot reach its data file.') + '</p>';
+      }
+      return false;
+    }
+  }
+
+  // The page runs either behind server.js (feeds refresh on a timer) or as a
+  // published snapshot. Say which, rather than implying the wire is live.
+  async function probeHost() {
+    try {
+      var r = await fetch('api/status', { cache: 'no-store' });
+      state.liveHost = r.ok;
+    } catch (e) { state.liveHost = false; }
+    document.body.dataset.host = state.liveHost ? 'live' : 'static';
+  }
+
+  async function boot() {
+    await probeHost();
+    try {
+      state.cur = await getJSON('data/curated.json');
+    } catch (e) {
+      $('#cyc-body').innerHTML = '<p class="cyc-p">Could not load the archive.</p>';
+      return;
+    }
+    try { state.awarded = await getJSON('data/awarded.json'); }
+    catch (e) { state.awarded = null; }
+    wireCycler();
+    renderRails();
+    await loadLive(false);
+
+    var polls = state.liveHost || (state.live && state.live.mode === 'hosted');
+    if (polls) setInterval(function () { loadLive(true); }, state.liveHost ? 90000 : 300000);
+    setInterval(setStatus, 60000);
+  }
+
+  // Wired before any data arrives, so a click in the first moments is never lost.
+  function switchView(v) {
+    if (state.view === v) return;
+    state.view = v;
+    state.showUnsorted = false;
+    state.expanded = false;
+    // Sector and channel mean the same thing in both feed views, so they carry
+    // across; kind and show do not apply outside their own view.
+    if (v !== 'awarded') state.show = '';
+    if (v === 'campaigns') state.kind = '';
+    renderView();
+    swap(state.view === 'news' ? $('#feed') : $('#cards'));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function wireControls() {
+    ['news', 'campaigns', 'awarded'].forEach(function (v) {
+      $('#view-' + v).addEventListener('click', function () { switchView(v); });
+    });
+    $('#tab-global').addEventListener('click', function () { switchTab('global'); });
+    $('#tab-europe').addEventListener('click', function () { switchTab('europe'); });
+    $('#refresh').addEventListener('click', async function () {
+      var b = $('#refresh');
+      b.dataset.busy = '1'; b.textContent = 'Pulling\u2026';
+      var pulled = false;
+      if (state.liveHost) {
+        try { var r = await fetch('api/refresh', { method: 'POST' }); pulled = r.ok; } catch (e) { pulled = false; }
+      }
+      await loadLive(pulled);
+      b.dataset.busy = '0'; b.textContent = 'Refresh';
+      if (!state.liveHost && !(state.live && state.live.mode === 'hosted')) {
+        toast('Static snapshot. Run the refresher for live feeds');
+      }
+    });
+  }
+
+  function switchTab(region) {
+    if (!state.live) { state.region = region; }
+    if (state.region === region && state.live) return;
+    state.region = region;
+    state.expanded = false;
+    ['global', 'europe'].forEach(function (r) {
+      $('#tab-' + r).setAttribute('aria-selected', String(r === region));
+    });
+    state.showUnsorted = false;
+    state.expanded = false;
+    renderView();
+    swap(state.view === 'news' ? $('#feed') : $('#cards'));
+  }
+
+  wireControls();
+  setDateline();
+
+  // Re-render when the layout crosses the phone breakpoint so the cap matches the column count.
+  var mq = window.matchMedia('(max-width:860px)');
+  var onMQ = function () { if (state.live) renderView(); };
+  window.addEventListener('resize', moveGliders);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveGliders);
+  mq.addEventListener ? mq.addEventListener('change', onMQ) : mq.addListener(onMQ);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target.matches('input,textarea')) return;
+    if (!state.cur) return;
+    if (e.key === 'ArrowLeft' && e.altKey) goTopic(state.topic - 1);
+    if (e.key === 'ArrowRight' && e.altKey) goTopic(state.topic + 1);
+  });
+
+  boot();
+})();
+</script>
