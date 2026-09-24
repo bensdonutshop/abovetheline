@@ -117,9 +117,12 @@ there is nothing to see the end of. A very faint warm wash drifts behind the wor
 on a pseudo-element moved with `transform`, so it costs a compositor layer and nothing else,
 and it holds still under `prefers-reduced-motion`.
 
-**The line ends in a sparkle.** A six-point star, flat and solid, sitting on the hot end of
-the gradient rule. Drawn as one SVG path with a generous waist so the points read as chunky
-rather than filigree. It is static - the line is the brand mark and a mark should hold still.
+**The line ends in an asterisk.** Seven flat-ended bars radiating from a solid centre, evenly
+spaced at 51.43 degrees, with three of them reaching about a quarter further. Flat ends rather
+than tapered points, and a bar width around 0.4 of the arm length, so it stays chunky. The
+three long arms sit roughly 103 degrees apart so the asymmetry reads as deliberate rather than
+accidental. Built as overlapping rects in one SVG, which union cleanly at a single fill. It is
+static - the line is the brand mark and a mark should hold still.
 
 **Type.** Syne Bold for the masthead, Schibsted Grotesk for everything else. Schibsted Grotesk
 is the face a Nordic news group commissioned for its own papers, so hierarchy comes from

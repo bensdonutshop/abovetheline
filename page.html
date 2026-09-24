@@ -124,12 +124,12 @@ html{scroll-behavior:smooth}
   background:var(--flare-grad); border-radius:2px;
 }
 .atl-spark{
-  position:absolute; right:-9px; top:50%; width:38px; height:38px;
+  position:absolute; right:-16px; top:50%; width:46px; height:46px;
   transform:translateY(-50%); fill:#D4160F; display:block;
 }
 :root[data-theme="dark"] .atl-spark, :root:not([data-theme="light"]) .atl-spark{fill:#E22A1C}
 @media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .atl-spark{fill:#D4160F} }
-@media (max-width:700px){ .atl-spark{width:28px; height:28px; right:-6px} }
+@media (max-width:700px){ .atl-spark{width:34px; height:34px; right:-12px} }
 .logo{
   margin:0; font-family:var(--masthead); font-weight:700;
   font-size:clamp(34px, 8.4vw, 108px); line-height:.9; letter-spacing:-.03em;
@@ -530,8 +530,16 @@ html{scroll-behavior:smooth}
          name means. Above the line: the bought media, the work everybody sees. -->
     <h1 class="logo">Above the Line</h1>
     <div class="atl-rule" aria-hidden="true">
-      <svg class="atl-spark" viewBox="-58 -58 116 116" role="presentation" focusable="false">
-        <path d="M0 -50 Q5 -8.66 43.3 -25 Q10 0 43.3 25 Q5 8.66 0 50 Q-5 8.66 -43.3 25 Q-10 0 -43.3 -25 Q-5 -8.66 0 -50 Z"/>
+      <svg class="atl-spark" viewBox="-60 -60 120 120" role="presentation" focusable="false">
+        <!-- Seven flat-ended bars, evenly spaced, three reaching further. -->
+        <circle cx="0" cy="0" r="11.5"/>
+        <rect x="-8" y="-51" width="16" height="51" transform="rotate(0)"/>
+        <rect x="-8" y="-40" width="16" height="40" transform="rotate(51.43)"/>
+        <rect x="-8" y="-51" width="16" height="51" transform="rotate(102.86)"/>
+        <rect x="-8" y="-40" width="16" height="40" transform="rotate(154.29)"/>
+        <rect x="-8" y="-51" width="16" height="51" transform="rotate(205.71)"/>
+        <rect x="-8" y="-40" width="16" height="40" transform="rotate(257.14)"/>
+        <rect x="-8" y="-40" width="16" height="40" transform="rotate(308.57)"/>
       </svg>
     </div>
     <p class="dateline"><span id="dateline-date"></span><b id="dateline-wire">The advertising wire</b></p>
