@@ -1,6 +1,7 @@
 dist/
 public/img/
 data/live.json
+data/awarded.json
 data/live.json.tmp
 .port
 node_modules/

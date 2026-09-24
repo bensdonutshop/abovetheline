@@ -32,6 +32,11 @@ jobs:
       - name: Pull the feeds
         run: node refresh.js --hosted
 
+      - name: Rebuild the awarded cases
+        run: |
+          node build-awarded.js
+          node enrich-curated.js data/awarded.json
+
       - name: Build the site
         run: node build.js --hosted
 

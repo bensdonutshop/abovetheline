@@ -26,8 +26,8 @@ const NO_IMG = process.argv.indexOf('--no-img') >= 0;
 const HOSTED = process.argv.indexOf('--hosted') >= 0;
 
 const MAX_AGE_DAYS = 21;
-const PER_COLUMN = { global: 34, europe: 34, nordic: 14 };
-const INSPECT_BUDGET = 150;    // articles we open to read their picture and paywall state
+const PER_COLUMN = { global: 80, europe: 80, nordic: 24 };
+const INSPECT_BUDGET = 280;    // articles we open to read their picture and paywall state
 // 'locked' is always dropped. Set KEEP_METERED=false to drop metered titles
 // (Digiday, Marketing Week, Campaign UK) as well.
 const KEEP_METERED = process.env.KEEP_METERED !== 'false';
@@ -297,7 +297,7 @@ function pruneImages(keep) {
 
   for (const k of Object.keys(buckets)) {
     buckets[k].sort((x, y) => score(y, now) - score(x, now));
-    buckets[k] = diversify(buckets[k], PER_COLUMN[k], k === 'nordic' ? 5 : 4);
+    buckets[k] = diversify(buckets[k], PER_COLUMN[k], k === 'nordic' ? 8 : 9);
   }
 
   const picked = [].concat(buckets.global, buckets.europe, buckets.nordic);

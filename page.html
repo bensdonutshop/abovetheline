@@ -67,13 +67,21 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   text-transform:uppercase; color:var(--ink-3); padding-bottom:1px;
 }
 
-.tabs{display:flex; gap:2px; padding:4px; background:var(--sunk); border-radius:999px}
+.tabs{display:flex; gap:2px; padding:4px; background:var(--sunk); border-radius:999px; position:relative}
+/* A single pill that slides between tabs, rather than each tab lighting up. */
+.glider{position:absolute; top:4px; bottom:4px; left:0; width:0; border-radius:999px;
+  background:var(--ink); z-index:0; opacity:0;
+  transition:transform .34s cubic-bezier(.4,0,.2,1), width .34s cubic-bezier(.4,0,.2,1), opacity .2s}
+.glider[data-ready="1"]{opacity:1}
+.views .glider{background:var(--flare)}
 .tab{
   font-family:var(--display); font-weight:700; font-stretch:88%; font-size:12.5px;
   letter-spacing:.09em; text-transform:uppercase; color:var(--ink-2);
-  padding:8px 17px; border-radius:999px; white-space:nowrap; transition:color .18s, background .18s;
+  padding:8px 17px; border-radius:999px; white-space:nowrap;
+  position:relative; z-index:1; transition:color .24s ease;
 }
-.tab[aria-selected="true"]{background:var(--ink); color:var(--paper)}
+.tab[aria-selected="true"]{color:var(--paper)}
+.views .tab[aria-selected="true"]{color:var(--flare-ink)}
 .tab:hover:not([aria-selected="true"]){color:var(--ink)}
 
 .status{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:10.5px;
@@ -171,13 +179,15 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
 /* ============================================================ views */
 .views .tab{font-size:12.5px}
-.views .tab[aria-selected="true"]{background:var(--flare); color:var(--flare-ink)}
 .shell[data-view="campaigns"] .col-topics,
 .shell[data-view="campaigns"] .col-lists,
 .shell[data-view="awarded"] .col-topics,
 .shell[data-view="awarded"] .col-lists{display:none}
 .shell[data-view="campaigns"],
 .shell[data-view="awarded"]{grid-template-columns:minmax(0,1fr); grid-template-areas:"main"}
+
+.swap{animation:swapin .34s cubic-bezier(.2,.8,.3,1) both}
+@keyframes swapin{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
 
 /* ============================================================ cards */
 .cards{display:grid; gap:26px 22px; grid-template-columns:repeat(auto-fill,minmax(262px,1fr))}
@@ -356,12 +366,12 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       <b>Above the Line</b>
       <i>Campaign desk</i>
     </div>
-    <div class="tabs views" role="tablist" aria-label="View">
+    <div class="tabs views" role="tablist" aria-label="View"><span class="glider" aria-hidden="true"></span>
       <button class="tab" role="tab" id="view-news" aria-selected="true">News</button>
       <button class="tab" role="tab" id="view-campaigns" aria-selected="false">Campaigns</button>
       <button class="tab" role="tab" id="view-awarded" aria-selected="false">Awarded</button>
     </div>
-    <div class="tabs" role="tablist" aria-label="News region" id="regions">
+    <div class="tabs" role="tablist" aria-label="Region" id="regions"><span class="glider" aria-hidden="true"></span>
       <button class="tab" role="tab" id="tab-global" aria-selected="true" aria-controls="feed">Global</button>
       <button class="tab" role="tab" id="tab-europe" aria-selected="false" aria-controls="feed">Europe</button>
     </div>
@@ -500,6 +510,30 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
            chip + also + '</div>';
   }
 
+  /* -------------------------------------------------------- tab glider */
+  function moveGlider(tabs) {
+    if (!tabs) return;
+    var g = tabs.querySelector('.glider');
+    var on = tabs.querySelector('[aria-selected="true"]');
+    if (!g || !on) return;
+    g.style.width = on.offsetWidth + 'px';
+    g.style.transform = 'translateX(' + on.offsetLeft + 'px)';
+    g.dataset.ready = '1';
+  }
+
+  function moveGliders() {
+    moveGlider(document.querySelector('.views'));
+    moveGlider($('#regions'));
+  }
+
+  // Replays the enter animation on whichever panel is now on screen.
+  function swap(el) {
+    if (!el) return;
+    el.classList.remove('swap');
+    void el.offsetWidth;          // restart the animation
+    el.classList.add('swap');
+  }
+
   /* ------------------------------------------------------------- cards */
   var TOP_AWARDS = /grand prix|black pencil|grand clio|titanium|grand prix for good/i;
 
@@ -550,7 +584,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
         '</a>';
     }).join('') + '</div>';
 
-    $('#feed-title').textContent = 'Campaign work' +
+    $('#feed-title').textContent = (state.region === 'europe' ? 'European campaign work' : 'Campaign work') +
       (state.sector ? ' \u00b7 ' + state.sector : '') + (state.channel ? ' \u00b7 ' + state.channel : '');
     $('#feed-note').textContent = list.length + ' campaigns';
   }
@@ -558,6 +592,10 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   // Award-winning cases, tagged with where they won and why.
   function renderAwarded() {
     var cases = (state.awarded && state.awarded.cases) || [];
+    // Global means everything; Europe narrows to work made in Europe.
+    if (state.region === 'europe') {
+      cases = cases.filter(function (c) { return c.region === 'europe'; });
+    }
     if (state.show) {
       cases = cases.filter(function (c) {
         return c.awards.some(function (a) { return a.show === state.show; });
@@ -586,8 +624,9 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       }).join('') + '</div>';
 
       var tags = c.awards.slice(0, 4).map(function (a) {
-        return '<span class="tag' + (TOP_AWARDS.test(a.level) ? ' top' : '') + '">' +
-          esc(a.level) + ' \u2014 ' + esc(a.category) + '</span>';
+        var label = a.category ? a.level + ' \u2014 ' + a.category : a.level;
+        return '<span class="tag' + (TOP_AWARDS.test(a.level) ? ' top' : '') + '" title="' +
+          esc(a.show + ': ' + label) + '">' + esc(label) + '</span>';
       });
       if (c.awards.length > 4) tags.push('<span class="tag plain">+' + (c.awards.length - 4) + '</span>');
 
@@ -601,7 +640,9 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
         '</a>';
     }).join('') + '</div>';
 
-    $('#feed-title').textContent = state.show ? state.show + ' \u2014 winning cases' : 'Most awarded cases';
+    var where = state.region === 'europe' ? 'European' : '';
+    $('#feed-title').textContent = (state.show ? state.show : (where ? where + ' awarded' : 'Most awarded')) +
+      (state.show && where ? ' \u00b7 Europe' : '') + (state.show ? ' \u2014 winning cases' : ' cases');
     $('#feed-note').textContent = cases.length + ' cases';
   }
 
@@ -609,7 +650,6 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   function renderView() {
     var news = state.view === 'news';
     $('#shell').dataset.view = state.view;
-    $('#regions').hidden = !news;
     $('#feed').hidden = !news;
     $('#cards').hidden = news;
     ['news', 'campaigns', 'awarded'].forEach(function (v) {
@@ -619,6 +659,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     if (news) renderFeed();
     else if (state.view === 'campaigns') renderCampaigns();
     else renderAwarded();
+    moveGliders();
   }
 
   /* ----------------------------------------------------------- filters */
@@ -1058,6 +1099,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     if (v !== 'awarded') state.show = '';
     if (v === 'campaigns') state.kind = '';
     renderView();
+    swap(state.view === 'news' ? $('#feed') : $('#cards'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -1091,10 +1133,9 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       $('#tab-' + r).setAttribute('aria-selected', String(r === region));
     });
     state.showUnsorted = false;
-    var f = $('#feed');
-    f.style.opacity = '0';
-    setTimeout(function () { renderView(); f.style.opacity = '1'; }, 110);
-    f.style.transition = 'opacity .18s ease';
+    state.expanded = false;
+    renderView();
+    swap(state.view === 'news' ? $('#feed') : $('#cards'));
   }
 
   wireControls();
@@ -1102,6 +1143,8 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   // Re-render when the layout crosses the phone breakpoint so the cap matches the column count.
   var mq = window.matchMedia('(max-width:860px)');
   var onMQ = function () { if (state.live) renderView(); };
+  window.addEventListener('resize', moveGliders);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveGliders);
   mq.addEventListener ? mq.addEventListener('change', onMQ) : mq.addListener(onMQ);
 
   document.addEventListener('keydown', function (e) {

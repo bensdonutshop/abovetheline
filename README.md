@@ -105,8 +105,12 @@ searches plus the hand-checked list under **Landmark work**.
 
 ## Three views
 
-`News` · `Campaigns` · `Awarded`, switched in the masthead. Global/Europe only appears on
-News, since it is a news-wire distinction.
+`News` · `Campaigns` · `Awarded`, switched in the masthead, with Global/Europe alongside —
+both rows stay put whichever view you are in. On News, Global and Europe are two different
+wires; on the card views, Global means everything and Europe narrows to work made there.
+
+The active tab is marked by a single pill that slides between positions rather than each tab
+lighting up, and the panel replays a short enter animation on every switch.
 
 **News** is the three-column front page: cycling 90-day archive on the left, ranked wire in
 the middle, campaign and Cannes rails on the right.
@@ -115,11 +119,20 @@ the middle, campaign and Cannes rails on the right.
 filterable by industry and channel. Built from the live wire — it is whatever the trade press
 is showing today.
 
-**Awarded** is a card feed of cases that won at Cannes Lions, D&AD, Clio and Eurobest, from
-`data/awarded.json`. Each card carries ribbons for the shows that recognised it and tags for
-the level and category, so it is obvious why a case is there. Ordered by how many *shows*
-recognised it, then how many statues, then how high — which puts genuinely cross-show work
-like AXA's *Three Words* (Cannes Grand Prix, D&AD Black Pencil, Grand Clio) at the top.
+**Awarded** is a card feed of ~200 cases that won at Cannes Lions, D&AD, Clio and Eurobest.
+Each card carries ribbons for the shows that recognised it and tags for the level and
+category, so it is obvious why a case is there. Ordered by how many *shows* recognised it,
+then how many statues, then how high — which puts genuinely cross-show work like AXA's
+*Three Words* (Cannes Grand Prix, D&AD Black Pencil, Grand Clio) at the top.
+
+`node build-awarded.js` regenerates it: it walks lovetheworkmore.com's Cannes index, which
+is laid out under `GRAND PRIX / TITANIUM` · `GOLD` · `SILVER` · `BRONZE` headings with entries
+reading `CAMPAIGN - BRAND (AGENCY CITY)`, then merges in the hand-researched D&AD, Clio and
+Eurobest recognition from `data/awarded-extra.json` by campaign name. `--all` includes Bronze.
+
+The agency's city gives each case a country and region (`lib/places.js`), so Global/Europe
+filters the award cards as well as the news. Brand and agency keep the index's original caps,
+because the cards render that line uppercase anyway and title-casing turns SKF into "Skf".
 
 Case thumbnails come from the video hosts themselves: YouTube exposes one per video id, and
 Vimeo answers oEmbed. Neither needs a key. `node enrich-curated.js data/awarded.json`
@@ -242,7 +255,10 @@ lib/cluster.js     groups the same story across outlets, prefers the readable on
 lib/classify.js    kind / sector / channel classification from article text
 data/sources.json  feed roster and filter vocabulary
 data/curated.json  the hand-researched rails
-data/awarded.json  award-winning cases, tagged by show, level and category
+data/awarded.json  generated — award-winning cases, tagged by show, level and category
+data/awarded-extra.json  hand-researched D&AD / Clio / Eurobest recognition, merged in
+build-awarded.js   scrapes the Cannes index and merges the cross-show research
+lib/places.js      agency city -> country and region
 enrich-curated.js  resolves thumbnails for curated entries (og:image, YouTube, Vimeo)
 data/live.json     generated — the current wire
 public/img/        generated — cached thumbnails
