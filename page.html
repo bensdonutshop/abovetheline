@@ -145,19 +145,11 @@ html{scroll-behavior:smooth}
   max-width:var(--max); margin:0 auto; padding:44px var(--gutter) 22px;
   display:flex; flex-direction:column; align-items:flex-start; text-align:left;
 }
-/* The line is the brand mark. It ends in a six-point sparkle: flat, solid,
-   geometric, sitting on the hot end of the gradient. */
-.atl-rule{
-  position:relative; display:block; width:100%; height:6px; margin-top:20px;
-  background:var(--flare-grad); border-radius:2px;
-}
-.atl-spark{
-  position:absolute; right:-21px; top:50%; width:46px; height:46px;
-  transform:translateY(-50%); fill:#D4160F; display:block;
-}
-:root[data-theme="dark"] .atl-spark, :root:not([data-theme="light"]) .atl-spark{fill:#E22A1C}
-@media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .atl-spark{fill:#D4160F} }
-@media (max-width:700px){ .atl-spark{width:34px; height:34px; right:-15px} }
+/* Rule and mark are one object: the line is simply one of the asterisk's seven
+   arms, run out to full width. Same stroke weight throughout, one gradient
+   across the whole shape, so there is nothing sitting on top of anything. */
+.atl-mark{display:block; width:100%; height:48px; margin-top:14px; overflow:visible}
+@media (max-width:700px){ .atl-mark{height:38px; margin-top:10px} }
 .logo{
   margin:0; font-family:var(--masthead); font-weight:700;
   font-size:clamp(34px, 8.4vw, 108px); line-height:.9; letter-spacing:-.03em;
@@ -175,7 +167,6 @@ html{scroll-behavior:smooth}
 }
 @media (max-width:700px){
   .masthead-in{padding:22px var(--gutter) 16px}
-  .atl-rule{height:4px; margin-top:12px}
   .dateline{gap:4px; font-size:9.5px; flex-direction:column; line-height:1.7}
   /* the hairline divider only makes sense on one line */
   .dateline b::before{display:none}
@@ -337,7 +328,6 @@ html{scroll-behavior:smooth}
 .flag em,
 .ribbon span.top,
 .chip.key[aria-pressed="true"],
-.atl-rule{
   box-shadow:inset 0 1px 0 rgba(255,228,176,.62), inset 0 -1px 0 rgba(120,26,4,.20);
 }
 .views .glider{box-shadow:inset 0 1.5px 0 rgba(255,232,186,.68), inset 0 -1px 0 rgba(120,26,4,.22)}
@@ -469,7 +459,7 @@ html{scroll-behavior:smooth}
 .daymark span{font-size:12px; letter-spacing:-.004em; color:var(--ink-3); white-space:nowrap}
 .daymark i{flex:1; height:1px; background:var(--rule)}
 
-.story{display:grid; grid-template-columns:112px minmax(0,1fr); gap:16px; padding:15px 0;
+.story{display:grid; grid-template-columns:142px minmax(0,1fr); gap:18px; padding:17px 0;
   border-top:1px solid var(--rule-soft); align-items:start}
 .daymark + .story{border-top:0}
 .story .shot{aspect-ratio:4/3; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
@@ -481,7 +471,7 @@ html{scroll-behavior:smooth}
 .story:hover h3{text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:3px; text-decoration-color:var(--flare)}
 .story p{margin:0 0 7px; font-size:14px; line-height:1.48; color:var(--ink-2); font-weight:300;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-clamp:2; overflow:hidden}
-@media (max-width:520px){ .story{grid-template-columns:86px minmax(0,1fr); gap:13px} .story h3{font-size:16px} .story p{display:none} }
+@media (max-width:520px){ .story{grid-template-columns:108px minmax(0,1fr); gap:14px} .story h3{font-size:16px} .story p{display:none} }
 
 /* fallback tile when a publisher gives us no picture */
 .tile{width:100%; height:100%; display:grid; place-items:center; position:relative; overflow:hidden}
@@ -503,10 +493,15 @@ html{scroll-behavior:smooth}
 
 /* ============================================================ rail modules */
 .mod{margin-bottom:34px}
-.rank{display:grid; grid-template-columns:26px minmax(0,1fr); gap:11px; padding:11px 0;
-  border-top:1px solid var(--rule-soft); align-items:baseline}
+.rank{display:grid; grid-template-columns:24px 58px minmax(0,1fr); gap:10px; padding:11px 0;
+  border-top:1px solid var(--rule-soft); align-items:start}
+.rank .pic{aspect-ratio:4/3; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
+.rank .pic img{width:100%; height:100%; object-fit:cover; transition:transform .5s var(--ease)}
+.rank:hover .pic img{transform:scale(1.06)}
+/* the Cannes rail has no pictures of its own, so it keeps the two-column form */
+.rank.nopic{grid-template-columns:24px minmax(0,1fr)}
 .rank:first-of-type{border-top:0; padding-top:2px}
-.rank .n{font-size:13px; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.03em;
+.rank .n{font-size:13px; font-weight:700; padding-top:1px; font-variant-numeric:tabular-nums; letter-spacing:-.03em;
   background:var(--flare-grad); -webkit-background-clip:text; background-clip:text; color:transparent}
 @supports not (background-clip:text){ .rank .n{color:var(--flare); background:none} }
 .rank h4{margin:0 0 3px; font-family:var(--display); font-weight:600; font-size:14.5px; line-height:1.24; letter-spacing:-.008em}
@@ -567,22 +562,16 @@ html{scroll-behavior:smooth}
     <!-- The wordmark sits above the rule, because that is literally what the
          name means. Above the line: the bought media, the work everybody sees. -->
     <h1 class="logo">Above the Line</h1>
-    <div class="atl-rule" aria-hidden="true">
-      <svg class="atl-spark" viewBox="-56 -56 112 112" role="presentation" focusable="false">
-        <!-- Seven equal arms, evenly spaced. One runs left into the rule, which
-             also makes the mark mirror-symmetric about the horizontal axis: the
-             only orientation in which an odd arm count sits still. Arm width
-             matches the rule's height, so the line reads as flowing into it. -->
-        <circle cx="0" cy="0" r="9.9"/>
-        <rect x="-8" y="-44" width="16" height="44" transform="rotate(270)"/>
-        <rect x="-8" y="-44" width="16" height="44" transform="rotate(321.43)"/>
-        <rect x="-8" y="-44" width="16" height="44" transform="rotate(12.86)"/>
-        <rect x="-8" y="-44" width="16" height="44" transform="rotate(64.29)"/>
-        <rect x="-8" y="-44" width="16" height="44" transform="rotate(115.71)"/>
-        <rect x="-8" y="-44" width="16" height="44" transform="rotate(167.14)"/>
-        <rect x="-8" y="-44" width="16" height="44" transform="rotate(218.57)"/>
-      </svg>
-    </div>
+    <svg class="atl-mark" id="atl-mark" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="atlGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#FF8A1F"/>
+          <stop offset="0.44" stop-color="#FF4A00"/>
+          <stop offset="1" stop-color="#D4160F"/>
+        </linearGradient>
+      </defs>
+      <g id="atl-geo" fill="url(#atlGrad)"></g>
+    </svg>
     <p class="dateline"><span id="dateline-date"></span><b id="dateline-wire">The advertising wire</b></p>
   </div>
 </header>
@@ -738,6 +727,45 @@ html{scroll-behavior:smooth}
       ? '<span class="sep"></span><span>also in ' + esc(item.alsoIn.join(', ')) + '</span>' : '';
     return '<div class="byline">' + kindTag + '<b>' + esc(item.source) + '</b>' +
            (t ? '<span>' + esc(t) + '</span>' : '') + chip + also + '</div>';
+  }
+
+  /* ------------------------------------------------------------ the mark */
+  /*
+   * The rule and the asterisk are one shape. Seven arms of identical weight
+   * radiate from a centre near the right edge; the arm pointing left is simply
+   * run out to x=0, and that is the line across the page. One gradient fills
+   * the whole thing, so the line arrives at the mark already red.
+   *
+   * Drawn in CSS pixel units with the viewBox set to the measured size, so the
+   * arms stay circular at any width. Stretching a fixed viewBox would shear
+   * them.
+   */
+  var MARK = { arms: 7, weight: 7, len: 21, pad: 3 };
+
+  function drawMark() {
+    var svg = $('#atl-mark'), g = $('#atl-geo');
+    if (!svg || !g) return;
+    var W = Math.max(120, Math.round(svg.clientWidth));
+    var H = Math.round(svg.clientHeight) || (MARK.len * 2 + MARK.pad * 2);
+    var cy = H / 2;
+    var cx = W - MARK.len - MARK.pad;
+    var w = MARK.weight, half = w / 2, step = 360 / MARK.arms;
+
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    var out = [];
+    // The arm that points left, run all the way out. This is the line.
+    out.push('<rect x="0" y="' + (cy - half) + '" width="' + cx + '" height="' + w + '"/>');
+    // The other six, evenly spaced around the same centre.
+    for (var i = 1; i < MARK.arms; i++) {
+      var a = 270 + i * step;
+      out.push('<rect x="' + (cx - half) + '" y="' + (cy - MARK.len) + '" width="' + w +
+               '" height="' + MARK.len + '" transform="rotate(' + a.toFixed(2) +
+               ' ' + cx + ' ' + cy + ')"/>');
+    }
+    // A disc the width of an arm keeps the junction solid at every angle.
+    out.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + half + '"/>');
+    g.innerHTML = out.join('');
   }
 
   /* -------------------------------------------------------- tab glider */
@@ -1361,8 +1389,13 @@ html{scroll-behavior:smooth}
       var why = [];
       if (x.awardCount) why.push(x.awardCount + (x.awardCount === 1 ? ' award' : ' awards'));
       if (x.outlets > 1) why.push(x.outlets + ' outlets');
+      var pic = x.pic
+        ? '<div class="pic"><img src="' + esc(x.pic) + '" alt="" loading="lazy" decoding="async" ' +
+          'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
+          'data-fb="' + esc(tile(x.brand || x.source)) + '"></div>'
+        : '<div class="pic">' + tile(x.brand || x.source) + '</div>';
       return '<a class="rank" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
-        '<span class="n">' + String(i + 1).padStart(2, '0') + '</span><div>' +
+        '<span class="n">' + String(i + 1).padStart(2, '0') + '</span>' + pic + '<div>' +
         '<h4>' + esc(x.title) + '</h4>' +
         '<div class="meta"><b>' + esc(x.brand || x.source) + '</b>' +
           (x.agency ? '<span>' + esc(x.agency) + '</span>' : '') + '</div>' +
@@ -1382,7 +1415,7 @@ html{scroll-behavior:smooth}
 
     $('#m-cannes').innerHTML = c.cannes2026.slice(0, 10).map(function (x) {
       var gp = /Grand Prix/i.test(x.award) ? '1' : '0';
-      return '<a class="rank" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
+      return '<a class="rank nopic" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
         '<span class="n">' + String(x.rank).padStart(2, '0') + '</span><div>' +
         '<span class="award" data-gp="' + gp + '">' + esc(x.award) + '</span>' +
         '<h4>' + esc(x.campaign) + '</h4>' +
@@ -1644,13 +1677,14 @@ html{scroll-behavior:smooth}
   }
 
   wireControls();
+  drawMark();
   setDateline();
 
   // Re-render when the layout crosses the phone breakpoint so the cap matches the column count.
   var mq = window.matchMedia('(max-width:860px)');
   var onMQ = function () { if (state.live) renderView(); };
-  window.addEventListener('resize', moveGliders);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveGliders);
+  window.addEventListener('resize', function () { moveGliders(); drawMark(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { moveGliders(); drawMark(); });
   mq.addEventListener ? mq.addEventListener('change', onMQ) : mq.addListener(onMQ);
 
   document.addEventListener('keydown', function (e) {

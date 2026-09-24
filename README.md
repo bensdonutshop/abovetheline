@@ -124,14 +124,14 @@ lead badge, top-award ribbons, the campaign-work chip, the masthead rule - carri
 inset highlight along its top edge and a darker one beneath, so it reads as a solid object
 catching a light rather than a flat fill.
 
-**The line ends in an asterisk.** Seven equal arms, flat-ended, evenly spaced at 51.43
-degrees, centred on the end of the rule. Orientation does the balancing: one arm runs left
-straight into the rule, which is also the only orientation in which an odd arm count is mirror
--symmetric about the horizontal axis, so the mark sits still instead of looking tilted. Arm
-width matches the rule's height, so the line reads as flowing into the mark rather than
-bumping into it. Arms are 2.75 times their width, which keeps it an asterisk rather than a
-blob. Built as overlapping rects in one SVG, unioned at a single fill. Static, because a brand
-mark should hold still.
+**The rule and the mark are one shape.** Seven arms of identical weight radiate from a centre
+near the right edge, and the arm pointing left is simply run out to x=0 - that is the line
+across the page. One gradient fills the whole thing, so the line arrives at the mark already
+red. Nothing sits on top of anything.
+
+It is drawn in CSS pixel units with the viewBox set to the measured size, because stretching a
+fixed viewBox across a variable width would shear the arms out of round. Redrawn on resize and
+once the webfont settles.
 
 **Type.** Syne Bold for the masthead, Schibsted Grotesk for everything else. Schibsted Grotesk
 is the face a Nordic news group commissioned for its own papers, so hierarchy comes from
