@@ -577,7 +577,7 @@ html{scroll-behavior:smooth}
   var $ = function (s) { return document.querySelector(s); };
   var state = { region: 'global', live: null, cur: null, topic: 0, stamp: '', raf: null, paused: false, expanded: false, liveHost: false,
     kind: '', sector: '', channel: '', showUnsorted: false,
-    view: 'news', awarded: null, show: '', awSector: '' };
+    view: 'news', awarded: null, show: '', awSector: '', sort: 'trending' };
   var CYCLE_MS = 8000;
 
   /* ------------------------------------------------------------ helpers */
@@ -689,33 +689,151 @@ html{scroll-behavior:smooth}
     return '<figure>' + inner + (ribbon || '') + '</figure>';
   }
 
+  /* ---------------------------------------------------- campaign pool */
+  /*
+   * Campaigns draws on three sources: the live wire, the award archive and the
+   * hand-researched twelve-month list. The same campaign turns up in more than
+   * one of them, and in several outlets inside the wire, so everything is
+   * keyed and collapsed before it reaches the grid.
+   */
+  var STOPW = ' the a an and or of to in on for with at by from as is are new its this that '.split(' ');
+
+  function keyTokens(str) {
+    return String(str || '').toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .split(/\s+/)
+      .filter(function (w) { return w.length > 2 && STOPW.indexOf(w) < 0; });
+  }
+
+  // Brand plus the two strongest words of the campaign name. Enough to catch
+  // the same work described differently, tight enough not to fuse two
+  // different campaigns from one brand.
+  function campaignKey(name, brand) {
+    var b = keyTokens(brand).slice(0, 2).join('-');
+    var n = keyTokens(name).slice(0, 3).sort().join('-');
+    return (b ? b + '|' : '') + n;
+  }
+
+  function wireItem(a) {
+    return {
+      title: a.title, url: a.url, pic: picture(a), brand: '', agency: '',
+      source: a.source, ts: a.ts || 0, sector: a.sector || '', channel: a.channel || '',
+      access: a.access || 'open', outlets: 1 + ((a.alsoIn || []).length),
+      awardCount: 0, showCount: 0, curated: 0, origin: 'wire',
+      blurb: a.summary || ''
+    };
+  }
+
+  function awardItem(c) {
+    var shows = {};
+    c.awards.forEach(function (a) { shows[a.show] = 1; });
+    return {
+      title: c.campaign, url: c.url, pic: c.thumb || '', brand: c.brand || '',
+      agency: c.agency || '', source: Object.keys(shows)[0], ts: 0,
+      sector: c.sector || '', channel: '', access: 'open', outlets: 1,
+      awardCount: c.awards.length, showCount: Object.keys(shows).length,
+      curated: 0, origin: 'award', blurb: c.blurb || ''
+    };
+  }
+
+  function curatedItem(x) {
+    return {
+      title: x.campaign, url: x.url, pic: x.thumb || '', brand: x.brand || '',
+      agency: x.agency || '', source: x.source || '', ts: 0,
+      sector: '', channel: '', access: 'open', outlets: 1, awardCount: 0,
+      showCount: 0, curated: 11 - (x.rank || 10), origin: 'curated', blurb: x.note || ''
+    };
+  }
+
+  function campaignPool() {
+    var d = state.live || {};
+    var eu = state.region === 'europe';
+    var wire = eu ? (d.europe || []) : [].concat(d.global || [], d.europe || [], d.nordic || []);
+
+    var items = [];
+    wire.forEach(function (a) { if (a.kind === 'work') items.push(wireItem(a)); });
+    ((state.awarded && state.awarded.cases) || []).forEach(function (c) {
+      if (eu && c.region !== 'europe') return;
+      items.push(awardItem(c));
+    });
+    ((state.cur && state.cur.campaigns12m) || []).forEach(function (x) {
+      items.push(curatedItem(x));
+    });
+
+    // Collapse duplicates, folding each duplicate's signal into the survivor.
+    var byKey = {};
+    items.forEach(function (it) {
+      var k = campaignKey(it.title, it.brand);
+      var cur = byKey[k];
+      if (!cur) { byKey[k] = it; return; }
+      cur.outlets = Math.max(cur.outlets, it.outlets) + (cur.origin !== it.origin ? 1 : 0);
+      cur.awardCount = Math.max(cur.awardCount, it.awardCount);
+      cur.showCount = Math.max(cur.showCount, it.showCount);
+      cur.curated = Math.max(cur.curated, it.curated);
+      if (!cur.pic && it.pic) cur.pic = it.pic;
+      if (!cur.brand && it.brand) cur.brand = it.brand;
+      if (!cur.agency && it.agency) cur.agency = it.agency;
+      if (!cur.sector && it.sector) cur.sector = it.sector;
+      if (!cur.ts && it.ts) cur.ts = it.ts;
+      if (!cur.blurb && it.blurb) cur.blurb = it.blurb;
+    });
+
+    var out = Object.keys(byKey).map(function (k) { return byKey[k]; });
+
+    // Second pass on the campaign name alone. One source writes the brand as
+    // "Claude / Anthropic" and another as "CLAUDE", so the brand-keyed pass
+    // leaves those apart even though it is plainly the same work.
+    var byName = {}, merged = [];
+    out.forEach(function (it) {
+      var n = keyTokens(it.title).slice(0, 4).sort().join('-');
+      var cur = byName[n];
+      if (!cur || !n) { if (n) byName[n] = it; merged.push(it); return; }
+      cur.outlets = Math.max(cur.outlets, it.outlets);
+      cur.awardCount = Math.max(cur.awardCount, it.awardCount);
+      cur.showCount = Math.max(cur.showCount, it.showCount);
+      cur.curated = Math.max(cur.curated, it.curated);
+      if (!cur.pic && it.pic) cur.pic = it.pic;
+      if (!cur.brand && it.brand) cur.brand = it.brand;
+      if (!cur.agency && it.agency) cur.agency = it.agency;
+      if (!cur.sector && it.sector) cur.sector = it.sector;
+      if (!cur.ts && it.ts) cur.ts = it.ts;
+      if (!cur.blurb && it.blurb) cur.blurb = it.blurb;
+    });
+
+    merged.forEach(function (it) { it.trend = trendScore(it); });
+    return merged;
+  }
+
+  /*
+   * How much a campaign is being talked about, from signals we actually hold:
+   * how many mastheads ran it, how many juries recognised it and across how
+   * many shows, whether it made the hand-researched twelve-month list, and a
+   * light recency term so this week's work is not buried by the archive.
+   */
+  function trendScore(it) {
+    var days = it.ts ? (Date.now() - it.ts) / 864e5 : 240;
+    return (it.outlets - 1) * 3
+         + it.awardCount * 2
+         + it.showCount * 4
+         + it.curated * 1.5
+         + Math.max(0, 6 - days / 14)
+         + (it.pic ? 0.5 : 0);
+  }
+
   // Campaign work, shown as something you scan rather than read.
   function renderCampaigns() {
-    // Campaigns is a gallery, not a wire. Global means every campaign we found,
-    // not just the stories that happened to sort into the global bucket.
-    var d = state.live || {};
-    var pool = state.region === 'europe'
-      ? (d.europe || [])
-      : [].concat(d.global || [], d.europe || [], d.nordic || []);
-    var seenUrl = {};
-    var list = pool.filter(function (a) {
-      if (a.kind !== 'work') return false;
-      if (seenUrl[a.url]) return false;
-      seenUrl[a.url] = 1;
-      return true;
-    });
+    var list = campaignPool();
     if (state.sector) list = list.filter(function (a) { return a.sector === state.sector; });
     if (state.channel) list = list.filter(function (a) { return a.channel === state.channel; });
 
-    // A card feed is carried by its pictures, so lead with the work that has one.
     list = list.slice().sort(function (x, y) {
-      return (picture(y) ? 1 : 0) - (picture(x) ? 1 : 0);
+      if (state.sort === 'recent' && y.ts !== x.ts) return y.ts - x.ts;
+      return y.trend - x.trend;
     });
 
     var host = $('#cards');
     if (!list.length) {
-      host.innerHTML = '<p class="empty">No campaign work matches that in this pull. ' +
-        'Try clearing the filters, or look under News.</p>';
+      host.innerHTML = '<p class="empty">No campaign work matches that. Try clearing the filters.</p>';
       return;
     }
 
@@ -723,21 +841,32 @@ html{scroll-behavior:smooth}
       var tags = [];
       if (a.sector) tags.push('<span class="tag">' + esc(a.sector) + '</span>');
       if (a.channel) tags.push('<span class="tag">' + esc(a.channel) + '</span>');
+      if (a.awardCount) tags.push('<span class="tag top">' + a.awardCount +
+        (a.awardCount === 1 ? ' award' : ' awards') + '</span>');
+      if (a.outlets > 1) tags.push('<span class="tag">' + a.outlets + ' outlets</span>');
       if (a.access === 'metered') tags.push('<span class="tag plain">Metered</span>');
-      var feat = idx === 0 && picture(a) ? ' card--feature' : '';
+
+      var feat = idx === 0 && a.pic ? ' card--feature' : '';
+      var credit = a.brand
+        ? '<b>' + esc(a.brand) + '</b>' + (a.agency ? '<i>' + esc(a.agency) + '</i>' : '')
+        : '<b>' + esc(a.source) + '</b>' + (a.ts ? '<i>' + esc(ago(a.ts)) + '</i>' : '');
+
       return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
         esc(a.url) + '" target="_blank" rel="noopener">' +
-        cardShot(picture(a), a.source,
-          '<span class="onshot"><b>' + esc(a.source) + '</b>' + (a.ts ? esc(ago(a.ts)) : '') + '</span>', idx) +
+        cardShot(a.pic, a.brand || a.source,
+          '<span class="onshot"><b>' + esc(a.brand || a.source) + '</b>' +
+          (a.ts ? esc(ago(a.ts)) : '') + '</span>', idx) +
         '<h3>' + esc(a.title) + '</h3>' +
-        (a.summary ? '<p class="blurb">' + esc(a.summary) + '</p>' : '') +
-        '<div class="who"><b>' + esc(a.source) + '</b>' + (a.ts ? '<i>' + esc(ago(a.ts)) + '</i>' : '') + '</div>' +
+        (a.blurb ? '<p class="blurb">' + esc(a.blurb) + '</p>' : '') +
+        '<div class="who">' + credit + '</div>' +
         (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') +
         '</a>';
     }).join('') + '</div>';
 
-    $('#feed-title').textContent = (state.region === 'europe' ? 'European campaign work' : 'Campaign work') +
-      (state.sector ? ', ' + state.sector.toLowerCase() : '') + (state.channel ? ', ' + state.channel.toLowerCase() : '');
+    var lens = state.sort === 'recent' ? 'Most recent work' : 'Trending this year';
+    $('#feed-title').textContent = (state.region === 'europe' ? 'European campaigns. ' : '') + lens +
+      (state.sector ? ', ' + state.sector.toLowerCase() : '') +
+      (state.channel ? ', ' + state.channel.toLowerCase() : '');
     $('#feed-note').textContent = list.length + ' campaigns';
   }
 
@@ -917,29 +1046,28 @@ html{scroll-behavior:smooth}
 
     // Campaigns is already only work, so the kind switch would be a no-op there.
     if (state.view === 'campaigns') {
-      var cd = state.live || {};
-      var cpool = state.region === 'europe'
-        ? (cd.europe || [])
-        : [].concat(cd.global || [], cd.europe || [], cd.nordic || []);
-      var cseen = {};
-      var work = cpool.filter(function (a) {
-        if (a.kind !== 'work' || cseen[a.url]) return false;
-        cseen[a.url] = 1; return true;
-      });
-      var f2 = (state.live.facets) || { sectors: [], channels: [] };
-      var h2 = '';
-      var secs2 = f2.sectors.filter(function (x) { return countBy(work, 'sector', x); });
+      var pool = campaignPool();
+      var f2 = (state.live && state.live.facets) || { sectors: [], channels: [] };
+      var cnt = function (k, v) { return pool.filter(function (a) { return a[k] === v; }).length; };
+
+      var h2 = '<div class="fgroup"><span class="flabel">Sort</span>' +
+        chip('Trending this year', state.sort !== 'recent', 'sort', 'trending', null, true) +
+        chip('Most recent work', state.sort === 'recent', 'sort', 'recent', null) +
+        '</div>';
+
+      var secs2 = f2.sectors.filter(function (x) { return cnt('sector', x); })
+        .sort(function (a, b) { return cnt('sector', b) - cnt('sector', a); });
       if (secs2.length) {
         h2 += '<div class="fgroup"><span class="flabel">Industry</span>' +
-          chip('All', !state.sector, 'sector', '', work.length) +
-          secs2.map(function (x) { return chip(x, state.sector === x, 'sector', x, countBy(work, 'sector', x)); }).join('') +
+          chip('All', !state.sector, 'sector', '', pool.length) +
+          secs2.map(function (x) { return chip(x, state.sector === x, 'sector', x, cnt('sector', x)); }).join('') +
           '</div>';
       }
-      var ch2 = f2.channels.filter(function (x) { return countBy(work, 'channel', x); });
+      var ch2 = f2.channels.filter(function (x) { return cnt('channel', x); });
       if (ch2.length) {
         h2 += '<div class="fgroup"><span class="flabel">Media</span>' +
           chip('All', !state.channel, 'channel', '', null) +
-          ch2.map(function (x) { return chip(x, state.channel === x, 'channel', x, countBy(work, 'channel', x)); }).join('') +
+          ch2.map(function (x) { return chip(x, state.channel === x, 'channel', x, cnt('channel', x)); }).join('') +
           '</div>';
       }
       host.innerHTML = h2;
@@ -987,6 +1115,7 @@ html{scroll-behavior:smooth}
         var k = b.dataset.key, v = b.dataset.val;
         state[k] = (state[k] === v) ? '' : v;
         if (k === 'kind' && state.kind !== 'work') { state.sector = ''; state.channel = ''; }
+        if (k === 'sort' && !state.sort) state.sort = 'trending';
         state.showUnsorted = false;
         state.expanded = false;
         renderView();

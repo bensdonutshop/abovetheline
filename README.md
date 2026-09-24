@@ -223,6 +223,49 @@ Classification is lexicon-based and deliberately abstains when two categories sc
 together, which is why a third of stories stay unclassified rather than being confidently
 mislabelled.
 
+## Campaigns: two lenses over one deduplicated pool
+
+Campaigns draws on three sources at once: the live wire, the award archive and the
+hand-researched twelve-month list. That is roughly 280 campaigns rather than the 60-odd the
+wire alone carries.
+
+The same work appears in more than one of them, and in several outlets inside the wire, so
+everything is keyed and collapsed before it reaches the grid. Two passes: first on brand plus
+the strongest words of the campaign name, then on the campaign name alone, because one source
+writes a brand as "Claude / Anthropic" and another as "CLAUDE". Each duplicate's signal is
+folded into the survivor rather than thrown away.
+
+Two sorts:
+
+**Most recent work** is the wire by date, with the undated archive behind it.
+
+**Trending this year** is scored from signals the project actually holds, not an invented
+number:
+
+| Signal | Weight | Where it comes from |
+|---|---|---|
+| Outlets carrying it | x3 | cross-outlet clustering in `lib/cluster.js` |
+| Shows that recognised it | x4 | `data/awarded.json` |
+| Individual awards | x2 | same |
+| On the twelve-month list | x1.5 | `data/curated.json`, by rank |
+| Recency | up to 6 | so this week is not buried by the archive |
+
+Cards show what earned the position: "3 awards", "2 outlets".
+
+## Nordic awards
+
+Guldagget and Vuoden Huiput sit alongside Cannes Lions, D&AD, Clio and Eurobest.
+
+Guldagget 2026 (the 65th, 23 April 2026) contributes its gold winners, taken from the
+official winners release, jury citations and all. Vuoden Huiput 2025 (gala 23 April 2026)
+contributes its Grand Prix and Kultahuippu winners from vuodenhuiput.fi and Grafia.
+
+Two cases turn out to be cross-show: Caritas Sverige's *Vehicle of Hope* and Way Out West's
+*The Kidney Pass* both won at Cannes and at Guldagget, which the ranking rewards.
+
+Where a credit could not be verified it is left blank rather than guessed. Several Vuoden
+Huiput entries carry a designer but no client, because the source does not name one.
+
 ## Industry filtering
 
 Both card views filter by industry. `lib/classify.js` holds 18 sectors, each a list of brand
