@@ -371,9 +371,15 @@ html{scroll-behavior:smooth}
 .views .glider{box-shadow:inset 0 1.5px 0 rgba(255,232,206,.64), inset 0 -1px 0 rgba(96,10,34,.24)}
 
 /* ============================================================ cards */
-.cards{display:grid; gap:26px 22px; grid-template-columns:repeat(auto-fill,minmax(262px,1fr))}
-.card{display:flex; flex-direction:column; gap:10px; min-width:0}
-.card figure{margin:0; aspect-ratio:16/10; border-radius:var(--r-md); overflow:hidden; background:var(--sunk); position:relative}
+.cards{display:grid; gap:20px 18px; grid-template-columns:repeat(auto-fill,minmax(262px,1fr))}
+.card{display:flex; flex-direction:column; gap:10px; min-width:0;
+  background:var(--surface); border:1px solid var(--rule); border-radius:var(--r-md);
+  overflow:hidden; padding-bottom:15px;
+  transition:border-color .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease)}
+.card:hover{border-color:var(--ink-3); transform:translateY(-2px); box-shadow:var(--shadow)}
+/* The shot bleeds to the card's own edge; everything below it is inset. */
+.card > h3, .card > .blurb, .card > .who, .card > .tags{padding-left:15px; padding-right:15px}
+.card figure{margin:0; aspect-ratio:16/10; overflow:hidden; background:var(--sunk); position:relative}
 .card figure img{width:100%; height:100%; object-fit:cover; transition:transform .55s cubic-bezier(.2,.7,.3,1)}
 .card:hover figure img{transform:scale(1.04)}
 .card h3{
@@ -533,6 +539,10 @@ html{scroll-behavior:smooth}
 
 /* ============================================================ rail modules */
 .mod{margin-bottom:34px}
+.mod--card{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r-md);
+  padding:16px 16px 6px}
+.mod--card .head{margin-bottom:14px}
+.mod--card .rank:first-of-type{border-top:0}
 .rank{display:grid; grid-template-columns:24px 58px minmax(0,1fr); gap:10px; padding:11px 0;
   border-top:1px solid var(--rule-soft); align-items:start}
 .rank .pic{aspect-ratio:4/3; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
@@ -652,7 +662,7 @@ html{scroll-behavior:smooth}
   </div>
 
   <aside class="col-lists">
-    <section class="mod">
+    <section class="mod mod--card">
       <div class="head"><h2>Most talked about</h2><span id="talked-note"></span></div>
       <div class="windows" id="windows" role="group" aria-label="Time window"></div>
       <div id="m-12"></div>
