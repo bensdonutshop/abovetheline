@@ -306,6 +306,11 @@ html{scroll-behavior:smooth}
   color:var(--ink-2); transition:.16s; flex:none}
 .arrow:hover{border-color:var(--ink); color:var(--ink); background:var(--sunk)}
 .arrow svg{width:13px; height:13px}
+.vh{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
+  clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0}
+.cyc-h a{display:inline; text-decoration:none}
+.cyc-h a:hover, .cyc-h a:focus-visible{text-decoration:underline;
+  text-decoration-thickness:2px; text-underline-offset:3px; text-decoration-color:var(--flare)}
 .pips{display:flex; gap:4px; margin:0 auto}
 .pip{width:5px; height:5px; border-radius:50%; background:var(--rule); padding:0; transition:.2s}
 .pip[aria-current="true"]{background:var(--flare-text); transform:scale(1.35)}
@@ -613,6 +618,7 @@ html{scroll-behavior:smooth}
           <button class="arrow" id="prev" aria-label="Previous topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
           <button class="arrow" id="next" aria-label="Next topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
           <div class="pips" id="pips" role="tablist" aria-label="Choose topic"></div>
+          <button class="arrow" id="cyc-play" aria-pressed="false" aria-label="Pause the topic carousel"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></button>
           <span class="count" id="cyc-idx">01/10</span>
         </div>
       </div>
@@ -654,7 +660,7 @@ html{scroll-behavior:smooth}
   'use strict';
 
   var $ = function (s) { return document.querySelector(s); };
-  var state = { region: 'global', live: null, cur: null, topic: 0, stamp: '', raf: null, paused: false, expanded: false, liveHost: false,
+  var state = { region: 'global', live: null, cur: null, topic: 0, stamp: '', raf: null, paused: false, userPaused: false, expanded: false, liveHost: false,
     kind: '', sector: '', channel: '', showUnsorted: false,
     view: 'news', awarded: null, show: '', awSector: '', sort: 'trending', window: 12 };
   var CYCLE_MS = 8000;
@@ -1105,6 +1111,11 @@ html{scroll-behavior:smooth}
     ['news', 'campaigns', 'awarded'].forEach(function (v) {
       $('#view-' + v).setAttribute('aria-selected', String(v === state.view));
     });
+    // Also here, not only in switchTab, so a region arriving from the URL on
+    // first paint marks its own tab.
+    ['global', 'europe'].forEach(function (r) {
+      $('#tab-' + r).setAttribute('aria-selected', String(r === state.region));
+    });
     renderFilters();
     if (news) renderFeed();
     else if (!state.live && !state.awarded) $('#cards').innerHTML = cardSkeletons(8);
@@ -1267,6 +1278,7 @@ html{scroll-behavior:smooth}
         if (k === 'sort' && !state.sort) state.sort = 'trending';
         state.showUnsorted = false;
         state.expanded = false;
+        syncUrl(false);
         renderView();
       });
     });
@@ -1400,6 +1412,7 @@ html{scroll-behavior:smooth}
       Array.prototype.forEach.call(wins.querySelectorAll('.win'), function (b) {
         b.addEventListener('click', function () {
           state.window = +b.dataset.m;
+          syncUrl(false);
           renderTalkedAbout();
         });
       });
@@ -1483,7 +1496,8 @@ html{scroll-behavior:smooth}
             'data-fb="' + esc(tile(t.kicker)) + '">'
           : tile(t.kicker)) + '</div>' +
         '<div><div class="cyc-kicker">' + esc(t.kicker) + '</div>' +
-        '<h3 class="cyc-h">' + esc(t.headline) + '</h3></div>' +
+        '<h3 class="cyc-h"><a href="' + esc(t.url) + '" target="_blank" rel="noopener">' +
+          esc(t.headline) + '<span class="vh"> (opens in a new tab)</span></a></h3></div>' +
       '</div>' +
       '<p class="cyc-p">' + esc(t.ingress) + '</p>' +
       '<div class="cyc-src">Read it at <u>' + esc(t.source) + '</u></div>' +
@@ -1509,7 +1523,7 @@ html{scroll-behavior:smooth}
     if (reduced) { bar.style.transform = 'scaleX(0)'; return; }
     var start = performance.now();
     (function step(now) {
-      if (state.paused) { start += 16; state.raf = requestAnimationFrame(step); return; }
+      if (state.paused || state.userPaused) { start += 16; state.raf = requestAnimationFrame(step); return; }
       var p = Math.min(1, (now - start) / CYCLE_MS);
       bar.style.transform = 'scaleX(' + p + ')';
       if (p >= 1) { goTopic(state.topic + 1); return; }
@@ -1531,8 +1545,17 @@ html{scroll-behavior:smooth}
     var box = $('#cycler');
     ['mouseenter', 'focusin'].forEach(function (e) { box.addEventListener(e, function () { state.paused = true; }); });
     ['mouseleave', 'focusout'].forEach(function (e) { box.addEventListener(e, function () { state.paused = false; }); });
+    var play = $('#cyc-play');
+    play.addEventListener('click', function () {
+      state.userPaused = !state.userPaused;
+      play.setAttribute('aria-pressed', String(state.userPaused));
+      play.setAttribute('aria-label', state.userPaused
+        ? 'Play the topic carousel' : 'Pause the topic carousel');
+      play.innerHTML = state.userPaused ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>' : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+    });
+
     box.addEventListener('click', function (ev) {
-      if (ev.target.closest('button')) return;
+      if (ev.target.closest('button, a')) return;
       if (box.dataset.href) window.open(box.dataset.href, '_blank', 'noopener');
     });
     box.style.cursor = 'pointer';
@@ -1654,6 +1677,62 @@ html{scroll-behavior:smooth}
     setInterval(setStatus, 60000);
   }
 
+
+  /* ------------------------------------------------------------- url state
+     Every view and filter lives in the query string, so a view can be shared,
+     reloaded and walked back through. Filters replace the entry; changing view
+     or region pushes one, because those are the moves people expect Back to
+     undo. */
+  var URL_KEYS = ['view', 'region', 'kind', 'sector', 'channel', 'show', 'awSector', 'sort', 'window'];
+  var URL_DEFAULT = {
+    view: 'news', region: 'global', kind: '', sector: '', channel: '',
+    show: '', awSector: '', sort: 'trending', window: 12
+  };
+
+  function syncUrl(push) {
+    var q = [];
+    URL_KEYS.forEach(function (k) {
+      if (String(state[k]) === String(URL_DEFAULT[k])) return;
+      q.push(encodeURIComponent(k.toLowerCase()) + '=' + encodeURIComponent(state[k]));
+    });
+    var url = location.pathname + (q.length ? '?' + q.join('&') : '') + location.hash;
+    try { history[push ? 'pushState' : 'replaceState']({ atl: 1 }, '', url); } catch (e) {}
+  }
+
+  function readUrl() {
+    var q = {};
+    location.search.replace(/^\?/, '').split('&').forEach(function (pair) {
+      if (!pair) return;
+      var i = pair.indexOf('=');
+      var k = decodeURIComponent(i < 0 ? pair : pair.slice(0, i));
+      q[k] = i < 0 ? '' : decodeURIComponent(pair.slice(i + 1).replace(/\+/g, ' '));
+    });
+    URL_KEYS.forEach(function (k) {
+      var v = q[k.toLowerCase()];
+      if (v === undefined) { state[k] = URL_DEFAULT[k]; return; }
+      state[k] = (k === 'window') ? (+v || URL_DEFAULT[k]) : v;
+    });
+    if (['news', 'campaigns', 'awarded'].indexOf(state.view) < 0) state.view = 'news';
+    if (['global', 'europe'].indexOf(state.region) < 0) state.region = 'global';
+  }
+
+  // Everything the two switchers touch, so a Back button lands on a whole view
+  // rather than half of one.
+  function applyState() {
+    ['global', 'europe'].forEach(function (r) {
+      $('#tab-' + r).setAttribute('aria-selected', String(r === state.region));
+    });
+    state.showUnsorted = false;
+    state.expanded = false;
+    renderView();
+    if (state.cur) renderTalkedAbout();
+  }
+
+  window.addEventListener('popstate', function () {
+    readUrl();
+    applyState();
+  });
+
   // Wired before any data arrives, so a click in the first moments is never lost.
   function switchView(v) {
     if (state.view === v) return;
@@ -1664,6 +1743,7 @@ html{scroll-behavior:smooth}
     // across; kind and show do not apply outside their own view.
     if (v !== 'awarded') { state.show = ''; state.awSector = ''; }
     if (v === 'campaigns') state.kind = '';
+    syncUrl(true);
     renderView();
     swap(state.view === 'news' ? $('#feed') : $('#cards'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1700,10 +1780,12 @@ html{scroll-behavior:smooth}
     });
     state.showUnsorted = false;
     state.expanded = false;
+    syncUrl(true);
     renderView();
     swap(state.view === 'news' ? $('#feed') : $('#cards'));
   }
 
+  readUrl();
   wireControls();
   drawMark();
   setDateline();
