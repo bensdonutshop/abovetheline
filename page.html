@@ -1,4 +1,5 @@
 <title>Above The Line</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314110E'/%3E%3Crect x='6' y='12' width='20' height='3.4' rx='1.4' fill='%23FF4D0F'/%3E%3Crect x='6' y='18.5' width='13' height='3.4' rx='1.4' fill='%23F2EEE8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=DM+Mono:wght@400;500&display=swap">
@@ -18,6 +19,17 @@
   --mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 
   --gutter:20px; --rail-l:288px; --rail-r:334px; --max:1560px;
+
+  /* One radius scale, applied by role. Inner elements tighter than containers. */
+  --r-xs:3px;      /* tags, award chips */
+  --r-sm:6px;      /* thumbnails, small media */
+  --r-md:10px;     /* cards, figures, panels */
+  --r-pill:999px;  /* anything you press */
+
+  /* Layers, named so nothing invents a 9999. */
+  --z-base:0; --z-raised:1; --z-sticky:50; --z-toast:80; --z-grain:90;
+
+  --ease:cubic-bezier(.2,.8,.3,1);
 }
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
   color-scheme:dark;
@@ -47,9 +59,32 @@ img{display:block; max-width:100%}
 :focus-visible{outline:2px solid var(--flare); outline-offset:3px; border-radius:2px}
 button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
+/* A fixed grain plate. Fixed and pointer-events:none so it never repaints on scroll. */
+body::after{
+  content:""; position:fixed; inset:0; z-index:var(--z-grain); pointer-events:none; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) body::after{opacity:.055} }
+:root[data-theme="dark"] body::after{opacity:.055}
+
+html{scroll-behavior:smooth}
+
+.skip{
+  position:absolute; left:16px; top:-100px; z-index:calc(var(--z-sticky) + 5);
+  background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:var(--r-pill);
+  font-family:var(--display); font-weight:700; font-size:12px; letter-spacing:.08em;
+  text-transform:uppercase; transition:top .2s var(--ease);
+}
+.skip:focus{top:calc(env(safe-area-inset-top, 0px) + 12px)}
+
+/* Press feedback. Nothing here moves more than a pixel. */
+.tab:active, .chip:active, .refresh:active, .more:active,
+.unsorted:active, .arrow:active{transform:translateY(1px)}
+.card:active figure{transform:scale(.995)}
+
 /* ============================================================ masthead */
 .mast{
-  position:sticky; top:env(safe-area-inset-top,0px); z-index:50;
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:var(--z-sticky);
   background:var(--paper); border-bottom:1px solid var(--rule);
 }
 .mast-in{
@@ -61,15 +96,15 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   font-family:var(--display); font-weight:800; font-stretch:82%;
   font-size:26px; letter-spacing:-.022em; line-height:1; text-transform:uppercase;
 }
-.wordmark .rule-dash{width:26px; height:4px; background:var(--flare); border-radius:1px; transform:translateY(-4px)}
+.wordmark .rule-dash{width:26px; height:4px; background:var(--flare); border-radius:2px; transform:translateY(-4px)}
 .wordmark i{
   font-family:var(--mono); font-style:normal; font-size:10px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--ink-3); padding-bottom:1px;
 }
 
-.tabs{display:flex; gap:2px; padding:4px; background:var(--sunk); border-radius:999px; position:relative}
+.tabs{display:flex; gap:2px; padding:4px; background:var(--sunk); border-radius:var(--r-pill); position:relative}
 /* A single pill that slides between tabs, rather than each tab lighting up. */
-.glider{position:absolute; top:4px; bottom:4px; left:0; width:0; border-radius:999px;
+.glider{position:absolute; top:4px; bottom:4px; left:0; width:0; border-radius:var(--r-pill);
   background:var(--ink); z-index:0; opacity:0;
   transition:transform .34s cubic-bezier(.4,0,.2,1), width .34s cubic-bezier(.4,0,.2,1), opacity .2s}
 .glider[data-ready="1"]{opacity:1}
@@ -77,7 +112,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .tab{
   font-family:var(--display); font-weight:700; font-stretch:88%; font-size:12.5px;
   letter-spacing:.09em; text-transform:uppercase; color:var(--ink-2);
-  padding:8px 17px; border-radius:999px; white-space:nowrap;
+  padding:8px 17px; border-radius:var(--r-pill); white-space:nowrap;
   position:relative; z-index:1; transition:color .24s ease;
 }
 .tab[aria-selected="true"]{color:var(--paper)}
@@ -90,7 +125,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   box-shadow:0 0 0 0 var(--flare-wash); animation:ping 2.6s ease-out infinite}
 @keyframes ping{0%{box-shadow:0 0 0 0 var(--flare-wash)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 .status b{color:var(--ink-2); font-weight:500}
-.refresh{border:1px solid var(--rule); border-radius:999px; padding:6px 13px; font-family:var(--mono);
+.refresh{border:1px solid var(--rule); border-radius:var(--r-pill); padding:6px 13px; font-family:var(--mono);
   font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); transition:.18s}
 .refresh:hover{border-color:var(--ink); color:var(--ink)}
 .refresh[data-busy="1"]{opacity:.5; pointer-events:none}
@@ -113,7 +148,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
 /* ============================================================ show-more */
 .more{display:block; width:100%; margin:22px 0 4px; padding:13px; border:1px solid var(--rule);
-  border-radius:3px; background:var(--surface); font-family:var(--display); font-weight:700;
+  border-radius:var(--r-md); background:var(--surface); font-family:var(--display); font-weight:700;
   font-stretch:88%; font-size:12px; letter-spacing:.09em; text-transform:uppercase; transition:.18s}
 .more:hover{border-color:var(--ink); background:var(--sunk)}
 
@@ -143,24 +178,24 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   margin:0; font-family:var(--display); font-weight:800; font-stretch:80%;
   font-size:14px; letter-spacing:.11em; text-transform:uppercase; line-height:1;
 }
-.head span{margin-left:auto; font-family:var(--mono); font-size:10px; letter-spacing:.07em;
+.head span{margin-left:auto; font-family:var(--mono); font-size:10px; letter-spacing:.07em; font-variant-numeric:tabular-nums;
   text-transform:uppercase; color:var(--ink-3); white-space:nowrap}
 
 /* ============================================================ topic cycler */
-.cycler{background:var(--surface); border:1px solid var(--rule); border-radius:3px; overflow:hidden; box-shadow:var(--shadow)}
+.cycler{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow)}
 .bar{height:3px; background:var(--rule-soft); position:relative; overflow:hidden}
 .bar i{position:absolute; inset:0 auto 0 0; width:100%; background:var(--flare);
   transform:scaleX(0); transform-origin:0 50%; will-change:transform}
 .cycler-in{padding:16px 17px 14px; display:flex; flex-direction:column; min-height:224px}
 .cyc-top{display:grid; grid-template-columns:72px minmax(0,1fr); gap:12px; align-items:start; margin-bottom:10px}
-.cyc-shot{aspect-ratio:1/1; border-radius:3px; overflow:hidden; background:var(--sunk)}
+.cyc-shot{aspect-ratio:1/1; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
 .cyc-shot img{width:100%; height:100%; object-fit:cover}
 .cyc-kicker{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--flare); margin-bottom:6px}
 .cyc-h{
   margin:0; font-family:var(--display); font-weight:700; font-stretch:84%;
   font-size:19px; line-height:1.16; letter-spacing:-.014em; text-wrap:balance;
 }
-.cyc-p{margin:0; font-size:14.5px; line-height:1.52; color:var(--ink-2); font-weight:300}
+.cyc-p{margin:0; font-size:14.5px; line-height:1.52; color:var(--ink-2); font-weight:300; text-wrap:pretty}
 .cyc-src{margin-top:10px; font-family:var(--mono); font-size:10px; letter-spacing:.05em;
   text-transform:uppercase; color:var(--ink-3)}
 .cyc-src u{text-decoration:none; border-bottom:1px solid var(--rule); padding-bottom:1px}
@@ -192,19 +227,22 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 /* ============================================================ cards */
 .cards{display:grid; gap:26px 22px; grid-template-columns:repeat(auto-fill,minmax(262px,1fr))}
 .card{display:flex; flex-direction:column; gap:10px; min-width:0}
-.card figure{margin:0; aspect-ratio:16/10; border-radius:3px; overflow:hidden; background:var(--sunk); position:relative}
+.card figure{margin:0; aspect-ratio:16/10; border-radius:var(--r-md); overflow:hidden; background:var(--sunk); position:relative}
 .card figure img{width:100%; height:100%; object-fit:cover; transition:transform .55s cubic-bezier(.2,.7,.3,1)}
 .card:hover figure img{transform:scale(1.04)}
 .card h3{
   margin:0; font-family:var(--display); font-weight:700; font-stretch:86%;
   font-size:18px; line-height:1.16; letter-spacing:-.014em; text-wrap:balance;
+  display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
 }
+.card--feature h3{-webkit-line-clamp:2; line-clamp:2}
 .card:hover h3{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; text-decoration-color:var(--flare)}
-.card .who{font-family:var(--mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3)}
-.card .blurb{margin:0; font-size:14px; line-height:1.46; color:var(--ink-2); font-weight:300}
-.card .tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:auto; padding-top:4px}
+.card .who{margin-top:auto; padding-top:2px; font-family:var(--mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3)}
+.card .blurb{margin:0; font-size:14px; line-height:1.46; color:var(--ink-2); font-weight:300; text-wrap:pretty;
+  display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+.card .tags{display:flex; flex-wrap:wrap; gap:5px; padding-top:2px}
 .tag{font-family:var(--mono); font-size:9px; letter-spacing:.05em; text-transform:uppercase;
-  border:1px solid var(--rule); border-radius:2px; padding:2px 5px; color:var(--ink-3);
+  border:1px solid var(--rule); border-radius:var(--r-xs); padding:2px 5px; color:var(--ink-3);
   white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis}
 .card .tags{min-width:0}
 .tag.top{border-color:var(--flare); color:var(--flare)}
@@ -213,10 +251,24 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 /* the award ribbon sits on the picture so a scan reads "why is this here" first */
 .ribbon{position:absolute; left:8px; top:8px; display:flex; flex-direction:column; gap:4px; align-items:flex-start}
 .ribbon span{font-family:var(--display); font-weight:700; font-stretch:88%; font-size:9.5px;
-  letter-spacing:.07em; text-transform:uppercase; padding:3px 7px; border-radius:2px;
+  letter-spacing:.07em; text-transform:uppercase; padding:3px 7px; border-radius:var(--r-xs);
   background:rgba(12,10,8,.78); color:#fff; backdrop-filter:blur(3px)}
 .ribbon span.top{background:var(--flare); color:var(--flare-ink)}
 .card .count{font-family:var(--mono); font-size:9.5px; color:var(--ink-3)}
+
+/* The first card carries the section. Breaking the uniform grid is the whole
+   difference between a gallery and a wall of equal rectangles. */
+@media (min-width:920px){
+  .card--feature{grid-column:span 2}
+  .card--feature figure{aspect-ratio:16/9}
+  .card--feature h3{font-size:27px; font-stretch:82%; letter-spacing:-.02em; line-height:1.08}
+  .card--feature .blurb{font-size:15px; max-width:56ch}
+  .card--feature .ribbon span{font-size:10.5px; padding:4px 9px}
+}
+
+/* Cards rise in sequence rather than all at once. */
+.cards .card{animation:rise .5s var(--ease) both; animation-delay:calc(var(--i, 0) * 34ms)}
+@keyframes rise{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
 
 @media (max-width:620px){
   .cards{grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:20px 14px}
@@ -236,23 +288,23 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .chip{
   font-family:var(--display); font-weight:600; font-stretch:90%; font-size:11.5px;
   letter-spacing:.055em; text-transform:uppercase; color:var(--ink-2);
-  border:1px solid var(--rule); border-radius:999px; padding:5px 11px; transition:.16s;
+  border:1px solid var(--rule); border-radius:var(--r-pill); padding:5px 11px; transition:.16s;
   display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
 }
 .chip:hover{border-color:var(--ink); color:var(--ink)}
 .chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper)}
-.chip i{font-style:normal; font-family:var(--mono); font-size:9.5px; opacity:.6; font-variant-numeric:tabular-nums}
+.chip i{font-style:normal; font-family:var(--mono); font-size:9.5px; opacity:.55; font-variant-numeric:tabular-nums}
 .chip[aria-pressed="true"] i{opacity:.75}
 .chip.key[aria-pressed="true"]{background:var(--flare); border-color:var(--flare); color:var(--flare-ink)}
 .unsorted{display:block; width:100%; margin:20px 0 4px; padding:11px; border:1px dashed var(--rule);
-  border-radius:3px; font-family:var(--mono); font-size:10.5px; letter-spacing:.05em;
+  border-radius:var(--r-md); font-family:var(--mono); font-size:10.5px; letter-spacing:.05em;
   text-transform:uppercase; color:var(--ink-3); transition:.16s; background:none}
 .unsorted:hover{border-color:var(--ink-3); color:var(--ink-2)}
 .empty{padding:26px 0; color:var(--ink-2); font-size:15px}
 
 /* ============================================================ lead story */
 .lead{display:block; margin-bottom:26px}
-.lead figure{margin:0 0 15px; position:relative; border-radius:3px; overflow:hidden; background:var(--sunk); aspect-ratio:16/9}
+.lead figure{margin:0 0 15px; position:relative; border-radius:var(--r-md); overflow:hidden; background:var(--sunk); aspect-ratio:16/9}
 .lead figure img{width:100%; height:100%; object-fit:cover; transition:transform .6s cubic-bezier(.2,.7,.3,1)}
 .lead:hover figure img{transform:scale(1.025)}
 .lead h1{
@@ -260,11 +312,11 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   font-size:clamp(30px,4.1vw,46px); line-height:1.02; letter-spacing:-.028em; text-wrap:balance;
 }
 .lead:hover h1{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px; text-decoration-color:var(--flare)}
-.lead p{margin:0 0 12px; font-size:18px; line-height:1.48; color:var(--ink-2); font-weight:300; max-width:60ch}
+.lead p{margin:0 0 12px; font-size:18px; line-height:1.48; color:var(--ink-2); font-weight:300; max-width:60ch; text-wrap:pretty}
 
 .flag{display:inline-flex; align-items:center; gap:7px; margin-bottom:11px;
   font-family:var(--mono); font-size:10px; letter-spacing:.11em; text-transform:uppercase}
-.flag em{font-style:normal; background:var(--flare); color:var(--flare-ink); padding:3px 7px; border-radius:2px; font-weight:500}
+.flag em{font-style:normal; background:var(--flare); color:var(--flare-ink); padding:3px 7px; border-radius:var(--r-xs); font-weight:500}
 .flag s{text-decoration:none; color:var(--ink-3)}
 
 .byline{display:flex; align-items:center; gap:9px; font-family:var(--mono); font-size:10.5px;
@@ -280,7 +332,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .story{display:grid; grid-template-columns:112px minmax(0,1fr); gap:16px; padding:15px 0;
   border-top:1px solid var(--rule-soft); align-items:start}
 .daymark + .story{border-top:0}
-.story .shot{aspect-ratio:4/3; border-radius:2px; overflow:hidden; background:var(--sunk)}
+.story .shot{aspect-ratio:4/3; border-radius:var(--r-sm); overflow:hidden; background:var(--sunk)}
 .story .shot img{width:100%; height:100%; object-fit:cover; transition:transform .5s cubic-bezier(.2,.7,.3,1)}
 .story:hover .shot img{transform:scale(1.05)}
 .story h3{
@@ -301,7 +353,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
 .meter{display:inline-flex; align-items:center; gap:4px; font-family:var(--mono); font-size:9px;
   letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3);
-  border:1px solid var(--rule); border-radius:2px; padding:1px 5px}
+  border:1px solid var(--rule); border-radius:var(--r-xs); padding:1px 5px}
 .meter b{font-weight:400; color:var(--ink-3)}
 
 /* ============================================================ rail modules */
@@ -317,14 +369,14 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .rank .note{margin:5px 0 0; font-size:13px; line-height:1.45; color:var(--ink-2); font-weight:300}
 
 .award{display:inline-block; font-family:var(--mono); font-size:9px; letter-spacing:.07em;
-  text-transform:uppercase; color:var(--ink-2); border:1px solid var(--rule); border-radius:2px;
+  text-transform:uppercase; color:var(--ink-2); border:1px solid var(--rule); border-radius:var(--r-xs);
   padding:2px 5px; margin-bottom:5px}
 .award[data-gp="1"]{border-color:var(--flare); color:var(--flare)}
 
 .nordic-item{display:grid; grid-template-columns:24px minmax(0,1fr); gap:10px; padding:10px 0; border-top:1px solid var(--rule-soft)}
 .nordic-item:first-of-type{border-top:0}
 .mk{font-family:var(--mono); font-size:9.5px; font-weight:500; letter-spacing:.04em; color:var(--ink-2);
-  border:1px solid var(--rule); border-radius:2px; padding:2px 0; text-align:center; height:fit-content}
+  border:1px solid var(--rule); border-radius:var(--r-xs); padding:2px 0; text-align:center; height:fit-content}
 .mk[data-m="FI"]{border-color:#0B5FC4; color:#0B5FC4}
 .mk[data-m="SE"]{border-color:#B08300; color:#8A6800}
 :root[data-theme="dark"] .mk[data-m="FI"], :root:not([data-theme="light"]) .mk[data-m="FI"]{color:#6FA8FF; border-color:#3D6FB5}
@@ -342,12 +394,12 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
 /* ============================================================ misc */
 .toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(140%);
-  background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:999px;
+  background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:var(--r-pill);
   font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
-  z-index:80; transition:transform .42s cubic-bezier(.2,.8,.3,1); box-shadow:var(--shadow);
+  z-index:var(--z-toast); transition:transform .42s cubic-bezier(.2,.8,.3,1); box-shadow:var(--shadow);
   padding-bottom:calc(10px + env(safe-area-inset-bottom,0px))}
 .toast[data-show="1"]{transform:translateX(-50%) translateY(0)}
-.skel{background:var(--sunk); border-radius:2px; animation:pulse 1.5s ease-in-out infinite}
+.skel{background:var(--sunk); border-radius:var(--r-xs); animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
 .foot{max-width:var(--max); margin:0 auto; padding:26px var(--gutter) 46px; border-top:1px solid var(--rule);
   font-family:var(--display); font-size:12.5px; line-height:1.65; color:var(--ink-3)}
@@ -355,10 +407,12 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 .foot strong{color:var(--ink-2); font-weight:600}
 
 @media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important}
 }
 </style>
 
+<a class="skip" href="#feed-title">Skip to the stories</a>
 <header class="mast">
   <div class="mast-in">
     <div class="wordmark">
@@ -382,7 +436,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
 <main class="shell" id="shell" data-view="news">
   <aside class="col-topics">
-    <div class="head"><h2>The Last 90 Days</h2><span id="cyc-count">—</span></div>
+    <div class="head"><h2>The Last 90 Days</h2><span id="cyc-count"></span></div>
     <section class="cycler" id="cycler" aria-roledescription="carousel" aria-label="Most discussed topics of the past three months">
       <div class="bar"><i id="bar"></i></div>
       <div class="cycler-in">
@@ -404,7 +458,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
   <div class="col-main">
     <div class="filters" id="filters"></div>
-    <div class="head"><h2 id="feed-title">Global — This Week</h2><span id="feed-note">—</span></div>
+    <div class="head"><h2 id="feed-title">Global this week</h2><span id="feed-note"></span></div>
     <div id="feed" role="tabpanel" aria-labelledby="tab-global"></div>
     <div id="cards" hidden></div>
   </div>
@@ -575,7 +629,9 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       if (a.sector) tags.push('<span class="tag">' + esc(a.sector) + '</span>');
       if (a.channel) tags.push('<span class="tag">' + esc(a.channel) + '</span>');
       if (a.access === 'metered') tags.push('<span class="tag plain">Metered</span>');
-      return '<a class="card" href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
+      var feat = idx === 0 && picture(a) ? ' card--feature' : '';
+      return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
+        esc(a.url) + '" target="_blank" rel="noopener">' +
         cardShot(picture(a), a.source, '', idx) +
         '<h3>' + esc(a.title) + '</h3>' +
         (a.summary ? '<p class="blurb">' + esc(a.summary) + '</p>' : '') +
@@ -624,13 +680,15 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       }).join('') + '</div>';
 
       var tags = c.awards.slice(0, 4).map(function (a) {
-        var label = a.category ? a.level + ' \u2014 ' + a.category : a.level;
+        var label = a.category ? a.level + ' \u00b7 ' + a.category : a.level;
         return '<span class="tag' + (TOP_AWARDS.test(a.level) ? ' top' : '') + '" title="' +
           esc(a.show + ': ' + label) + '">' + esc(label) + '</span>';
       });
       if (c.awards.length > 4) tags.push('<span class="tag plain">+' + (c.awards.length - 4) + '</span>');
 
-      return '<a class="card" href="' + esc(c.url) + '" target="_blank" rel="noopener">' +
+      var feat = idx === 0 && c.thumb ? ' card--feature' : '';
+      return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
+        esc(c.url) + '" target="_blank" rel="noopener">' +
         cardShot(c.thumb || '', c.brand, ribbon, idx) +
         '<h3>' + esc(c.campaign) + '</h3>' +
         '<div class="who">' + esc(c.brand) + ' \u00b7 ' + esc(c.agency) +
@@ -642,11 +700,20 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
 
     var where = state.region === 'europe' ? 'European' : '';
     $('#feed-title').textContent = (state.show ? state.show : (where ? where + ' awarded' : 'Most awarded')) +
-      (state.show && where ? ' \u00b7 Europe' : '') + (state.show ? ' \u2014 winning cases' : ' cases');
+      (state.show && where ? ' \u00b7 Europe' : '') + (state.show ? ' winning cases' : ' cases');
     $('#feed-note').textContent = cases.length + ' cases';
   }
 
   // One entry point, so every path through the app agrees on what is on screen.
+  function cardSkeletons(n) {
+    var one = '<div class="card" aria-hidden="true">' +
+      '<div class="skel" style="aspect-ratio:16/10;border-radius:var(--r-md)"></div>' +
+      '<div class="skel" style="height:15px;width:85%"></div>' +
+      '<div class="skel" style="height:15px;width:55%"></div>' +
+      '<div class="skel" style="height:10px;width:40%"></div></div>';
+    return '<div class="cards">' + new Array(n + 1).join(one) + '</div>';
+  }
+
   function renderView() {
     var news = state.view === 'news';
     $('#shell').dataset.view = state.view;
@@ -657,6 +724,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     });
     renderFilters();
     if (news) renderFeed();
+    else if (!state.live && !state.awarded) $('#cards').innerHTML = cardSkeletons(8);
     else if (state.view === 'campaigns') renderCampaigns();
     else renderAwarded();
     moveGliders();
@@ -863,7 +931,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     }
     if (unsorted.length && !state.showUnsorted) {
       html += '<button class="unsorted" id="unsorted">+ ' + unsorted.length +
-        ' more we could not classify \u2014 show ' + (unsorted.length === 1 ? 'it' : 'them') + '</button>';
+        ' we could not classify. Show ' + (unsorted.length === 1 ? 'it' : 'them') + '</button>';
     }
 
     host.innerHTML = html;
@@ -877,7 +945,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     if (state.kind) bits.push(KIND_LABEL[state.kind]);
     if (state.sector) bits.push(state.sector);
     if (state.channel) bits.push(state.channel);
-    $('#feed-title').textContent = bits.length ? scope + ' — ' + bits.join(' · ') : scope + ' — This Week';
+    $('#feed-title').textContent = bits.length ? scope + ': ' + bits.join(' · ') : scope + ' this week';
     $('#feed-note').textContent = list.length + ' of ' + full.length + ' stories';
     $('#feed').setAttribute('aria-labelledby', 'tab-' + state.region);
   }
@@ -891,7 +959,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       return '<a class="rank" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
         '<span class="n">' + String(x.rank).padStart(2, '0') + '</span><div>' +
         '<h4>' + esc(x.campaign) + '</h4>' +
-        '<div class="meta">' + esc(x.brand) + (x.agency && x.agency !== '—' ? ' · ' + esc(x.agency) : '') + '</div>' +
+        '<div class="meta">' + esc(x.brand) + (x.agency ? ' · ' + esc(x.agency) : '') + '</div>' +
         '<p class="note">' + esc(x.note) + '</p></div></a>';
     }).join('');
 
@@ -920,7 +988,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
         '<span class="mk" data-m="' + esc(x.market) + '">' + esc(x.market) + '</span><div>' +
         '<h4>' + esc(x.campaign) + '</h4>' +
         '<div class="meta" style="font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)">' +
-        esc(x.brand) + (x.agency && x.agency !== '—' ? ' · ' + esc(x.agency) : '') + '</div></div></a>';
+        esc(x.brand) + (x.agency ? ' · ' + esc(x.agency) : '') + '</div></div></a>';
     }).join('');
   }
 
@@ -1023,9 +1091,9 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       ((state.liveHost || (d && d.mode === 'hosted'))
         ? 'pulls the advertising trade press every few minutes and ranks it by '
         : 'is showing a saved pull of the advertising trade press, ranked by ') +
-      'recency, masthead and how squarely the story is about the work. Every headline links straight to the publisher — nothing is rewritten here.</p>' +
+      'recency, masthead and how squarely the story is about the work. Every headline links straight to the publisher, and nothing is rewritten here.</p>' +
       '<p style="max-width:76ch;margin:0 0 10px">Articles the publisher marks as subscriber-only are dropped before they reach this page, ' +
-      'checked per article rather than per masthead — so a paywalled title\'s open journalism still gets through. Where the same story ran in ' +
+      'checked per article rather than per masthead, so a paywalled title\'s open journalism still gets through. Where the same story ran in ' +
       'several outlets, the version you can actually read wins. Titles marked <span class="meter">Metered</span> allow a few free reads a month.</p>' +
       '<p style="max-width:76ch;margin:0 0 10px">On the wire right now: ' + srcs.map(esc).join(' · ') + '.</p>' +
       '<p style="margin:0">Cannes Lions case films are indexed by <a href="https://www.lovetheworkmore.com" target="_blank" rel="noopener">lovetheworkmore.com</a>. ' +
@@ -1055,6 +1123,13 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       return true;
     } catch (e) {
       setStatus();
+      if (!state.live) {
+        $('#feed').innerHTML =
+          '<p class="empty"><strong>The wire did not load.</strong><br>' +
+          (state.liveHost
+            ? 'The refresher may still be running. Try Refresh in a moment.'
+            : 'This copy of the page cannot reach its data file.') + '</p>';
+      }
       return false;
     }
   }
@@ -1119,7 +1194,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       await loadLive(pulled);
       b.dataset.busy = '0'; b.textContent = 'Refresh';
       if (!state.liveHost && !(state.live && state.live.mode === 'hosted')) {
-        toast('Static snapshot \u2014 run the refresher for live feeds');
+        toast('Static snapshot. Run the refresher for live feeds');
       }
     });
   }

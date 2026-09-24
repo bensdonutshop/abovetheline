@@ -103,6 +103,49 @@ Finnish trade press is the one genuine gap: *Markkinointi & Mainonta*, *Markkino
 and *Kauppalehti* publish no reachable feed, so Finland arrives through Finnish-language news
 searches plus the hand-checked list under **Landmark work**.
 
+## Design system
+
+**Type.** Archivo for display (condensed, newsroom weight), Newsreader for body, DM Mono for
+labels, timestamps and counts. The serif is the *reading* face, not the display face, which is
+the inversion trade titles use and the reason the page reads as press rather than as a product.
+
+**Colour.** Warm-grey paper rather than cream, a single accent (`#FF4D0F`, `#FF6B33` on dark),
+and neutrals biased warm throughout so nothing reads as a stock grey ramp. One accent, used
+identically in every view. Shadows carry the paper's hue instead of being black at low opacity.
+
+**Shape.** One radius scale applied by role, not per component:
+
+| Token | Used for |
+|---|---|
+| `--r-xs` 3px | tags, award chips, badges |
+| `--r-sm` 6px | thumbnails and small media |
+| `--r-md` 10px | cards, figures, panels |
+| `--r-pill` | anything you press |
+
+Circles stay circles (status dot, carousel pips, the round arrow buttons). Layers come from
+named `--z-*` tokens so nothing invents a `9999`.
+
+**Depth.** A fixed grain plate over the page at 3.5% (5.5% on dark), `position: fixed` and
+`pointer-events: none` so it never repaints while scrolling.
+
+**Grid rhythm.** The first card in each card feed spans two columns with a 16:9 figure and a
+larger headline. A wall of identical rectangles is the difference between a gallery and a
+contact sheet. Headlines clamp to three lines (two on the feature) and the metadata block is
+pinned to the bottom of each card, so source lines and award tags form clean rows across a row
+of cards whatever the headline lengths above them.
+
+**No em-dashes.** Not in copy, labels, tags or headlines. Publisher headlines are normalised
+*typographically only* in `lib/parse.js` - the dash glyph is swapped, never the words, because
+rewriting someone's headline to suit a house style would misrepresent their story.
+
+**States.** Press feedback on every control, skeleton cards while the first pull lands, a real
+message when the wire fails to load, and empty states that say what to do next. Cards rise in
+sequence on entry rather than all at once. Everything collapses under
+`prefers-reduced-motion`, including smooth scrolling.
+
+**Access.** A skip link to the stories, visible focus rings, a branded favicon, and both
+themes designed rather than inverted.
+
 ## Three views
 
 `News` · `Campaigns` · `Awarded`, switched in the masthead, with Global/Europe alongside —

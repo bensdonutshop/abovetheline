@@ -52,6 +52,10 @@ const KEEP_CAPS = new Set(('ai tv pr ooh sdg b2b b2c uk us usa ny la sos pos skf
   'tbwa kfc mtv bbc nhs hiv un wwf ikea lego h&m m&m mms kkk qr ar vr ux ui ceo cmo ' +
   'f1 nba nfl fifa uefa dna gps atm pc tv2 rtl sbs abc cbs nbc hbo').split(' '));
 
+function noDash(s) {
+  return String(s || '').replace(/\s+[\u2014\u2013]\s+/g, ' - ').replace(/[\u2014\u2013]/g, '-');
+}
+
 function titleCaseCampaign(s) {
   return s.split(/(\s+)/).map(function (w) {
     if (/^\s+$/.test(w)) return w;
@@ -107,9 +111,9 @@ function cleanCategory(c) {
 
     const place = placeOf(e.agency);
     out.push({
-      campaign: titleCaseCampaign(e.campaign),
-      brand: e.brand,
-      agency: e.agency,
+      campaign: noDash(titleCaseCampaign(e.campaign)),
+      brand: noDash(e.brand),
+      agency: noDash(e.agency),
       country: place.country,
       region: place.region,
       url: t.href.replace(/&amp;/g, '&'),
@@ -117,7 +121,7 @@ function cleanCategory(c) {
         show: 'Cannes Lions',
         level: e.category && /GRAND PRIX/i.test(e.category) ? 'Grand Prix'
              : e.category && /TITANIUM/i.test(e.category) ? 'Titanium' : level,
-        category: e.category ? (titleCaseCampaign(cleanCategory(e.category)) || 'Titanium') : ''
+        category: e.category ? noDash(titleCaseCampaign(cleanCategory(e.category)) || 'Titanium') : ''
       }]
     });
   }
