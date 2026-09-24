@@ -355,8 +355,9 @@ html{scroll-behavior:smooth}
 .card:hover h3{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; text-decoration-color:var(--flare)}
 .card .who{margin-top:auto; padding-top:6px; font-size:13px; line-height:1.45; color:var(--ink-3);
   display:flex; flex-direction:column}
-.card .who b{font-weight:600; color:var(--ink-2)}
-.card .who i{font-style:normal; color:var(--ink-3)}
+.card .who b{font-weight:600; color:var(--ink-2); text-transform:uppercase}
+.card .who i{font-style:normal; color:var(--ink-3); text-transform:none}
+.card .who{text-transform:uppercase}
 .card .blurb{margin:0; font-size:14px; line-height:1.46; color:var(--ink-2); font-weight:300; text-wrap:pretty;
   display:-webkit-box; -webkit-line-clamp:3; line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
 .card .tags{display:flex; flex-wrap:wrap; gap:5px; padding-top:2px}
@@ -1027,6 +1028,17 @@ html{scroll-behavior:smooth}
   }
 
   // Award-winning cases, tagged with where they won and why.
+  // Some Lions are named after their prize, so the index repeats the word in
+  // both fields. Say it once, and the right way round.
+  var PRIZE_WORD = /^(titanium|glass|innovation|impact)$/i;
+  function awardLabel(a) {
+    var lvl = a.level || '', cat = a.category || '';
+    if (!cat) return lvl;
+    if (cat.toLowerCase() === lvl.toLowerCase()) return lvl;
+    if (PRIZE_WORD.test(cat) && /grand prix/i.test(lvl)) return cat + ' ' + lvl;
+    return lvl + ', ' + cat.toLowerCase();
+  }
+
   function renderAwarded() {
     var cases = (state.awarded && state.awarded.cases) || [];
     // Global means everything; Europe narrows to work made in Europe.
@@ -1067,7 +1079,7 @@ html{scroll-behavior:smooth}
       }).join('') + '</div>';
 
       var tags = c.awards.slice(0, 4).map(function (a) {
-        var label = a.category ? a.level + ', ' + a.category.toLowerCase() : a.level;
+        var label = awardLabel(a);
         return '<span class="tag' + (TOP_AWARDS.test(a.level) ? ' top' : '') + '" title="' +
           esc(a.show + ': ' + label) + '">' + esc(label) + '</span>';
       });
