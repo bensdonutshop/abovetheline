@@ -445,6 +445,8 @@ html{scroll-behavior:smooth}
 :root[data-theme="dark"] .mk[data-m="SE"], :root:not([data-theme="light"]) .mk[data-m="SE"]{color:#E8C24A; border-color:#8A7226}
 @media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .mk[data-m="FI"]{color:#0B5FC4; border-color:#0B5FC4}
   :root:not([data-theme="dark"]) .mk[data-m="SE"]{color:#8A6800; border-color:#B08300} }
+.nordic-item .meta{display:flex; flex-wrap:wrap; gap:0 8px}
+.nordic-item .meta b{font-weight:600; color:var(--ink-2)}
 .nordic-item h4{margin:0 0 3px; font-family:var(--display); font-weight:600; font-size:14px; line-height:1.26}
 .nordic-item a:hover h4{text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--flare)}
 
@@ -1048,7 +1050,7 @@ html{scroll-behavior:smooth}
       return '<a class="rank" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
         '<span class="n">' + String(x.rank).padStart(2, '0') + '</span><div>' +
         '<h4>' + esc(x.campaign) + '</h4>' +
-        '<div class="meta">' + esc(x.brand) + (x.agency ? ' · ' + esc(x.agency) : '') + '</div>' +
+        '<div class="meta"><b>' + esc(x.brand) + '</b>' + (x.agency ? '<span>' + esc(x.agency) + '</span>' : '') + '</div>' +
         '<p class="note">' + esc(x.note) + '</p></div></a>';
     }).join('');
 
@@ -1058,17 +1060,17 @@ html{scroll-behavior:smooth}
         '<span class="n">' + String(x.rank).padStart(2, '0') + '</span><div>' +
         '<span class="award" data-gp="' + gp + '">' + esc(x.award) + '</span>' +
         '<h4>' + esc(x.campaign) + '</h4>' +
-        '<div class="meta">' + esc(x.brand) + ' · ' + esc(x.agency) + '</div></div></a>';
+        '<div class="meta"><b>' + esc(x.brand) + '</b><span>' + esc(x.agency) + '</span></div></div></a>';
     }).join('');
 
     var live = (state.live && state.live.nordic) || [];
     $('#m-nordic-live').innerHTML = live.length
       ? live.slice(0, 8).map(function (x) {
           return '<a class="nordic-item" href="' + esc(x.url) + '" target="_blank" rel="noopener">' +
-            '<span class="mk" data-m="' + esc(x.market || '') + '">' + esc(x.market || '··') + '</span><div>' +
+            '<span class="mk" data-m="' + esc(x.market || '') + '">' + esc(x.market || '--') + '</span><div>' +
             '<h4>' + esc(x.title) + '</h4>' +
             '<div class="meta" style="font-size:12.5px;color:var(--ink-3)">' +
-            esc(x.source) + (x.ts ? ' · ' + esc(ago(x.ts)) : '') + '</div></div></a>';
+            '<b>' + esc(x.source) + '</b>' + (x.ts ? '<span>' + esc(ago(x.ts)) + '</span>' : '') + '</div></div></a>';
         }).join('')
       : '<p style="color:var(--ink-3);font-size:13px">Nothing new off the Nordic wire right now.</p>';
 
@@ -1077,7 +1079,7 @@ html{scroll-behavior:smooth}
         '<span class="mk" data-m="' + esc(x.market) + '">' + esc(x.market) + '</span><div>' +
         '<h4>' + esc(x.campaign) + '</h4>' +
         '<div class="meta" style="font-size:12.5px;color:var(--ink-3)">' +
-        esc(x.brand) + (x.agency ? ' · ' + esc(x.agency) : '') + '</div></div></a>';
+        '<b>' + esc(x.brand) + '</b>' + (x.agency ? '<span>' + esc(x.agency) + '</span>' : '') + '</div></div></a>';
     }).join('');
   }
 
@@ -1197,7 +1199,7 @@ html{scroll-behavior:smooth}
       '<p style="max-width:76ch;margin:0 0 10px">Articles the publisher marks as subscriber-only are dropped before they reach this page, ' +
       'checked per article rather than per masthead, so a paywalled title\'s open journalism still gets through. Where the same story ran in ' +
       'several outlets, the version you can actually read wins. Titles marked <span class="meter">Metered</span> allow a few free reads a month.</p>' +
-      '<p style="max-width:76ch;margin:0 0 10px">On the wire right now: ' + srcs.map(esc).join(' · ') + '.</p>' +
+      '<p style="max-width:76ch;margin:0 0 10px">On the wire right now: ' + srcs.map(esc).join(', ') + '.</p>' +
       '<p style="margin:0">Cannes Lions case films are indexed by <a href="https://www.lovetheworkmore.com" target="_blank" rel="noopener">lovetheworkmore.com</a>. ' +
       'Rankings in the right-hand rails were compiled ' + esc(c ? c.generated : '') + ' and are reviewed by hand.</p>';
   }
