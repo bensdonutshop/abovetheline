@@ -310,6 +310,39 @@ html{scroll-behavior:smooth}
   color:var(--ink-2); transition:.16s; flex:none}
 .arrow:hover{border-color:var(--ink); color:var(--ink); background:var(--sunk)}
 .arrow svg{width:13px; height:13px}
+/* ------------------------------------------------------ case film player
+   The iframe is only written when the film is opened, so nothing loads from
+   YouTube or Vimeo until somebody asks for it. */
+.playbtn{position:absolute; inset:0; display:grid; place-items:center; border:0; padding:0;
+  background:transparent; cursor:pointer; z-index:2}
+.playbtn span{width:54px; height:54px; border-radius:50%; display:grid; place-items:center;
+  background:rgba(0,0,0,.55); backdrop-filter:blur(3px); border:1.5px solid rgba(255,255,255,.75);
+  transition:transform .18s var(--ease), background .18s}
+.playbtn svg{width:19px; height:19px; margin-left:3px; fill:#fff}
+.card:hover .playbtn span{transform:scale(1.09); background:rgba(0,0,0,.72)}
+.playbtn:focus-visible span{outline:2px solid var(--flare); outline-offset:3px}
+
+.film{position:fixed; inset:0; z-index:120; display:none; padding:24px;
+  background:rgba(0,0,0,.82); backdrop-filter:blur(6px); overflow:auto}
+.film[data-open="1"]{display:grid; place-items:center}
+.film-box{width:min(1120px,100%); background:var(--surface); border:1px solid var(--rule);
+  border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow)}
+.film-frame{position:relative; aspect-ratio:16/9; background:#000}
+.film-frame iframe{position:absolute; inset:0; width:100%; height:100%; border:0}
+.film-meta{padding:16px 20px 20px; display:grid; gap:8px}
+.film-meta h3{margin:0; font-size:21px; line-height:1.18; letter-spacing:-.02em; font-weight:700}
+.film-meta .who{font-size:13px; color:var(--ink-3); text-transform:uppercase}
+.film-meta .who b{color:var(--ink-2); font-weight:600}
+.film-meta .who i{font-style:normal; text-transform:none}
+.film-meta p{margin:0; font-size:15px; line-height:1.5; color:var(--ink-2); font-weight:300; max-width:70ch}
+.film-meta .tags{display:flex; flex-wrap:wrap; gap:5px; margin-top:2px}
+.film-out{font-size:13px; color:var(--ink-3)}
+.film-out u{text-decoration-color:var(--flare)}
+.film-x{position:absolute; top:10px; right:10px; z-index:3; width:34px; height:34px; border-radius:50%;
+  background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.35); color:#fff; display:grid; place-items:center}
+.film-x:hover{background:rgba(0,0,0,.85)}
+.film-x svg{width:15px; height:15px}
+@media (max-width:700px){ .film{padding:0} .film-box{border-radius:0; border:0} }
 .vh{position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden;
   clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; border:0}
 .cyc-h a{display:inline; text-decoration:none}
@@ -658,6 +691,16 @@ html{scroll-behavior:smooth}
 </main>
 
 <footer class="foot" id="foot"></footer>
+<div class="film" id="film" role="dialog" aria-modal="true" aria-label="Case film" data-open="0">
+  <div class="film-box">
+    <div class="film-frame" id="film-frame">
+      <button class="film-x" id="film-x" aria-label="Close the film">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="film-meta" id="film-meta"></div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -822,14 +865,14 @@ html{scroll-behavior:smooth}
   // container that was hidden a moment earlier, and a lazy image parsed while
   // its container is hidden may never begin loading at all. Cards further down
   // stay lazy so a phone does not pull the whole gallery at once.
-  function cardShot(pic, fallbackLabel, ribbon, idx) {
+  function cardShot(pic, fallbackLabel, ribbon, idx, hasFilm) {
     var load = (idx == null || idx < 6) ? 'eager' : 'lazy';
     var inner = pic
       ? '<img src="' + esc(pic) + '" alt="" loading="' + load + '" decoding="async" ' +
         'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
         'data-fb="' + esc(tile(fallbackLabel) + (ribbon || '')) + '">'
       : tile(fallbackLabel);
-    return '<figure>' + inner + (ribbon || '') + '</figure>';
+    return '<figure>' + inner + (ribbon || '') + (hasFilm ? PLAY_ICON : '') + '</figure>';
   }
 
   /* ---------------------------------------------------- campaign pool */
@@ -1004,15 +1047,18 @@ html{scroll-behavior:smooth}
       if (a.access === 'metered') tags.push('<span class="tag plain">Metered</span>');
 
       var feat = idx === 0 && a.pic ? ' card--feature' : '';
+      var film = videoOf(a.url);
       var credit = a.brand
         ? '<b>' + esc(a.brand) + '</b>' + (a.agency ? '<i>' + esc(a.agency) + '</i>' : '')
         : '<b>' + esc(a.source) + '</b>' + (a.ts ? '<i>' + esc(ago(a.ts)) + '</i>' : '');
 
       return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
-        esc(a.url) + '" target="_blank" rel="noopener">' +
+        esc(a.url) + '" target="_blank" rel="noopener"' +
+        (film ? ' data-film="' + filmData({ url: a.url, title: a.title, brand: a.brand,
+          agency: a.agency, blurb: a.blurb, tags: tags.join('') }) + '"' : '') + '>' +
         cardShot(a.pic, a.brand || a.source,
           '<span class="onshot"><b>' + esc(a.brand || a.source) + '</b>' +
-          (a.ts ? esc(ago(a.ts)) : '') + '</span>', idx) +
+          (a.ts ? esc(ago(a.ts)) : '') + '</span>', idx, !!film) +
         '<h3>' + esc(a.title) + '</h3>' +
         (a.blurb ? '<p class="blurb">' + esc(a.blurb) + '</p>' : '') +
         '<div class="who">' + credit + '</div>' +
@@ -1086,9 +1132,12 @@ html{scroll-behavior:smooth}
       if (c.awards.length > 4) tags.push('<span class="tag plain">+' + (c.awards.length - 4) + '</span>');
 
       var feat = idx === 0 && c.thumb ? ' card--feature' : '';
+      var film = videoOf(c.url);
       return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
-        esc(c.url) + '" target="_blank" rel="noopener">' +
-        cardShot(c.thumb || '', c.brand, ribbon, idx) +
+        esc(c.url) + '" target="_blank" rel="noopener"' +
+        (film ? ' data-film="' + filmData({ url: c.url, title: c.campaign, brand: c.brand,
+          agency: c.agency, country: c.country, blurb: c.blurb, tags: tags.join('') }) + '"' : '') + '>' +
+        cardShot(c.thumb || '', c.brand, ribbon, idx, !!film) +
         '<h3>' + esc(c.campaign) + '</h3>' +
         '<div class="who"><b>' + esc(c.brand) + '</b>' + esc(c.agency) +
           (c.country ? '<i>' + esc(c.country) + '</i>' : '') + '</div>' +
@@ -1694,6 +1743,87 @@ html{scroll-behavior:smooth}
   }
 
 
+/* ------------------------------------------------------ case film player */
+  // 79% of the award cases point at YouTube or Vimeo, so most of the archive
+  // can play where it sits instead of throwing the reader out to a new tab.
+  function videoOf(url) {
+    if (!url) return null;
+    var y = String(url).match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/i);
+    if (y) return { host: 'youtube', id: y[1] };
+    var v = String(url).match(/vimeo\.com\/(?:video\/)?(\d{6,})/i);
+    if (v) return { host: 'vimeo', id: v[1] };
+    return null;
+  }
+
+  var PLAY_ICON = '<button class="playbtn" tabindex="-1" aria-hidden="true"><span>' +
+    '<svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span></button>';
+
+  var filmReturn = null;
+
+  function openFilm(d, returnTo) {
+    var v = videoOf(d.url);
+    if (!v) return false;
+    filmReturn = returnTo || null;
+    var src = v.host === 'youtube'
+      ? 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(v.id) + '?autoplay=1&rel=0'
+      : 'https://player.vimeo.com/video/' + encodeURIComponent(v.id) + '?autoplay=1';
+
+    var frame = $('#film-frame');
+    var old = frame.querySelector('iframe');
+    if (old) old.remove();
+    var f = document.createElement('iframe');
+    f.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+    f.setAttribute('allowfullscreen', '');
+    f.setAttribute('title', d.title || 'Case film');
+    f.src = src;
+    frame.appendChild(f);
+
+    var credit = '';
+    if (d.brand) credit += '<b>' + esc(d.brand) + '</b>';
+    if (d.agency) credit += '<i>' + esc(d.agency) + '</i>';
+    if (d.country) credit += '<i>' + esc(d.country) + '</i>';
+
+    $('#film-meta').innerHTML =
+      '<h3>' + esc(d.title || '') + '</h3>' +
+      (credit ? '<div class="who">' + credit + '</div>' : '') +
+      (d.blurb ? '<p>' + esc(d.blurb) + '</p>' : '') +
+      (d.tags ? '<div class="tags">' + d.tags + '</div>' : '') +
+      '<div class="film-out">Or <a href="' + esc(d.url) + '" target="_blank" rel="noopener">' +
+        '<u>watch it on ' + (v.host === 'youtube' ? 'YouTube' : 'Vimeo') + '</u>' +
+        '<span class="vh"> (opens in a new tab)</span></a></div>';
+
+    $('#film').dataset.open = '1';
+    document.body.style.overflow = 'hidden';
+    $('#film-x').focus();
+    return true;
+  }
+
+  function closeFilm() {
+    var film = $('#film');
+    if (film.dataset.open !== '1') return;
+    film.dataset.open = '0';
+    var f = film.querySelector('iframe');
+    if (f) f.remove();                       // stops playback
+    document.body.style.overflow = '';
+    if (filmReturn && document.contains(filmReturn)) filmReturn.focus();
+    filmReturn = null;
+  }
+
+  // One handler for the whole grid: any card carrying a film opens it here.
+  function wireFilms(host) {
+    host.addEventListener('click', function (ev) {
+      var card = ev.target.closest('.card[data-film]');
+      if (!card) return;
+      var d;
+      try { d = JSON.parse(card.dataset.film); } catch (e) { return; }
+      if (openFilm(d, card)) ev.preventDefault();
+    });
+  }
+
+  function filmData(o) {
+    return esc(JSON.stringify(o));
+  }
+
   /* ------------------------------------------------------------- url state
      Every view and filter lives in the query string, so a view can be shared,
      reloaded and walked back through. Filters replace the entry; changing view
@@ -1800,6 +1930,11 @@ html{scroll-behavior:smooth}
     renderView();
     swap(state.view === 'news' ? $('#feed') : $('#cards'));
   }
+
+  wireFilms($('#cards'));
+  $('#film-x').addEventListener('click', closeFilm);
+  $('#film').addEventListener('click', function (ev) { if (ev.target === $('#film')) closeFilm(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeFilm(); });
 
   readUrl();
   wireControls();
