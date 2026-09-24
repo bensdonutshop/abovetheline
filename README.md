@@ -105,9 +105,17 @@ searches plus the hand-checked list under **Landmark work**.
 
 ## Design system
 
-**Type.** Archivo for display (condensed, newsroom weight), Newsreader for body, DM Mono for
-labels, timestamps and counts. The serif is the *reading* face, not the display face, which is
-the inversion trade titles use and the reason the page reads as press rather than as a product.
+**The masthead.** "Above the line" is the industry's own term for bought media, the work
+everybody sees. So the mark says it: the wordmark sits above a solid orange rule. It is set in
+Bodoni Moda, a didone, which is the typographic language of creative and award press, and it
+is used *only* for the masthead so it never competes with the headlines. The front-page
+masthead scrolls away; the sticky bar below it carries the abbreviation, ATL, which is what
+the industry actually says out loud.
+
+**Type.** Bodoni Moda for the masthead, Archivo for display (condensed, newsroom weight),
+Newsreader for body, DM Mono for labels, timestamps and counts. The serif is the *reading*
+face, not the display face, which is the inversion trade titles use and the reason the page
+reads as press rather than as a product.
 
 **Colour.** Warm-grey paper rather than cream, a single accent (`#FF4D0F`, `#FF6B33` on dark),
 and neutrals biased warm throughout so nothing reads as a stock grey ramp. One accent, used

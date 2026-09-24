@@ -2,7 +2,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314110E'/%3E%3Crect x='6' y='12' width='20' height='3.4' rx='1.4' fill='%23FF4D0F'/%3E%3Crect x='6' y='18.5' width='13' height='3.4' rx='1.4' fill='%23F2EEE8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700;6..96,800&family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=DM+Mono:wght@400;500&display=swap">
 
 <style>
 /* ============================================================ tokens */
@@ -12,8 +12,10 @@
   --rule:#D9D3C9; --rule-soft:#E6E1D8;
   --flare:#FF4D0F; --flare-ink:#FFFFFF; --flare-wash:rgba(255,77,15,.10);
   --shadow:0 1px 2px rgba(22,19,15,.05), 0 8px 24px -14px rgba(22,19,15,.22);
+  --wash:rgba(255,77,15,.07);
 
   --display:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --masthead:"Bodoni Moda","Bodoni 72",Didot,"Times New Roman",serif;
   --narrow:"Archivo Narrow","Archivo","Helvetica Neue",Arial,sans-serif;
   --body:"Newsreader",Georgia,"Times New Roman",serif;
   --mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -38,6 +40,7 @@
   --rule:#2E2925; --rule-soft:#241F1B;
   --flare:#FF6B33; --flare-ink:#1A0B03; --flare-wash:rgba(255,107,51,.13);
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.8);
+  --wash:rgba(255,107,51,.10);
 }}
 :root[data-theme="dark"]{
   color-scheme:dark;
@@ -46,6 +49,7 @@
   --rule:#2E2925; --rule-soft:#241F1B;
   --flare:#FF6B33; --flare-ink:#1A0B03; --flare-wash:rgba(255,107,51,.13);
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.8);
+  --wash:rgba(255,107,51,.10);
 }
 
 *{box-sizing:border-box}
@@ -81,6 +85,56 @@ html{scroll-behavior:smooth}
 .tab:active, .chip:active, .refresh:active, .more:active,
 .unsorted:active, .arrow:active{transform:translateY(1px)}
 .card:active figure{transform:scale(.995)}
+
+/* ============================================================ front-page masthead */
+.masthead{
+  border-bottom:1px solid var(--rule);
+  background:
+    radial-gradient(120% 140% at 50% 0%, var(--wash) 0%, transparent 62%),
+    var(--paper);
+}
+.masthead-in{
+  max-width:var(--max); margin:0 auto; padding:34px var(--gutter) 22px;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
+}
+.atl-rule{
+  display:block; width:100%; height:6px; background:var(--flare);
+  border-radius:2px; margin-top:18px;
+}
+.logo{
+  margin:0; font-family:var(--masthead); font-weight:800;
+  font-size:clamp(34px, 8.6vw, 112px); line-height:.86; letter-spacing:-.024em;
+  font-variation-settings:"opsz" 96;
+  text-transform:uppercase; white-space:nowrap;
+}
+.dateline{
+  margin:12px 0 0; display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+}
+.dateline b{font-weight:400; color:var(--ink-2)}
+.dateline span, .dateline b{position:relative}
+.dateline b::before{
+  content:""; position:absolute; left:-8px; top:50%; width:1px; height:11px;
+  background:var(--rule); transform:translateY(-50%);
+}
+@media (max-width:700px){
+  .masthead-in{padding:22px var(--gutter) 16px}
+  .atl-rule{height:4px; margin-top:12px}
+  .dateline{gap:4px; font-size:9.5px; flex-direction:column; line-height:1.7}
+  /* the hairline divider only makes sense on one line */
+  .dateline b::before{display:none}
+  /* the dateline above already carries freshness, so the sticky bar drops a row */
+  .mast .status{display:none}
+}
+
+/* The abbreviation is the industry term, so the sticky bar can use it alone. */
+.monogram{display:flex; align-items:center; gap:8px; margin-right:auto; padding:12px 0}
+.monogram .rule-dash{width:18px; height:3px; background:var(--flare); border-radius:2px}
+.monogram b{
+  font-family:var(--display); font-weight:800; font-stretch:82%; font-size:17px;
+  letter-spacing:.04em; line-height:1;
+}
+.monogram:hover b{color:var(--flare)}
 
 /* ============================================================ masthead */
 .mast{
@@ -258,6 +312,24 @@ html{scroll-behavior:smooth}
 
 /* The first card carries the section. Breaking the uniform grid is the whole
    difference between a gallery and a wall of equal rectangles. */
+/* Campaigns is looked at before it is read, so the picture leads and the
+   chrome gets out of the way. The source only surfaces on hover. */
+.shell[data-view="campaigns"] .cards{grid-template-columns:repeat(auto-fill,minmax(288px,1fr)); gap:30px 22px}
+.shell[data-view="campaigns"] .card figure{aspect-ratio:4/3}
+.shell[data-view="campaigns"] .card .blurb{-webkit-line-clamp:2; line-clamp:2}
+.shell[data-view="campaigns"] .card figure::after{
+  content:""; position:absolute; inset:0; opacity:0; transition:opacity .3s var(--ease);
+  background:linear-gradient(to top, rgba(10,8,6,.72) 0%, rgba(10,8,6,.15) 42%, transparent 70%);
+}
+.shell[data-view="campaigns"] .card:hover figure::after{opacity:1}
+.shell[data-view="campaigns"] .card .onshot{
+  position:absolute; left:12px; right:12px; bottom:11px; z-index:2;
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:#fff; opacity:0; transform:translateY(6px);
+  transition:opacity .3s var(--ease), transform .3s var(--ease);
+}
+.shell[data-view="campaigns"] .card:hover .onshot{opacity:1; transform:none}
+
 @media (min-width:920px){
   .card--feature{grid-column:span 2}
   .card--feature figure{aspect-ratio:16/9}
@@ -413,13 +485,23 @@ html{scroll-behavior:smooth}
 </style>
 
 <a class="skip" href="#feed-title">Skip to the stories</a>
+
+<header class="masthead" id="top">
+  <div class="masthead-in">
+    <!-- The wordmark sits above the rule, because that is literally what the
+         name means. Above the line: the bought media, the work everybody sees. -->
+    <h1 class="logo">Above the Line</h1>
+    <span class="atl-rule" aria-hidden="true"></span>
+    <p class="dateline"><span id="dateline-date"></span><b id="dateline-wire">The advertising wire</b></p>
+  </div>
+</header>
+
 <header class="mast">
   <div class="mast-in">
-    <div class="wordmark">
-      <span class="rule-dash"></span>
-      <b>Above the Line</b>
-      <i>Campaign desk</i>
-    </div>
+    <a class="monogram" href="#top" aria-label="Above the Line, back to top">
+      <span class="rule-dash" aria-hidden="true"></span>
+      <b>ATL</b>
+    </a>
     <div class="tabs views" role="tablist" aria-label="View"><span class="glider" aria-hidden="true"></span>
       <button class="tab" role="tab" id="view-news" aria-selected="true">News</button>
       <button class="tab" role="tab" id="view-campaigns" aria-selected="false">Campaigns</button>
@@ -607,8 +689,19 @@ html{scroll-behavior:smooth}
 
   // Campaign work, shown as something you scan rather than read.
   function renderCampaigns() {
-    var list = ((state.live && state.live[state.region]) || [])
-      .filter(function (a) { return a.kind === 'work'; });
+    // Campaigns is a gallery, not a wire. Global means every campaign we found,
+    // not just the stories that happened to sort into the global bucket.
+    var d = state.live || {};
+    var pool = state.region === 'europe'
+      ? (d.europe || [])
+      : [].concat(d.global || [], d.europe || [], d.nordic || []);
+    var seenUrl = {};
+    var list = pool.filter(function (a) {
+      if (a.kind !== 'work') return false;
+      if (seenUrl[a.url]) return false;
+      seenUrl[a.url] = 1;
+      return true;
+    });
     if (state.sector) list = list.filter(function (a) { return a.sector === state.sector; });
     if (state.channel) list = list.filter(function (a) { return a.channel === state.channel; });
 
@@ -632,7 +725,8 @@ html{scroll-behavior:smooth}
       var feat = idx === 0 && picture(a) ? ' card--feature' : '';
       return '<a class="card' + feat + '" style="--i:' + Math.min(idx, 14) + '" href="' +
         esc(a.url) + '" target="_blank" rel="noopener">' +
-        cardShot(picture(a), a.source, '', idx) +
+        cardShot(picture(a), a.source,
+          '<span class="onshot">' + esc(a.source) + (a.ts ? ' \u00b7 ' + esc(ago(a.ts)) : '') + '</span>', idx) +
         '<h3>' + esc(a.title) + '</h3>' +
         (a.summary ? '<p class="blurb">' + esc(a.summary) + '</p>' : '') +
         '<div class="who">' + esc(a.source) + (a.ts ? ' \u00b7 ' + esc(ago(a.ts)) : '') + '</div>' +
@@ -790,7 +884,15 @@ html{scroll-behavior:smooth}
 
     // Campaigns is already only work, so the kind switch would be a no-op there.
     if (state.view === 'campaigns') {
-      var work = list.filter(function (a) { return a.kind === 'work'; });
+      var cd = state.live || {};
+      var cpool = state.region === 'europe'
+        ? (cd.europe || [])
+        : [].concat(cd.global || [], cd.europe || [], cd.nordic || []);
+      var cseen = {};
+      var work = cpool.filter(function (a) {
+        if (a.kind !== 'work' || cseen[a.url]) return false;
+        cseen[a.url] = 1; return true;
+      });
       var f2 = (state.live.facets) || { sectors: [], channels: [] };
       var h2 = '';
       var secs2 = f2.sectors.filter(function (x) { return countBy(work, 'sector', x); });
@@ -1073,6 +1175,19 @@ html{scroll-behavior:smooth}
     t._t = setTimeout(function () { t.dataset.show = '0'; }, 3200);
   }
 
+  function setDateline() {
+    var d = new Date();
+    var el = $('#dateline-date');
+    if (el) el.textContent = d.toLocaleDateString(undefined,
+      { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    var w = $('#dateline-wire');
+    if (w && state.live) {
+      var n = (state.live.sources || []).length;
+      var when = ago(Date.parse(state.live.generatedAt));
+      w.textContent = n + ' titles on the wire, updated ' + when;
+    }
+  }
+
   function setStatus() {
     var d = state.live;
     if (!d) { $('#status').textContent = 'Offline'; return; }
@@ -1118,7 +1233,7 @@ html{scroll-behavior:smooth}
       var changed = state.stamp && d.generatedAt !== state.stamp;
       state.live = d;
       state.stamp = d.generatedAt;
-      renderView(); renderRails(); setStatus(); renderFooter();
+      renderView(); renderRails(); setStatus(); setDateline(); renderFooter();
       if (changed && announce) toast('Wire updated');
       return true;
     } catch (e) {
@@ -1214,6 +1329,7 @@ html{scroll-behavior:smooth}
   }
 
   wireControls();
+  setDateline();
 
   // Re-render when the layout crosses the phone breakpoint so the cap matches the column count.
   var mq = window.matchMedia('(max-width:860px)');
