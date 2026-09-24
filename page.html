@@ -503,11 +503,14 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
   /* ------------------------------------------------------------- cards */
   var TOP_AWARDS = /grand prix|black pencil|grand clio|titanium|grand prix for good/i;
 
-  function cardShot(pic, fallbackLabel, ribbon) {
-    // No lazy loading here: the card views swap in and out of a hidden
-    // container, and a lazy image parsed while hidden never starts loading.
+  // `eager` matters for the cards above the fold: these views render into a
+  // container that was hidden a moment earlier, and a lazy image parsed while
+  // its container is hidden may never begin loading at all. Cards further down
+  // stay lazy so a phone does not pull the whole gallery at once.
+  function cardShot(pic, fallbackLabel, ribbon, idx) {
+    var load = (idx == null || idx < 6) ? 'eager' : 'lazy';
     var inner = pic
-      ? '<img src="' + esc(pic) + '" alt="" decoding="async" ' +
+      ? '<img src="' + esc(pic) + '" alt="" loading="' + load + '" decoding="async" ' +
         'onerror="this.parentNode.innerHTML=this.getAttribute(\'data-fb\')" ' +
         'data-fb="' + esc(tile(fallbackLabel) + (ribbon || '')) + '">'
       : tile(fallbackLabel);
@@ -533,13 +536,13 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       return;
     }
 
-    host.innerHTML = '<div class="cards">' + list.map(function (a) {
+    host.innerHTML = '<div class="cards">' + list.map(function (a, idx) {
       var tags = [];
       if (a.sector) tags.push('<span class="tag">' + esc(a.sector) + '</span>');
       if (a.channel) tags.push('<span class="tag">' + esc(a.channel) + '</span>');
       if (a.access === 'metered') tags.push('<span class="tag plain">Metered</span>');
       return '<a class="card" href="' + esc(a.url) + '" target="_blank" rel="noopener">' +
-        cardShot(picture(a), a.source, '') +
+        cardShot(picture(a), a.source, '', idx) +
         '<h3>' + esc(a.title) + '</h3>' +
         (a.summary ? '<p class="blurb">' + esc(a.summary) + '</p>' : '') +
         '<div class="who">' + esc(a.source) + (a.ts ? ' \u00b7 ' + esc(ago(a.ts)) : '') + '</div>' +
@@ -574,7 +577,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
     var host = $('#cards');
     if (!cases.length) { host.innerHTML = '<p class="empty">No cases from that show yet.</p>'; return; }
 
-    host.innerHTML = '<div class="cards">' + cases.map(function (c) {
+    host.innerHTML = '<div class="cards">' + cases.map(function (c, idx) {
       var shows = [];
       c.awards.forEach(function (a) { if (shows.indexOf(a.show) < 0) shows.push(a.show); });
       var ribbon = '<div class="ribbon">' + shows.slice(0, 3).map(function (sh) {
@@ -589,7 +592,7 @@ button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
       if (c.awards.length > 4) tags.push('<span class="tag plain">+' + (c.awards.length - 4) + '</span>');
 
       return '<a class="card" href="' + esc(c.url) + '" target="_blank" rel="noopener">' +
-        cardShot(c.thumb || '', c.brand, ribbon) +
+        cardShot(c.thumb || '', c.brand, ribbon, idx) +
         '<h3>' + esc(c.campaign) + '</h3>' +
         '<div class="who">' + esc(c.brand) + ' \u00b7 ' + esc(c.agency) +
           (c.country ? ' \u00b7 ' + esc(c.country) : '') + '</div>' +
