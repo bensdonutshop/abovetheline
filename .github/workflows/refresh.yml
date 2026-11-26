@@ -4,7 +4,7 @@ on:
   schedule:
     # Every 15 minutes. GitHub queues scheduled runs, so treat this as "about
     # every 15-20 minutes" rather than exact.
-    - cron: '*/15 * * * *'
+    - cron: '11-59/15 * * * *'
   workflow_dispatch:        # lets you trigger a pull by hand from the Actions tab
   push:
     branches: [main]

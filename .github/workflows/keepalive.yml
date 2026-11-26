@@ -1,0 +1,48 @@
+name: Keep the schedule alive
+
+# GitHub switches off scheduled workflows in a public repository after 60 days
+# with no repository activity. The refresh workflow deploys Pages but never
+# commits, so the repo read as idle and the schedule died on day 60.
+#
+# This runs on the 1st of each month and nudges the minute offset on the
+# refresh cron, which is both repository activity and — per GitHub's own docs —
+# the specific change that reactivates a deactivated schedule.
+
+on:
+  schedule:
+    - cron: '23 5 1 * *'    # 05:23 UTC on the 1st, well inside the 60 days
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Rotate the refresh cron offset
+        run: node keepalive.js
+
+      - name: Commit it
+        run: |
+          if git diff --quiet; then
+            echo "nothing changed this run"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/refresh.yml
+          git commit -m "Keepalive: move the refresh cron offset
+
+          Keeps the schedule inside GitHub's 60-day inactivity window."
+          git push
