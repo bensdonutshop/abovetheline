@@ -919,7 +919,7 @@ html{scroll-behavior:smooth}
     return {
       title: c.campaign, url: c.url, pic: c.thumb || '', brand: c.brand || '',
       agency: c.agency || '', source: Object.keys(shows)[0], ts: monthTs(c.date),
-      sector: c.sector || '', channel: '', access: 'open', outlets: 1,
+      sector: c.sector || '', channel: c.channel || '', access: 'open', outlets: 1,
       awardCount: c.awards.length, showCount: Object.keys(shows).length,
       curated: 0, origin: 'award', blurb: c.blurb || ''
     };
@@ -937,7 +937,7 @@ html{scroll-behavior:smooth}
     return {
       title: x.campaign, url: x.url, pic: x.thumb || '', brand: x.brand || '',
       agency: x.agency || '', source: x.source || '', ts: monthTs(x.date),
-      sector: x.sector || '', channel: '', access: 'open', outlets: 1, awardCount: 0,
+      sector: x.sector || '', channel: x.channel || '', access: 'open', outlets: 1, awardCount: 0,
       showCount: 0, curated: 11 - (x.rank || 10), origin: 'curated',
       blurb: x.note || x.blurb || ''
     };
@@ -1027,7 +1027,7 @@ html{scroll-behavior:smooth}
   function renderCampaigns() {
     var list = campaignPool();
     if (state.sector) list = list.filter(function (a) { return a.sector === state.sector; });
-    if (state.channel) list = list.filter(function (a) { return a.channel === state.channel; });
+    if (state.channel) list = list.filter(matchesChannel);
 
     list = list.slice().sort(function (x, y) {
       if (state.sort === 'recent' && y.ts !== x.ts) return y.ts - x.ts;
@@ -1072,8 +1072,8 @@ html{scroll-behavior:smooth}
     var lens = state.sort === 'recent' ? 'Most recent work' : 'Trending this year';
     $('#feed-title').textContent = (state.region === 'europe' ? 'European campaigns. ' : '') + lens +
       (state.sector ? ', ' + state.sector.toLowerCase() : '') +
-      (state.channel ? ', ' + state.channel.toLowerCase() : '');
-    $('#feed-note').textContent = list.length + ' campaigns';
+      (state.channel ? ', ' + (state.channel === UNTAGGED ? 'medium untagged' : state.channel.toLowerCase()) : '');
+    $('#feed-note').textContent = list.length + (list.length === 1 ? ' campaign' : ' campaigns');
   }
 
   // Award-winning cases, tagged with where they won and why.
@@ -1193,16 +1193,19 @@ html{scroll-behavior:smooth}
   }
 
   /* ----------------------------------------------------------- filters */
-  // The Media filter hides itself until the tagging can carry it. Coverage sat
-  // at 11 of 262 campaigns, so every choice but one came back empty, which
-  // reads as a broken site rather than a thin field. Raise the tagging and the
-  // control comes back on its own.
-  var CHANNEL_MIN_COVERAGE = 0.8;
-  function channelCovered(list) {
-    if (!list || !list.length) return false;
-    var n = 0;
-    for (var i = 0; i < list.length; i++) if (list[i].channel) n++;
-    return n / list.length >= CHANNEL_MIN_COVERAGE;
+  // The medium is known for the wire campaigns and for the cases whose jury
+  // filed them under a Lion that names one. It is not known for the rest, and
+  // the award index carries no medium to read, so that bucket is shown as
+  // Untagged rather than hidden or guessed at.
+  var UNTAGGED = '__none';
+  function matchesChannel(a) {
+    if (!state.channel) return true;
+    return state.channel === UNTAGGED ? !a.channel : a.channel === state.channel;
+  }
+  function countChannel(list, val) {
+    return list.filter(function (a) {
+      return val === UNTAGGED ? !a.channel : a.channel === val;
+    }).length;
   }
 
   var KIND_LABEL = { work: 'Campaign work', industry: 'Agency business',
@@ -1213,7 +1216,7 @@ html{scroll-behavior:smooth}
     if (state.kind && a.kind !== state.kind) return false;
     if (state.kind === 'work') {
       if (state.sector && a.sector !== state.sector) return false;
-      if (state.channel && a.channel !== state.channel) return false;
+      if (!matchesChannel(a)) return false;
     }
     return true;
   }
@@ -1224,7 +1227,7 @@ html{scroll-behavior:smooth}
     if (state.kind && !a.kind) return true;
     if (state.kind && a.kind === state.kind) {
       if (state.sector && !a.sector) return true;
-      if (state.channel && !a.channel) return true;
+      if (state.channel && state.channel !== UNTAGGED && !a.channel) return true;
     }
     return false;
   }
@@ -1237,10 +1240,6 @@ html{scroll-behavior:smooth}
     return '<button class="chip' + (isKey ? ' key' : '') + '" aria-pressed="' + (active ? 'true' : 'false') +
       '" data-key="' + key + '" data-val="' + esc(val) + '">' + esc(label) +
       (count != null ? '<i>' + count + '</i>' : '') + '</button>';
-  }
-
-  function clearHiddenChannel(list) {
-    if (state.channel && !channelCovered(list)) state.channel = '';
   }
 
   function renderFilters() {
@@ -1308,13 +1307,17 @@ html{scroll-behavior:smooth}
           secs2.map(function (x) { return chip(x, state.sector === x, 'sector', x, cnt('sector', x)); }).join('') +
           '</div>';
       }
-      clearHiddenChannel(pool);
-      var ch2 = channelCovered(pool)
-        ? f2.channels.filter(function (x) { return cnt('channel', x); }) : [];
+      // Built from the pool, not the wire facets: Design, PR and Gaming only
+      // ever arrive on award cases and would be missing otherwise.
+      var ch2 = [];
+      pool.forEach(function (a) { if (a.channel && ch2.indexOf(a.channel) < 0) ch2.push(a.channel); });
+      ch2.sort(function (a, b) { return countChannel(pool, b) - countChannel(pool, a); });
       if (ch2.length) {
+        var untagged2 = countChannel(pool, UNTAGGED);
         h2 += '<div class="fgroup"><span class="flabel">Media</span>' +
-          chip('All', !state.channel, 'channel', '', null) +
-          ch2.map(function (x) { return chip(x, state.channel === x, 'channel', x, cnt('channel', x)); }).join('') +
+          chip('All', !state.channel, 'channel', '', pool.length) +
+          ch2.map(function (x) { return chip(x, state.channel === x, 'channel', x, countChannel(pool, x)); }).join('') +
+          (untagged2 ? chip('Untagged', state.channel === UNTAGGED, 'channel', UNTAGGED, untagged2) : '') +
           '</div>';
       }
       host.innerHTML = h2;
@@ -1342,15 +1345,16 @@ html{scroll-behavior:smooth}
           }).join('') + '</div>';
       }
 
-      clearHiddenChannel(work);
-      var chans = channelCovered(work)
-        ? facets.channels.filter(function (x) { return countBy(work, 'channel', x); }) : [];
+      var chans = facets.channels.filter(function (x) { return countChannel(work, x); });
       if (chans.length) {
+        var untagged = countChannel(work, UNTAGGED);
         html += '<div class="fgroup"><span class="flabel">Media</span>' +
-          chip('All', !state.channel, 'channel', '', null) +
+          chip('All', !state.channel, 'channel', '', work.length) +
           chans.map(function (x) {
-            return chip(x, state.channel === x, 'channel', x, countBy(work, 'channel', x));
-          }).join('') + '</div>';
+            return chip(x, state.channel === x, 'channel', x, countChannel(work, x));
+          }).join('') +
+          (untagged ? chip('Untagged', state.channel === UNTAGGED, 'channel', UNTAGGED, untagged) : '') +
+          '</div>';
       }
     }
 
@@ -1458,7 +1462,7 @@ html{scroll-behavior:smooth}
     var bits = [];
     if (state.kind) bits.push(KIND_LABEL[state.kind]);
     if (state.sector) bits.push(state.sector);
-    if (state.channel) bits.push(state.channel);
+    if (state.channel) bits.push(state.channel === UNTAGGED ? 'Untagged' : state.channel);
     $('#feed-title').textContent = bits.length ? scope + ': ' + bits.join(', ').toLowerCase() : scope + ' this week';
     $('#feed-note').textContent = list.length + ' of ' + full.length + ' stories';
     $('#feed').setAttribute('aria-labelledby', 'tab-' + state.region);

@@ -17,7 +17,7 @@ const path = require('path');
 const { get } = require('./lib/fetch');
 const P = require('./lib/parse');
 const { placeOf } = require('./lib/places');
-const { sectorOf } = require('./lib/classify');
+const { sectorOf, channelOf, channelFromAwards } = require('./lib/classify');
 
 const SRC_URL = 'https://lovetheworkmore.com/2026-2/';
 const CANNES_YEAR = 2026;                 // the index page this is scraped from
@@ -183,13 +183,26 @@ function cleanCategory(c) {
     if (best) c.date = best;
   });
 
+  // The medium. Where a jury filed the case under a category that names one,
+  // that wins; otherwise read it out of the campaign name, blurb and brand.
+  out.forEach(c => {
+    c.channel = channelFromAwards(c.awards)
+      || channelOf(c.campaign, [c.campaign, c.blurb || '', c.brand, c.agency].join(' '), 2)
+      || '';
+  });
+
   const sectors = [];
   out.forEach(c => { if (c.sector && sectors.indexOf(c.sector) < 0) sectors.push(c.sector); });
   sectors.sort();
 
+  const channels = [];
+  out.forEach(c => { if (c.channel && channels.indexOf(c.channel) < 0) channels.push(c.channel); });
+  channels.sort();
+
   const doc = {
     generated: new Date().toISOString().slice(0, 10),
     sectors: sectors,
+    channels: channels,
     note: 'Cannes Lions winners indexed by lovetheworkmore.com, with D&AD, Clio and Eurobest recognition researched separately and merged in.',
     shows,
     levels: WANT,
